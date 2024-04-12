@@ -95,7 +95,6 @@ export class Player extends Physics.Arcade.Sprite{
         let attack = new Beam(pointer, scene, this.x, this.y, angle, "laser");
         scene.attacks.push(attack);
       }
-      
     });
   }
 

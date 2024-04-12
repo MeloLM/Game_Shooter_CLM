@@ -9,30 +9,35 @@ import { RedBottle } from "./Scene/RedBottle.js";
 import { YellowBottle } from "./Scene/YellowBottle.js";
 import { BlueBottle } from "./Scene/BlueBottle.js";
 import { Shield } from "./Scene/Shield.js";
+import { GreenBottle } from "./Scene/GreenBottle.js";
+import { PurpleBottle } from "./Scene/PurpleBottle.js";
+import { Thunder } from "./Scene/Thunder.js";
 
 export class Level extends Scene{
   startAnimation;
 	targetPosStartAnimation = 64;
 	door;
   player;
-  bottleList = [
-    (x, y) => new RedBottle (this, x, y),
-    (x, y) => new YellowBottle(this, x, y),
-    (x, y) => new BlueBottle(this, x, y),
-  ];
-  bottles = [];
   enemiesList = [
     (x, y) => new Slime(this, x, y),
     (x, y) => new Goblin(this, x, y),
     (x, y) => new Fly(this, x, y ),
   ];
   enemies = [];
+  bottleList = [
+    (x, y) => new RedBottle (this, x, y),
+    (x, y) => new YellowBottle(this, x, y),
+    (x, y) => new BlueBottle(this, x, y),
+    (x, y) => new GreenBottle(this, x, y),
+    (x, y) => new PurpleBottle(this, x, y, this.enemies),
+
+  ];
+  bottles = [];
   attacks = [];
   immunity = false;
   immuneDuration = 7000;
   lastCollisionTime = 0;
   shield;
-  
 
   //serve per inizializzare i dati del livello
   init() {
@@ -52,11 +57,14 @@ export class Level extends Scene{
     this.load.spritesheet("slime", "assets/enemy/slime.png", {frameWidth: 16, frameHeight: 16});
     this.load.spritesheet("sword", "assets/player/sword.png", {frameWidth: 16, frameHeight: 16});
     this.load.spritesheet("laser", "assets/player/laser.png", {frameWidth: 16, frameHeight: 16});    
-    this.load.spritesheet("death", "assets/enemy/explosion-6.png", {frameWidth: 48, frameHeight: 48});
     this.load.spritesheet("potion", "assets/potions/red_potion.png", {frameWidth: 16, frameHeight: 16});
     this.load.spritesheet("yellow_potion", "assets/potions/yellow_potion.png", {frameWidth: 16, frameHeight: 16});
     this.load.spritesheet("blue_potion", "assets/potions/azure_potion.png", {frameWidth: 16, frameHeight: 16});
-    this.load.spritesheet("shield1", "assets/player/shield1.png", {frameWidth: 48, frameHeight: 48});
+    this.load.spritesheet("green_potion", "assets/potions/green_potion.png", {frameWidth: 16, frameHeight: 16});
+    this.load.spritesheet("purple_potion", "assets/potions/purple_potion.png", {frameWidth: 16, frameHeight: 16});
+    this.load.spritesheet("death", "assets/enemy/explosion-6.png", {frameWidth: 48, frameHeight: 48});
+    this.load.spritesheet("thunder", "assets/enemy/electro_ray.png", {frameWidth: 64, frameHeight: 64});
+    this.load.spritesheet("shield1", "assets/player/shield1.png", {frameWidth: 64, frameHeight: 64});
 
     this.load.spritesheet("door", "assets/door.png", { frameWidth: 32, frameHeight: 32 })
     this.load.tilemapTiledJSON("tilemap", "assets/Map.json")
@@ -83,7 +91,7 @@ export class Level extends Scene{
     this.shield.play("shield")
 
     this.time.addEvent({
-      delay: 5000,
+      delay: 2000,
       loop: true,
       callback : () => {
         let randomIndex = Math.Between(0, this.bottleList.length - 1);
@@ -142,9 +150,9 @@ export class Level extends Scene{
       }
     });
 
-    // if(this.immunity && this.time.now > this.lastCollisionTime + this.immuneDuration){
-    //   this.immunity = false; // Scaduta l'animazione toglie l'immunità
-    // }
+    if(this.immunity && this.time.now > this.lastCollisionTime + this.immuneDuration){
+      this.immunity = false; // Scaduta l'animazione toglie l'immunità
+    }
 
     this.physics.collide(this.player, this.bottles, (player, bottle) => {
       //Gestisce la bottiglia presa
@@ -154,13 +162,31 @@ export class Level extends Scene{
       } else if (bottle instanceof RedBottle) {   // Se la bottiglia è rossa, cura il giocatore
         player.power = false;
         player.heal();
+
+      } else if (bottle instanceof GreenBottle) { // Se la bottliglia è verde aumenta la velocità del giocatore        
+        this.player.speed += 100;                
+         this.time.delayedCall(4000, () => {
+            this.player.speed -= 100;
+            console.log("Velocità ridotta dopo 5 secondi");
+        });
       } else if (bottle instanceof BlueBottle) { // Se la bottiglie è blu, fornisce immunità
         player.power = false;
         if(!this.immunity){
           this.immunity = true;
           this.lastCollisionTime = this.time.now;
+          this.shield = new Shield(this, player.x, player.y, "shield1");          
         }
         console.log("Effetto blue potion")
+      } else if (bottle instanceof PurpleBottle) {   // Se la bottiglia è rossa, cura il giocatore
+        player.power = false;
+        this.enemies.forEach((enemy) => {
+          new Thunder(this, enemy.x, enemy.y);
+          enemy.die("thunder");
+        });
+
+        console.log("Hai ucciso :" , this.enemies);
+        console.log("Destroy All");
+
       } else {  // Se la bottiglia non è riconosciuta, stampa un messaggio di errore
         console.log("Bottiglia non riconosciuta");
       }
@@ -171,7 +197,9 @@ export class Level extends Scene{
       console.log(player.currentHP);
     });
 
-    // this.shield.setPosition(this.player.x, this.player.y - 20);
+    if(this.shield) {
+      this.shield.updatePosition(this.player.x, this.player.y);
+    };
 
     this.physics.collide(this.player, this.enemies, (player, enemy)=>{
       if(this.immunity == false){
