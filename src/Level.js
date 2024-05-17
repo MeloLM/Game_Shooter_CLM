@@ -1,4 +1,4 @@
-import { Scene, Math } from "phaser";
+import { Scene, Math, Text } from "phaser";
 import { Player } from "./Scene/Player.js";
 import { Fly } from "./Enemies/Fly.js";
 import { Goblin } from "./Enemies/Goblin.js";
@@ -30,7 +30,6 @@ export class Level extends Scene{
     (x, y) => new BlueBottle(this, x, y),
     (x, y) => new GreenBottle(this, x, y),
     (x, y) => new PurpleBottle(this, x, y, this.enemies),
-
   ];
   bottles = [];
   attacks = [];
@@ -38,6 +37,8 @@ export class Level extends Scene{
   immuneDuration = 7000;
   lastCollisionTime = 0;
   shield;
+  scoreText = " ";
+  enemyCounter = 0;
 
   //serve per inizializzare i dati del livello
   init() {
@@ -80,6 +81,13 @@ export class Level extends Scene{
 		wallLayer.setCollisionBetween(1, wallLayer.tilesTotal);
 		this.map.createLayer("Decorations", "shooter");
 
+    this.enemyCounter >= 0;
+    let centerX = this.cameras.main.centerX;
+    let topY = 35;
+    this.scoreText = this.add.text(centerX, topY, "You killed: "+ this.enemyCounter , { fontFamily: 'Arial', fontSize: 20, color: 'white' });
+    this.scoreText.setOrigin(0.5, 0);
+    this.scoreText.setDepth(wallLayer.depth + 1);            
+
     this.player = new Player(this, 320, 0, "player_idle");
     this.player.setOrigin(0.5, 0.5);
     this.player.setBodySize(8 , 10);
@@ -108,8 +116,8 @@ export class Level extends Scene{
       }
     });
 
-    this.time.addEvent({
-      delay: 200,
+    this.time.addEvent({      
+      delay: 200,              
       loop: true,
       callback: () => {
         let x = Math.Between(0, 640);
@@ -118,9 +126,8 @@ export class Level extends Scene{
 					let enemy = this.enemiesList[Math.Between(0, this.enemiesList.length - 1)](x,y)
 					this.enemies = [...this.enemies, enemy];
 				}
-      },
+      },      
     });
-
 
     this.physics.add.collider(this.player, wallLayer);
 		this.physics.add.collider(this.player, this.door);
@@ -154,6 +161,7 @@ export class Level extends Scene{
       this.immunity = false; // Scaduta l'animazione toglie l'immunità
     }
 
+    // Power Up Bottle Logic
     this.physics.collide(this.player, this.bottles, (player, bottle) => {
       //Gestisce la bottiglia presa
       if (bottle instanceof YellowBottle) { // Se la bottiglia è gialla , cambia arma
@@ -162,31 +170,27 @@ export class Level extends Scene{
       } else if (bottle instanceof RedBottle) {   // Se la bottiglia è rossa, cura il giocatore
         player.power = false;
         player.heal();
-
       } else if (bottle instanceof GreenBottle) { // Se la bottliglia è verde aumenta la velocità del giocatore        
         this.player.speed += 100;                
          this.time.delayedCall(4000, () => {
             this.player.speed -= 100;
             console.log("Velocità ridotta dopo 5 secondi");
         });
-      } else if (bottle instanceof BlueBottle) { // Se la bottiglie è blu, fornisce immunità
-        player.power = false;
+      } else if (bottle instanceof BlueBottle) { // Se la bottiglie è blu, fornisce immunità        
         if(!this.immunity){
           this.immunity = true;
           this.lastCollisionTime = this.time.now;
           this.shield = new Shield(this, player.x, player.y, "shield1");          
         }
-        console.log("Effetto blue potion")
-      } else if (bottle instanceof PurpleBottle) {   // Se la bottiglia è rossa, cura il giocatore
-        player.power = false;
+        console.log("Immunity")
+      } else if (bottle instanceof PurpleBottle) {   // Se la bottiglia è rossa, cura il giocatore        
         this.enemies.forEach((enemy) => {
           new Thunder(this, enemy.x, enemy.y);
           enemy.die("thunder");
+          this.enemyCounter++;
+          this.scoreText.setText('You killed: ' + this.enemyCounter , {fontSize: 20, color: 'white'});
         });
-
-        console.log("Hai ucciso :" , this.enemies);
-        console.log("Destroy All");
-
+        console.log("Hai ucciso :" , this.enemies);              
       } else {  // Se la bottiglia non è riconosciuta, stampa un messaggio di errore
         console.log("Bottiglia non riconosciuta");
       }
@@ -195,12 +199,16 @@ export class Level extends Scene{
     // Rimuove la bottiglia dall'array bottles
       this.bottles = this.bottles.filter(b => b !== bottle);
       console.log(player.currentHP);
+      console.log(this.enemyCounter);
+      return this.enemyCounter;
     });
 
+    // Set Shield position
     if(this.shield) {
       this.shield.updatePosition(this.player.x, this.player.y);
     };
 
+    // Health Bar Dynamic
     this.physics.collide(this.player, this.enemies, (player, enemy)=>{
       if(this.immunity == false){
         this.player.takeDamage(enemy.enemyDmg)
@@ -212,19 +220,22 @@ export class Level extends Scene{
       console.log(player.currentHP);
     })
 
+    // Death Animation
     this.physics.collide(this.attacks, this.enemies, (attack, enemy)=>{
       new DeathAnim(this, enemy.x, enemy.y)
       enemy.die("death");
       attack.destroy();
+      this.enemyCounter++;
+      console.log(`Kill: ${this.enemyCounter}`);            
+      this.scoreText.setText('You killed: ' + this.enemyCounter , {fontSize: 20, color: 'white'});           
     });
 
-    this.updateShieldVisibility();
-
-    
-
+    this.updateShieldVisibility();    
     this.player.updateHPBar();
+    return;   
   }
+
   updateShieldVisibility() {
-      this.shield.setVisible(this.immunity);
-  };
+    this.shield.setVisible(this.immunity);
+  }
 }
