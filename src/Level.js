@@ -53,16 +53,20 @@ export class Level extends Scene{
   preload() {
     this.load.spritesheet("knight_idle", "assets/player/knight_idle.png", {frameWidth: 16, frameHeight: 16});
     this.load.spritesheet("knight_run", "assets/player/knight_run.png", {frameWidth: 16, frameHeight: 16});
+    
     this.load.spritesheet("fly", "assets/enemy/fly.png", {frameWidth: 16, frameHeight: 16});
     this.load.spritesheet("goblin", "assets/enemy/goblin.png", {frameWidth: 16, frameHeight: 16});
     this.load.spritesheet("slime", "assets/enemy/slime.png", {frameWidth: 16, frameHeight: 16});
+
     this.load.spritesheet("sword", "assets/player/sword.png", {frameWidth: 16, frameHeight: 16});
-    this.load.spritesheet("laser", "assets/player/laser.png", {frameWidth: 16, frameHeight: 16});    
+    this.load.spritesheet("laser", "assets/player/laser.png", {frameWidth: 16, frameHeight: 16});
+
     this.load.spritesheet("potion", "assets/potions/red_potion.png", {frameWidth: 16, frameHeight: 16});
     this.load.spritesheet("yellow_potion", "assets/potions/yellow_potion.png", {frameWidth: 16, frameHeight: 16});
     this.load.spritesheet("blue_potion", "assets/potions/azure_potion.png", {frameWidth: 16, frameHeight: 16});
     this.load.spritesheet("green_potion", "assets/potions/green_potion.png", {frameWidth: 16, frameHeight: 16});
     this.load.spritesheet("purple_potion", "assets/potions/purple_potion.png", {frameWidth: 16, frameHeight: 16});
+
     this.load.spritesheet("death", "assets/enemy/explosion-6.png", {frameWidth: 48, frameHeight: 48});
     this.load.spritesheet("thunder", "assets/enemy/electro_ray.png", {frameWidth: 64, frameHeight: 64});
     this.load.spritesheet("shield1", "assets/player/shield1.png", {frameWidth: 64, frameHeight: 64});
@@ -106,7 +110,7 @@ export class Level extends Scene{
         let randomBottle = this.bottles[randomIndex];
 
         let x = Phaser.Math.Between(0, this.map.widthInPixels);
-        let y = Phaser.Math.Between(0, this.map.heightInPixels);
+        let y = Phaser.Math.Between(0, this.map.heightInPixels - 30);
 
         if (!wallLayer.getTileAtWorldXY(x, y)) {
           let bottle = this.bottleList[randomIndex](x,y)
@@ -115,6 +119,7 @@ export class Level extends Scene{
 
       }
     });
+
 
     this.time.addEvent({      
       delay: 200,              
@@ -216,6 +221,7 @@ export class Level extends Scene{
       this.player.updateHPBar();
       if (this.player.currentHP == 0) {
       this.scene.restart();
+      this.enemyCounter = 0;
     }
       console.log(player.currentHP);
     })

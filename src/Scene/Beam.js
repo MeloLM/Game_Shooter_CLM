@@ -9,8 +9,10 @@ export class Beam extends Physics.Arcade.Sprite{
     scene.add.existing(this);
     scene.physics.add.existing(this);
     scene.physics.moveTo(this, pointer.worldX, pointer.worldY, this.speed);
-    
+
+    this.body.setSize(10, 5);  
     this.rotation = angle;
+    
     scene.time.addEvent({
       delay: 7000,
       callback: ()=> this.destroy()

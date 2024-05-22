@@ -16,10 +16,10 @@ export class PurpleBottle extends Phaser.Physics.Arcade.Sprite {
       scene.anims.create({
       key: "pPotion",
       repeat: -1,
-      frameRate: 8,
+      frameRate: 9,
       frames: scene.anims.generateFrameNumbers(texture, {
         start: 0,
-        end: 7,
+        end: 8,
       }),
 
       

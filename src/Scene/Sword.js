@@ -9,6 +9,7 @@ export class Sword extends Physics.Arcade.Sprite{
     scene.physics.add.existing(this);
     scene.physics.moveTo(this, pointer.worldX, pointer.worldY);
 
+    this.body.setSize(10, 15);      
     this.rotation = angle;
 
     scene.time.addEvent({

@@ -7,7 +7,9 @@ export class Shield extends Physics.Arcade.Sprite{
 
     scene.add.existing(this);
     scene.physics.add.existing(this);
-    this.setScale(0.45);
+    this.setScale(0.35);
+    this.body.setSize(50, 50);
+    this.body.setOffset(-8, 10)
 
     scene.time.addEvent({
       delay: 7000,
