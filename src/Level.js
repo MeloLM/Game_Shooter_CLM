@@ -74,6 +74,7 @@ export class Level extends Scene{
     this.load.spritesheet("door", "assets/door.png", { frameWidth: 32, frameHeight: 32 })
     this.load.tilemapTiledJSON("tilemap", "assets/Map.json")
 		this.load.image("shooter", "assets/tilesheet.png")
+    this.load.image("pause_btn", "assets/pauseBtn.png");
   }
 
   //serve per costruire il livello e le sue entità
@@ -118,7 +119,7 @@ export class Level extends Scene{
         }
 
       }
-    });
+    });    
 
 
     this.time.addEvent({      
@@ -168,26 +169,37 @@ export class Level extends Scene{
 
     // Power Up Bottle Logic
     this.physics.collide(this.player, this.bottles, (player, bottle) => {
+      let powerUpName = '';
+      let powerUpColor = '#ffffff';
+
       //Gestisce la bottiglia presa
       if (bottle instanceof YellowBottle) { // Se la bottiglia è gialla , cambia arma
         player.power = true;
+        powerUpName = 'Laser';
+        powerUpColor = '#ffa500';
         console.log("change Weapon")
       } else if (bottle instanceof RedBottle) {   // Se la bottiglia è rossa, cura il giocatore
         player.power = false;
         player.heal();
+        powerUpName = 'Heal';
+        powerUpColor = '#ff0000';
       } else if (bottle instanceof GreenBottle) { // Se la bottliglia è verde aumenta la velocità del giocatore        
-        this.player.speed += 100;                
-         this.time.delayedCall(4000, () => {
-            this.player.speed -= 100;
-            console.log("Velocità ridotta dopo 5 secondi");
+        this.player.speed += 120;
+        powerUpName = 'Speed';
+        powerUpColor = '#00ff00';                
+         this.time.delayedCall(5000, () => {
+            this.player.speed -= 110;
+            
         });
+        console.log(this.player.speed);
       } else if (bottle instanceof BlueBottle) { // Se la bottiglie è blu, fornisce immunità        
         if(!this.immunity){
           this.immunity = true;
           this.lastCollisionTime = this.time.now;
           this.shield = new Shield(this, player.x, player.y, "shield1");          
         }
-        console.log("Immunity")
+        powerUpName = 'Shield';
+        powerUpColor = '#0000ff';        
       } else if (bottle instanceof PurpleBottle) {   // Se la bottiglia è rossa, cura il giocatore        
         this.enemies.forEach((enemy) => {
           new Thunder(this, enemy.x, enemy.y);
@@ -195,16 +207,37 @@ export class Level extends Scene{
           this.enemyCounter++;
           this.scoreText.setText('You killed: ' + this.enemyCounter , {fontSize: 20, color: 'white'});
         });
-        console.log("Hai ucciso :" , this.enemies);              
+        powerUpName = 'Thunder';
+        powerUpColor = '#800080';                      
       } else {  // Se la bottiglia non è riconosciuta, stampa un messaggio di errore
         console.log("Bottiglia non riconosciuta");
       }
+
+      const powerUpText = this.add.text(this.player.x, this.player.y - 50, powerUpName, {
+        fontSize: '10px',
+        fill: powerUpColor
+      });
+      powerUpText.setOrigin(0.5, 0.5);
+
+      // Aggiorna la posizione del testo in base alla posizione del giocatore
+      const textUpdate = this.time.addEvent({
+        delay: 16, // Circa 60 FPS
+        callback: () => {
+          powerUpText.setPosition(this.player.x, this.player.y - 20);
+        },
+        loop: true
+      });
+      
+      this.time.delayedCall(1000, () => {
+        powerUpText.destroy();
+        textUpdate.remove(false);
+      });
+
       bottle.destroy();    // Distrugge la bottiglia con cui il giocatore ha collidito
 
     // Rimuove la bottiglia dall'array bottles
-      this.bottles = this.bottles.filter(b => b !== bottle);
-      console.log(player.currentHP);
-      console.log(this.enemyCounter);
+      this.bottles = this.bottles.filter(b => b !== bottle);      
+      console.log(`your speed: ${this.player.speed}`);
       return this.enemyCounter;
     });
 
