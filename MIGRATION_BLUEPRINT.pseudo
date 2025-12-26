@@ -1,0 +1,141 @@
+// ==========================================
+// 1. DATA STRUCTURE: GAME CONFIGURATION
+// Target File: src/utils/GameConfig.js
+// ==========================================
+
+CONST GameConfig = {
+    // Centralize all magic numbers from Enemy.js and Level.js here
+    ENEMIES: {
+        SLIME_GREEN: { hp: 40, damage: 20, speed: 40, xp: 10, texture: 'slime_green' },
+        SLIME_BLUE:  { hp: 50, damage: 25, speed: 30, xp: 12, texture: 'slime_blue' },
+        SLIME_RED:   { hp: 30, damage: 30, speed: 55, xp: 15, texture: 'slime_red' },
+        GOBLIN:      { hp: 60, damage: 25, speed: 35, xp: 15, texture: 'goblin' },
+        // ... include all enemies from AI_CONTEXT.md
+    },
+    BOSSES: {
+        GIANT_GOBLIN: { hp: 500, damage: 50, speed: 25 },
+        ORC_BOSS:     { hp: 750, damage: 60, speed: 30 }
+    },
+    WEAPONS: {
+        SWORD: { damage: 10, cooldown: 500 },
+        BEAM:  { duration: 10000 }
+        // ... other weapons
+    },
+    SYSTEM: {
+        WAVE_DURATION: 15000, // ms
+        COMBO_RESET: 3000     // ms
+    }
+};
+
+EXPORT GameConfig;
+
+// ==========================================
+// 2. NEW SCENE: HUD (User Interface)
+// Target File: src/scenes/HUD.js
+// ==========================================
+
+CLASS HUDScene EXTENDS Phaser.Scene {
+    CONSTRUCTOR() {
+        super({ key: 'HUD' });
+    }
+
+    CREATE() {
+        // 1. Setup UI Elements (Moved from Level.js)
+        this.scoreText = CREATE_TEXT(10, 10, "Score: 0");
+        this.healthBar = NEW HealthBar(this); // Refactored component
+        this.minimap   = NEW Minimap(this);   // Moved logic
+        this.comboText = CREATE_TEXT(...);
+
+        // 2. Setup Event Listeners (The most important part)
+        CONST gameScene = this.scene.get('Level');
+        
+        // Listen to Game Scene events
+        gameScene.events.on('score-changed', (newScore) => {
+            this.scoreText.setText("Score: " + newScore);
+        });
+
+        gameScene.events.on('player-hp-changed', (currentHP, maxHP) => {
+            this.healthBar.update(currentHP, maxHP);
+        });
+
+        gameScene.events.on('combo-updated', (comboCount) => {
+            this.updateComboUI(comboCount);
+        });
+
+        // Clean up events on shutdown
+        this.events.on('shutdown', this.cleanup, this);
+    }
+}
+
+// ==========================================
+// 3. REFACTORED SCENE: LEVEL (Gameplay Only)
+// Target File: src/scenes/Level.js
+// ==========================================
+
+CLASS LevelScene EXTENDS Phaser.Scene {
+    CREATE() {
+        // 1. Initialize Registry (Global State)
+        this.registry.set('score', 0);
+        this.registry.set('playerXP', 0);
+
+        // 2. Launch UI in parallel
+        this.scene.launch('HUD');
+
+        // 3. Gameplay Systems
+        this.player = NEW Player(this, ...);
+        this.waveManager = NEW WaveManager(this); // Pass config inside manager
+        
+        // REMOVED: this.scoreText (Moved to HUD)
+        // REMOVED: this.healthBar (Moved to HUD)
+        // REMOVED: this.minimap   (Moved to HUD)
+    }
+
+    UPDATE() {
+        // Only gameplay logic here
+        this.player.update();
+        this.waveManager.update();
+        // UI updates are handled via events, NOT direct calls
+    }
+
+    // Example of Event Emission
+    addScore(amount) {
+        let currentScore = this.registry.get('score');
+        currentScore += amount;
+        this.registry.set('score', currentScore);
+        
+        // Notify HUD
+        this.events.emit('score-changed', currentScore);
+    }
+}
+
+// ==========================================
+// 4. MIGRATION STEPS (Instructions for AI)
+// ==========================================
+
+FUNCTION ExecuteMigration() {
+    
+    STEP_1: "Create GameConfig.js" {
+        - Extract hardcoded numbers from `Enemy.js` and `Level.js`.
+        - Create the file in `src/utils/`.
+        - Update `Enemy.js` to import stats from Config.
+    }
+
+    STEP_2: "Create HUD.js" {
+        - Create new Scene class.
+        - Cut UI code (Text, Graphics) from `Level.js`.
+        - Paste into `HUD.js`.
+        - Implement Event Listeners for 'score', 'hp', 'combo'.
+    }
+
+    STEP_3: "Clean Level.js" {
+        - Import GameConfig.
+        - In `create()`: Add `this.scene.launch('HUD')`.
+        - Remove all direct UI manipulation lines.
+        - Replace `this.scoreText.setText()` with `this.events.emit('score-changed')`.
+    }
+
+    STEP_4: "Update Main.js" {
+        - Import HUDScene.
+        - Add HUDScene to the Phaser Game Config scene array (before Level or parallel).
+    }
+}

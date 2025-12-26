@@ -1,9 +1,9 @@
 import { Game, Scale } from "phaser";
-import { Level } from "./src/Level";
-import { MainMenu } from "./src/MainMenu";
-import { GameOver } from "./src/GameOver";
-import { TrophyScreen } from "./src/TrophyScreen";
-import { Settings } from "./src/Settings";
+import { Level } from "./src/scenes/Level";
+import { MainMenu } from "./src/scenes/MainMenu";
+import { GameOver } from "./src/scenes/GameOver";
+import { TrophyScreen } from "./src/scenes/TrophyScreen";
+import { Settings } from "./src/scenes/Settings";
  
 
  new Game({

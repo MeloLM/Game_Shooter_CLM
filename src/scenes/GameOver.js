@@ -1,5 +1,5 @@
 import { Scene } from "phaser";
-import { AudioManager } from "./AudioManager.js";
+import { AudioManager } from "../managers/AudioManager.js";
 
 export class GameOver extends Scene {
   constructor() {

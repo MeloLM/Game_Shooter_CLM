@@ -1,8 +1,8 @@
 import { Physics } from "phaser";
-import { Sword } from "./Sword";
-import { Beam } from "./Beam";
-import { Shotgun } from "./Shotgun";
-import { Boomerang } from "./Boomerang";
+import { Sword } from "./weapons/Sword";
+import { Beam } from "./weapons/Beam";
+import { Shotgun } from "./weapons/Shotgun";
+import { Boomerang } from "./weapons/Boomerang";
 
 
 
