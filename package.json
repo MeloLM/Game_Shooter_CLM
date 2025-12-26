@@ -1,7 +1,8 @@
 {
-  "name": "shooter",
+  "name": "knight-shooter",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.6.0",
+  "description": "Knight Shooter - Survival Arena Game built with Phaser 3",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -13,5 +14,8 @@
   },
   "dependencies": {
     "phaser": "^3.80.1"
-  }
+  },
+  "keywords": ["game", "phaser", "arcade", "shooter", "survival"],
+  "author": "",
+  "license": "MIT"
 }

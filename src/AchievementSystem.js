@@ -1,20 +1,20 @@
 /**
  * Sistema Achievement
  * Gestisce obiettivi e ricompense per le azioni del giocatore
- * I trofei si resettano ogni partita
+ * I trofei vengono salvati permanentemente in localStorage
  */
 export class AchievementSystem {
   scene;
   achievements = [];
-  unlockedAchievements = []; // Resettato ogni partita
+  unlockedAchievements = []; // Caricato da localStorage
   achievementQueue = []; // Coda per mostrare achievement
   isShowingAchievement = false;
   trophyText = null; // UI trofei durante il gioco
   
   constructor(scene) {
     this.scene = scene;
-    // NON caricare da localStorage - resetta ogni partita
-    this.unlockedAchievements = [];
+    // Carica trofei salvati da localStorage
+    this.loadUnlocked();
     this.initAchievements();
     this.createTrophyUI();
   }
@@ -24,22 +24,22 @@ export class AchievementSystem {
    */
   createTrophyUI() {
     // Container per trofei con progressi
-    this.trophyContainer = this.scene.add.container(10, 70);
+    this.trophyContainer = this.scene.add.container(10, 30);
     this.trophyContainer.setScrollFactor(0);
     this.trophyContainer.setDepth(50);
     
     // Testo principale trofei
     this.trophyText = this.scene.add.text(0, 0, '🏆 0/16', {
       fontFamily: 'Arial',
-      fontSize: '10px',
+      fontSize: '9px',
       color: '#ffd700'
     });
     this.trophyContainer.add(this.trophyText);
     
     // Prossimo trofeo (progress)
-    this.nextTrophyText = this.scene.add.text(0, 12, '', {
+    this.nextTrophyText = this.scene.add.text(0, 10, '', {
       fontFamily: 'Arial',
-      fontSize: '8px',
+      fontSize: '7px',
       color: '#aaaaaa'
     });
     this.trophyContainer.add(this.nextTrophyText);
@@ -253,17 +253,20 @@ export class AchievementSystem {
   }
   
   /**
-   * NON usato - i trofei si resettano ogni partita
+   * Carica achievement sbloccati da localStorage
    */
   loadUnlocked() {
-    // Disabilitato - reset ogni partita
+    const saved = localStorage.getItem('achievements_unlocked');
+    if (saved) {
+      this.unlockedAchievements = JSON.parse(saved);
+    }
   }
   
   /**
-   * NON usato - i trofei si resettano ogni partita
+   * Salva achievement sbloccati in localStorage
    */
   saveUnlocked() {
-    // Disabilitato - reset ogni partita
+    localStorage.setItem('achievements_unlocked', JSON.stringify(this.unlockedAchievements));
   }
   
   /**
@@ -304,8 +307,6 @@ export class AchievementSystem {
     if (achievement.reward && achievement.reward.xp && this.scene.player) {
       this.scene.player.addXP(achievement.reward.xp);
     }
-    
-    console.log(`🏆 Achievement Unlocked: ${achievement.name}`);
   }
   
   /**

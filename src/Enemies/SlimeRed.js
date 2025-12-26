@@ -68,6 +68,10 @@ export class SlimeRed extends Physics.Arcade.Sprite {
     // Leggermente più piccolo
     this.setScale(0.45);
     
+    // Hitbox piccola e centrata
+    this.body.setSize(20, 16);
+    this.body.setOffset(22, 24);
+    
     // Tinta rossa
     this.setTint(0xff4444);
   }

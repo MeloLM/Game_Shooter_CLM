@@ -68,6 +68,10 @@ export class SlimeGreen extends Physics.Arcade.Sprite {
     
     // Scale per adattare lo sprite
     this.setScale(0.5);
+    
+    // Hitbox piccola e centrata
+    this.body.setSize(20, 16);
+    this.body.setOffset(22, 24);
   }
 
   updateHPBar() {

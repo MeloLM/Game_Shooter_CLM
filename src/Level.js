@@ -2,14 +2,12 @@ import { Scene } from "phaser";
 import { Player } from "./Scene/Player.js";
 import { Fly } from "./Enemies/Fly.js";
 import { Goblin } from "./Enemies/Goblin.js";
-import { Slime } from "./Enemies/Slime.js";
 import { SlimeGreen } from "./Enemies/SlimeGreen.js";
 import { SlimeBlue } from "./Enemies/SlimeBlue.js";
 import { SlimeRed } from "./Enemies/SlimeRed.js";
 import { TankEnemy } from "./Enemies/TankEnemy.js";
 import { SpeedEnemy } from "./Enemies/SpeedEnemy.js";
 import { RangedEnemy } from "./Enemies/RangedEnemy.js";
-// import { SkeletonKnight } from "./Enemies/SkeletonKnight.js"; // ARCHIVED: Sprites not ready
 import { GiantGoblin } from "./Enemies/Bosses/GiantGoblin.js";
 import { OrcBoss } from "./Enemies/Bosses/OrcBoss.js";
 import { Door } from "./Scene/Door.js";
@@ -30,7 +28,6 @@ import { VisualEffects } from "./VisualEffects.js";
 import { AchievementSystem } from "./AchievementSystem.js";
 import { DifficultyManager } from "./DifficultyManager.js";
 import { AudioManager } from "./AudioManager.js";
-import { Shotgun } from "./Scene/Shotgun.js";
 import { Boomerang } from "./Scene/Boomerang.js";
 
 export class Level extends Scene{
@@ -485,8 +482,8 @@ export class Level extends Scene{
         });
         powerUpName = 'Thunder';
         powerUpColor = '#800080';                      
-      } else {  // Se la bottiglia non è riconosciuta, stampa un messaggio di errore
-        console.log("Bottiglia non riconosciuta");
+      } else {  // Se la bottiglia non è riconosciuta, ignora
+        // Bottiglia non riconosciuta
       }
 
       // Effetto particelle alla raccolta

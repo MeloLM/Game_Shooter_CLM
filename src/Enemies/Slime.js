@@ -29,6 +29,10 @@ export class Slime extends Physics.Arcade.Sprite{
     }
 
     this.play("slime_run");
+    
+    // Hitbox piccola e centrata
+    this.body.setSize(20, 16);
+    this.body.setOffset(6, 8);
   }
 
   updateHPBar() {

@@ -1,9 +1,32 @@
 # 🎮 KNIGHT SHOOTER - AI Development Bible
 
-> **Versione:** 1.5.0  
+> **Versione:** 1.6.0  
 > **Framework:** Phaser 3.80.1 | Vite 5.2.0  
 > **Tipo:** 2D Top-Down Shooter / Survival  
 > **Ultimo Aggiornamento:** 26 Dicembre 2025
+
+---
+
+## 📋 CHANGELOG v1.6.0
+
+### Code Cleanup & Optimization
+- ✅ **UI Layout Fix**: Risolte sovrapposizioni testo (Trophy y:30, Difficulty y:50, Combo y:62)
+- ✅ **Trofei Persistenti**: I trofei ora si salvano in localStorage permanentemente
+- ✅ **Import Cleanup**: Rimossi import inutilizzati (Slime, Shotgun da Level.js)
+- ✅ **Console.log Cleanup**: Rimossi tutti i log di debug
+- ✅ **Package.json**: Aggiornato con nome, versione, descrizione, keywords
+- ✅ **Hitbox Slime Fix**: Tutti gli slime hanno hitbox 20x16 centrata sullo sprite
+
+### Layout UI Gameplay (sinistra, dall'alto)
+```
+💀 Score          (y: 5)   - HUD superiore
+🏆 0/16           (y: 30)  - Trofei partita
+🗡️ progress      (y: 40)  - Prossimo trofeo  
+⚔️ Difficoltà    (y: 50)  - Livello difficoltà
+🔥 Combo x2       (y: 62)  - Solo quando attivo
+x points          (y: 75)  - Moltiplicatore
+[===]             (y: 86)  - Timer combo
+```
 
 ---
 
@@ -11,54 +34,7 @@
 
 ### New Features
 - ✅ **Trophy Screen**: Nuova schermata dedicata ai trofei accessibile dal menu principale
-- ✅ **Hitbox uniformate**: Tutti i nemici ora hanno hitbox standard 12x12 come gli slime
-
-### Bug Fix
-- ✅ Nemici TankEnemy, SpeedEnemy, RangedEnemy avevano hitbox troppo grandi
-
----
-
-## 📋 CHANGELOG v1.4.0
-
-### New Features
-- ✅ **Knockback**: Il player viene spinto indietro quando colpito dai nemici
-- ✅ **Trophy Progress**: Ora mostra il progresso verso il prossimo trofeo (es. `🗡️ 5/10`)
-- ✅ **Mobile Responsive**: Supporto landscape per dispositivi mobili (min 320x180, max 1280x720)
-- ✅ **Multi-touch**: Supporto fino a 3 tocchi simultanei
-
-### Bug Fix
-- ✅ Boss sprite ridimensionati (Giant Goblin 0.6x, Orc 0.7x) - ora visibili correttamente
-
----
-
-## 📋 CHANGELOG v1.3.2
-
-### UI Improvements
-- ✅ Combo UI spostata sotto la difficoltà (y: 100, a sinistra)
-- ✅ Trofei visibili durante la PAUSA (pannello con lista trofei sbloccati)
-- ✅ Trofei si resettano ogni nuova partita (non salvati)
-
-### Layout UI Gameplay (sinistra)
-```
-💀 Score          (y: 5)
-HP Bar            (y: 30-45)
-🏆 0/16           (y: 70 - Trofei partita)
-🗡️ 5/10          (y: 82 - Progresso prossimo trofeo)
-⚔️ Difficoltà    (y: 97)
-🔥 Combo x2       (y: 112 - solo quando attivo)
-```
-
----
-
-## 📋 CHANGELOG v1.3.1
-
-### Bug Fix
-- ✅ Minimap spostata più in basso per evitare sovrapposizione con combo UI
-- ✅ Nemici ora spawnano dentro i bordi della mappa (non più fuori)
-- ✅ Aggiunto bounds checking per nemici (10-630 x, 10-350 y)
-- ✅ Trofei ora si aggiornano in tempo reale durante il gameplay
-- ✅ RedBottle non resetta più l'arma corrente
-- ✅ Boss ora chiamano update() correttamente
+- ✅ **Hitbox uniformate**: Tutti i nemici ora hanno hitbox ridotte e centrate
 
 ---
 
@@ -434,11 +410,12 @@ npm run preview
 ## 🐛 DEBUG E TESTING
 
 ### Console Logs Utili
+Il gioco non include console.log di debug in produzione. Per debugging, aggiungili temporaneamente:
 ```javascript
-// Level.js già logga:
+// Level.js - esempio debug wave
 console.log(`Wave ${wave} started`);
+// Level.js - esempio debug kill
 console.log(`Kill: ${count} | Score: ${score} (x${multiplier})`);
-console.log(`Level up! Now level ${level}`);
 ```
 
 ### Testare Specifiche Wave
@@ -607,7 +584,6 @@ git checkout <commit_hash> -- src/NomeFile.js
 - [ ] `npm run dev` funziona senza errori console
 - [ ] Nuove feature testate in game
 - [ ] Import aggiunti dove necessario
-- [ ] Nessun `console.log` di debug lasciato
 - [ ] README aggiornato se necessario
 
 ---

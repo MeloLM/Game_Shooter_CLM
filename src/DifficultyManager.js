@@ -83,9 +83,9 @@ export class DifficultyManager {
    * Crea l'indicatore di difficoltà nell'UI
    */
   createUI() {
-    this.difficultyText = this.scene.add.text(10, 85, '', {
+    this.difficultyText = this.scene.add.text(10, 50, '', {
       fontFamily: 'Arial',
-      fontSize: '10px',
+      fontSize: '9px',
       color: '#ff6600'
     });
     this.difficultyText.setScrollFactor(0);

@@ -128,12 +128,11 @@ export class TrophyScreen extends Scene {
   }
 
   /**
-   * Ottieni lista achievement sbloccati
+   * Ottieni lista achievement sbloccati da localStorage
    */
   getUnlockedAchievements() {
-    // Per ora ritorna array vuoto (i trofei si resettano ogni partita)
-    // Se vuoi persistenza, usa localStorage
-    return [];
+    const saved = localStorage.getItem('achievements_unlocked');
+    return saved ? JSON.parse(saved) : [];
   }
 
   /**

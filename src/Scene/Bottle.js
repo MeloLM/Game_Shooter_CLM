@@ -53,7 +53,6 @@ export class Bottle extends Physics.Arcade.Sprite {
    */
   applyEffect(player, scene) {
     // Da implementare nelle sottoclassi
-    console.log(`${this.potionName} collected!`);
   }
   
   /**

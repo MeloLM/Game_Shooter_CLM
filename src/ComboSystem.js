@@ -36,9 +36,9 @@ export class ComboSystem {
    */
   createComboUI() {
     // Testo combo (sotto la difficoltà, a sinistra)
-    this.comboText = this.scene.add.text(10, 100, '', {
+    this.comboText = this.scene.add.text(10, 62, '', {
       fontFamily: 'Arial',
-      fontSize: '12px',
+      fontSize: '11px',
       color: '#ffcc00',
       fontStyle: 'bold',
       stroke: '#000000',
@@ -50,9 +50,9 @@ export class ComboSystem {
     this.comboText.setAlpha(0);
 
     // Testo moltiplicatore
-    this.multiplierText = this.scene.add.text(10, 115, '', {
+    this.multiplierText = this.scene.add.text(10, 75, '', {
       fontFamily: 'Arial',
-      fontSize: '9px',
+      fontSize: '8px',
       color: '#ffffff',
       stroke: '#000000',
       strokeThickness: 1
@@ -63,7 +63,7 @@ export class ComboSystem {
     this.multiplierText.setAlpha(0);
 
     // Barra timer combo
-    this.comboTimerBar = this.scene.add.rectangle(60, 130, 80, 4, 0xffcc00);
+    this.comboTimerBar = this.scene.add.rectangle(50, 86, 60, 3, 0xffcc00);
     this.comboTimerBar.setOrigin(0.5, 0.5);
     this.comboTimerBar.setScrollFactor(0);
     this.comboTimerBar.setDepth(50);

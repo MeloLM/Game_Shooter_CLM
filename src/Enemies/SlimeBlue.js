@@ -68,6 +68,10 @@ export class SlimeBlue extends Physics.Arcade.Sprite {
     // Leggermente più grande
     this.setScale(0.55);
     
+    // Hitbox piccola e centrata
+    this.body.setSize(20, 16);
+    this.body.setOffset(22, 24);
+    
     // Tinta blu
     this.setTint(0x6699ff);
   }
