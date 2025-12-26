@@ -91,16 +91,16 @@ export class MainMenu extends Scene {
       trophyButton.setFillStyle(0xaa8a4a);
       trophyText.setScale(1.1);
     });
-    tr// Avvia audio al primo click (per policy browser)
-      if (!this.audioStarted) {
-        this.audioManager.playMenuBGM();
-        this.audioStarted = true;
-      }
-      ophyButton.on('pointerout', () => {
+    trophyButton.on('pointerout', () => {
       trophyButton.setFillStyle(0x8a6a2a);
       trophyText.setScale(1);
     });
     trophyButton.on('pointerdown', () => {
+      // Avvia audio al primo click (per policy browser)
+      if (!this.audioStarted) {
+        this.audioManager.playMenuBGM();
+        this.audioStarted = true;
+      }
       this.scene.start('TrophyScreen', { from: 'MainMenu' });
     });
 
