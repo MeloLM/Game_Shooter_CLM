@@ -14,14 +14,17 @@ export class DeathAnim extends Physics.Arcade.Sprite{
       callback: ()=> this.destroy()
     });
 
-    scene.anims.create({
-      key: "death",      
-      frameRate: 8,
-      frames: scene.anims.generateFrameNumbers(texture, {
-        start: 0,
-        end: 7,
-      })
-    });
+    // Controlla se l'animazione esiste già
+    if (!scene.anims.exists("death")) {
+      scene.anims.create({
+        key: "death",      
+        frameRate: 8,
+        frames: scene.anims.generateFrameNumbers(texture, {
+          start: 0,
+          end: 7,
+        })
+      });
+    }
 
     this.play("death");
   }

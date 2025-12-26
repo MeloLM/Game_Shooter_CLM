@@ -14,14 +14,17 @@ export class Thunder extends Physics.Arcade.Sprite{
       callback: ()=> this.destroy()
     });
 
-    scene.anims.create({
-      key: "thunder",   
-      frameRate: 9,
-      frames: scene.anims.generateFrameNumbers(texture, {
-        start: 2,
-        end: 8,
-      })
-    });
+    // Controlla se l'animazione esiste già
+    if (!scene.anims.exists("thunder")) {
+      scene.anims.create({
+        key: "thunder",   
+        frameRate: 9,
+        frames: scene.anims.generateFrameNumbers(texture, {
+          start: 2,
+          end: 8,
+        })
+      });
+    }
 
     this.play("thunder");
   }

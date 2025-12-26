@@ -130,11 +130,18 @@ export class SlimeBlue extends Physics.Arcade.Sprite {
     this.clearTint();
     this.play("slime_blue_death_anim");
     
+    // Salva riferimento per la callback
+    const scene = this.scene;
+    const hpBar = this.hpBar;
+    const self = this;
+    
     this.once('animationcomplete', () => {
-      if (this.hpBar) this.hpBar.destroy();
-      const index = this.scene.enemies.indexOf(this);
-      if (index > -1) this.scene.enemies.splice(index, 1);
-      this.destroy();
+      if (hpBar) hpBar.destroy();
+      if (scene && scene.enemies) {
+        const index = scene.enemies.indexOf(self);
+        if (index > -1) scene.enemies.splice(index, 1);
+      }
+      self.destroy();
     });
   }
 }

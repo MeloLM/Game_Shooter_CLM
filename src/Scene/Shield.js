@@ -16,15 +16,18 @@ export class Shield extends Physics.Arcade.Sprite{
       callback: ()=> this.destroy()
     });
 
-    scene.anims.create({
-      key: "shield",
-      repeat: -1,
-      frameRate: 6,
-      frames: scene.anims.generateFrameNumbers(texture, {
-        start: 3,
-        end: 5,
-      })
-    });
+    // Controlla se l'animazione esiste già
+    if (!scene.anims.exists("shield")) {
+      scene.anims.create({
+        key: "shield",
+        repeat: -1,
+        frameRate: 6,
+        frames: scene.anims.generateFrameNumbers(texture, {
+          start: 3,
+          end: 5,
+        })
+      });
+    }
 
     this.play("shield");
   }

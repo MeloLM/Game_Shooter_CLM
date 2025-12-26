@@ -7,7 +7,7 @@
  * - Wave 7-9: + Goblin
  * - Wave 10: BOSS Giant Goblin
  * - Wave 11-14: + Speed + Ranged
- * - Wave 15-19: + Tank + Skeleton
+ * - Wave 15-19: + Tank
  * - Wave 20: BOSS Orc
  * - Wave 21+: Tutti i nemici + Boss ogni 10 wave
  */
@@ -36,8 +36,8 @@ export class WaveManager {
     goblin: { minWave: 7, weight: 20 },
     speed: { minWave: 11, weight: 12 },
     ranged: { minWave: 11, weight: 10 },
-    tank: { minWave: 15, weight: 5 },
-    skeleton: { minWave: 15, weight: 8 }
+    tank: { minWave: 15, weight: 5 }
+    // skeleton: { minWave: 15, weight: 8 } // ARCHIVED: Sprites not ready
   };
   
   constructor(scene) {
@@ -196,7 +196,7 @@ export class WaveManager {
       text = `WAVE ${this.currentWave}\n⚡ New: Speed & Ranged!`;
       color = '#ff00ff';
     } else if (this.currentWave === 15) {
-      text = `WAVE ${this.currentWave}\n💀🛡️ New: Skeleton & Tank!`;
+      text = `WAVE ${this.currentWave}\n�️ New: Tank Enemy!`;
       color = '#8B4513';
     }
     
@@ -335,8 +335,8 @@ export class WaveManager {
         return enemyCreators[4] ? enemyCreators[4](x, y) : enemyCreators[2](x, y);
       case 'ranged':
         return enemyCreators[5] ? enemyCreators[5](x, y) : enemyCreators[1](x, y);
-      case 'skeleton':
-        return enemyCreators[8] ? enemyCreators[8](x, y) : enemyCreators[1](x, y);
+      // case 'skeleton': // ARCHIVED: Sprites not ready
+      //   return enemyCreators[8] ? enemyCreators[8](x, y) : enemyCreators[1](x, y);
       default:
         return enemyCreators[0](x, y);
     }

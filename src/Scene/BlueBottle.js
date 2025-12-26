@@ -10,16 +10,18 @@ export class BlueBottle extends Phaser.Physics.Arcade.Sprite {
       // Imposta le dimensioni dell'oggetto
       this.setScale(0.5);
       
-      scene.anims.create({
-      key: "bPotion",
-      repeat: -1,
-      frameRate: 8,
-      frames: scene.anims.generateFrameNumbers(texture, {
-        start: 0,
-        end: 7,
-      })
-
-    });
+      // Controlla se l'animazione esiste già
+      if (!scene.anims.exists("bPotion")) {
+        scene.anims.create({
+          key: "bPotion",
+          repeat: -1,
+          frameRate: 8,
+          frames: scene.anims.generateFrameNumbers(texture, {
+            start: 0,
+            end: 7,
+          })
+        });
+      }
       
       // Attiva la collisione con il giocatore
       this.setCollideWorldBounds(true);

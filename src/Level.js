@@ -9,7 +9,7 @@ import { SlimeRed } from "./Enemies/SlimeRed.js";
 import { TankEnemy } from "./Enemies/TankEnemy.js";
 import { SpeedEnemy } from "./Enemies/SpeedEnemy.js";
 import { RangedEnemy } from "./Enemies/RangedEnemy.js";
-import { SkeletonKnight } from "./Enemies/SkeletonKnight.js";
+// import { SkeletonKnight } from "./Enemies/SkeletonKnight.js"; // ARCHIVED: Sprites not ready
 import { GiantGoblin } from "./Enemies/Bosses/GiantGoblin.js";
 import { OrcBoss } from "./Enemies/Bosses/OrcBoss.js";
 import { Door } from "./Scene/Door.js";
@@ -52,7 +52,7 @@ export class Level extends Scene{
     (x, y) => new RangedEnemy(this, x, y),  // 5 - ranged
     (x, y) => new SlimeBlue(this, x, y),    // 6 - slimeBlue
     (x, y) => new SlimeRed(this, x, y),     // 7 - slimeRed
-    (x, y) => new SkeletonKnight(this, x, y), // 8 - skeleton
+    // (x, y) => new SkeletonKnight(this, x, y), // 8 - skeleton ARCHIVED
   ];
   enemies = [];
   waveManager = null;
@@ -147,11 +147,11 @@ export class Level extends Scene{
     this.load.spritesheet("slime_red_run", "assets/enemy/Slime_sprite_pack/PNG/Slime3/Without_shadow/Slime3_Run_without_shadow.png", {frameWidth: 64, frameHeight: 64});
     this.load.spritesheet("slime_red_death", "assets/enemy/Slime_sprite_pack/PNG/Slime3/Without_shadow/Slime3_Death_without_shadow.png", {frameWidth: 64, frameHeight: 64});
     
-    // Skeleton Knight sprites
-    this.load.spritesheet("skeleton_idle", "assets/enemy/Skeleton_knight_sprite/Skeleton_Crusader_1/PNG/PNG Sequences/Idle/0_Crusader_Idle_000.png", {frameWidth: 64, frameHeight: 64});
-    this.load.spritesheet("skeleton_walk", "assets/enemy/Skeleton_knight_sprite/Skeleton_Crusader_1/PNG/PNG Sequences/Walking/0_Crusader_Walking_000.png", {frameWidth: 64, frameHeight: 64});
-    this.load.spritesheet("skeleton_attack", "assets/enemy/Skeleton_knight_sprite/Skeleton_Crusader_1/PNG/PNG Sequences/Slashing/0_Crusader_Slashing_000.png", {frameWidth: 64, frameHeight: 64});
-    this.load.spritesheet("skeleton_death", "assets/enemy/Skeleton_knight_sprite/Skeleton_Crusader_1/PNG/PNG Sequences/Dying/0_Crusader_Dying_000.png", {frameWidth: 64, frameHeight: 64});
+    // Skeleton Knight sprites - ARCHIVED: Sprites not ready
+    // this.load.spritesheet("skeleton_idle", "assets/enemy/Skeleton_knight_sprite/Skeleton_Crusader_1/PNG/PNG Sequences/Idle/0_Crusader_Idle_000.png", {frameWidth: 64, frameHeight: 64});
+    // this.load.spritesheet("skeleton_walk", "assets/enemy/Skeleton_knight_sprite/Skeleton_Crusader_1/PNG/PNG Sequences/Walking/0_Crusader_Walking_000.png", {frameWidth: 64, frameHeight: 64});
+    // this.load.spritesheet("skeleton_attack", "assets/enemy/Skeleton_knight_sprite/Skeleton_Crusader_1/PNG/PNG Sequences/Slashing/0_Crusader_Slashing_000.png", {frameWidth: 64, frameHeight: 64});
+    // this.load.spritesheet("skeleton_death", "assets/enemy/Skeleton_knight_sprite/Skeleton_Crusader_1/PNG/PNG Sequences/Dying/0_Crusader_Dying_000.png", {frameWidth: 64, frameHeight: 64});
     
     // Boss sprites - Giant Goblin
     this.load.spritesheet("boss_goblin_idle", "assets/bosses/Bosses_sprite/Giant Goblin/PNG/Spritesheets/Front - Idle.png", {frameWidth: 100, frameHeight: 100});

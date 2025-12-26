@@ -42,25 +42,29 @@ export class Player extends Physics.Arcade.Sprite{
     this.createLevelUI(scene);
 
   // ANIMAZIONI PLAYER
-    scene.anims.create({
-      key: "player_idle",
-      frameRate: 6,
-      repeat: -1 ,
-      frames: scene.anims.generateFrameNumbers("knight_idle", {
-        start: 0,
-        end: 5,
+    if (!scene.anims.exists("player_idle")) {
+      scene.anims.create({
+        key: "player_idle",
+        frameRate: 6,
+        repeat: -1 ,
+        frames: scene.anims.generateFrameNumbers("knight_idle", {
+          start: 0,
+          end: 5,
+        })
       })
-    })
+    }
 
-    scene.anims.create({
-      key: "player_run",
-      frameRate: 6,
-      repeat: -1 ,
-      frames: scene.anims.generateFrameNumbers("knight_run", {
-        start: 0,
-        end: 5,
+    if (!scene.anims.exists("player_run")) {
+      scene.anims.create({
+        key: "player_run",
+        frameRate: 6,
+        repeat: -1 ,
+        frames: scene.anims.generateFrameNumbers("knight_run", {
+          start: 0,
+          end: 5,
+        })
       })
-    })
+    }
 
     this.play("player_idle");
 
