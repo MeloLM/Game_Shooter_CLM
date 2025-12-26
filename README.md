@@ -1,26 +1,40 @@
 # 🎮 KNIGHT SHOOTER - DOCUMENTAZIONE TECNICA COMPLETA
 
-> **Versione:** 1.0.0  
+> **Versione:** 1.1.0  
 > **Framework:** Phaser 3.80.1  
 > **Build Tool:** Vite 5.2.0  
 > **Tipo:** Gioco 2D Top-Down Shooter / Survival  
-> **Ultimo Aggiornamento:** 20 Dicembre 2025
+> **Ultimo Aggiornamento:** 26 Dicembre 2025
 
 ---
 
 ## 📋 INDICE
 
 1. [Panoramica del Progetto](#-panoramica-del-progetto)
-2. [Novità Versione 1.0](#-novità-versione-10)
-3. [Architettura del Codice](#-architettura-del-codice)
-4. [Struttura delle Directory](#-struttura-delle-directory)
-5. [Componenti Principali](#-componenti-principali)
-6. [Sistema di Gioco](#-sistema-di-gioco)
-7. [Assets e Risorse](#-assets-e-risorse)
-8. [Guida per Sviluppatori/Agenti AI](#-guida-per-sviluppatoriagenti-ai)
-9. [Comandi e Configurazione](#-comandi-e-configurazione)
-10. [Problemi Risolti](#-problemi-risolti)
-11. [Idee Future](#-idee-future)
+2. [Novità Versione 1.1](#-novità-versione-11)
+3. [Novità Versione 1.0](#-novità-versione-10)
+4. [Architettura del Codice](#-architettura-del-codice)
+5. [Struttura delle Directory](#-struttura-delle-directory)
+6. [Componenti Principali](#-componenti-principali)
+7. [Sistema di Gioco](#-sistema-di-gioco)
+8. [Assets e Risorse](#-assets-e-risorse)
+9. [Guida per Sviluppatori/Agenti AI](#-guida-per-sviluppatoriagenti-ai)
+10. [Comandi e Configurazione](#-comandi-e-configurazione)
+11. [TODO - Bug da Fixare](#-todo---bug-da-fixare)
+12. [Idee Future](#-idee-future)
+
+---
+
+## 🔧 TODO - BUG DA FIXARE
+
+### Priorità Alta
+- [ ] **Bug Velocità Player:** Il personaggio perde velocità nel tempo (probabilmente speed boost non resettato correttamente)
+- [ ] **Achievement Invadenti:** I popup degli achievement sono troppo grandi/frequenti, rendere più discreti
+- [ ] **Spawn Armi Frequente:** Le pozioni arma (Shotgun/Boomerang) spawnano troppo spesso, bilanciare la probabilità
+
+### Da Verificare
+- [ ] Aggiungere nuovi tipi di nemici (sprites necessari)
+- [ ] Bilanciamento generale difficoltà
 
 ---
 
@@ -31,10 +45,12 @@ Questo è un **gioco 2D top-down shooter/survival** sviluppato con **Phaser 3**.
 
 ### Meccaniche Core
 - **Movimento:** WASD per muoversi
-- **Attacco:** Click sinistro del mouse per sparare (spada o laser)
+- **Attacco:** Click sinistro del mouse per sparare (spada, laser, shotgun, boomerang)
 - **Pausa:** ESC o P per mettere in pausa
-- **Obiettivo:** Uccidere più nemici possibili e battere il proprio record
-- **Power-ups:** 5 tipi di pozioni con effetti diversi
+- **Obiettivo:** Sopravvivere alle wave di nemici e battere il proprio record
+- **Power-ups:** 7 tipi di pozioni con effetti diversi
+- **Sistema Wave:** Nemici a ondate progressive con difficoltà crescente
+- **Sistema XP:** Guadagna esperienza, sali di livello, potenzia il personaggio
 
 ### Configurazione Phaser
 ```javascript
@@ -54,6 +70,41 @@ Questo è un **gioco 2D top-down shooter/survival** sviluppato con **Phaser 3**.
   pixelArt: true
 }
 ```
+
+---
+
+## ✨ NOVITÀ VERSIONE 1.1
+
+### 🆕 Nuovi Sistemi
+- ✅ **Sistema Wave:** Ondate progressive di nemici con difficoltà crescente
+  - Wave 1-3: Solo Slime
+  - Wave 4-6: Slime + Fly
+  - Wave 7-10: Slime + Fly + Goblin
+  - Wave 11+: Tutti i nemici base + Speed + Ranged
+  - Wave 15+: Tutti + Tank
+- ✅ **Sistema XP/Level Up:** Guadagna XP uccidendo nemici, sali di livello per bonus stats
+- ✅ **Sistema Combo:** Uccisioni consecutive = moltiplicatore punti (x1.5, x2, x2.5, x3, x4, x5)
+- ✅ **Sistema Achievement:** 16 obiettivi sbloccabili con popup e rewards XP
+- ✅ **Difficoltà Dinamica:** La sfida aumenta col tempo e le performance del giocatore
+- ✅ **Mini-mappa:** Mostra posizione player (verde), nemici (rosso), pozioni (cyan)
+
+### 🎯 Nuovi Nemici
+- ✅ **Tank Enemy:** Lento ma molto resistente (150 HP, 40 DMG, marrone)
+- ✅ **Speed Enemy:** Velocissimo con movimento zigzag (15 HP, 10 DMG, rosso)
+- ✅ **Ranged Enemy:** Spara proiettili viola, mantiene le distanze (35 HP, 15 DMG)
+
+### ⚔️ Nuove Armi
+- ✅ **Shotgun:** 3 proiettili a ventaglio (pozione arancione, 10s durata)
+- ✅ **Boomerang:** Proiettile che torna indietro (pozione cyan, 10s durata)
+
+### 🎨 Effetti Visivi
+- ✅ **Trail Proiettili:** Scia visiva dietro i proiettili
+- ✅ **Particelle Morte:** Esplosioni colorate per tipo di nemico
+- ✅ **Effetti Hit:** Scintille quando si colpisce un nemico
+
+### 🏗️ Refactoring
+- ✅ **Classe Base Enemy:** Tutti i nemici ereditano da `Enemy.js`
+- ✅ **Classe Base Bottle:** Struttura comune per le pozioni
 
 ---
 
@@ -915,6 +966,38 @@ npm run dev
 
 ## 📈 CHANGELOG
 
+### v1.1.0 (26 Dicembre 2025)
+**🚀 Major Update - Sistemi Avanzati**
+
+**Nuovi Sistemi:**
+- ✅ Sistema Wave con progressione nemici
+- ✅ Sistema XP e Level Up del personaggio
+- ✅ Sistema Combo con moltiplicatori punti
+- ✅ Sistema Achievement (16 obiettivi)
+- ✅ Difficoltà Dinamica
+- ✅ Mini-mappa HUD
+
+**Nuovi Nemici:**
+- ✅ Tank Enemy (lento, resistente)
+- ✅ Speed Enemy (veloce, zigzag)
+- ✅ Ranged Enemy (spara proiettili)
+
+**Nuove Armi:**
+- ✅ Shotgun (3 proiettili a ventaglio)
+- ✅ Boomerang (torna indietro)
+
+**Effetti Visivi:**
+- ✅ Trail proiettili
+- ✅ Particelle morte nemici
+- ✅ Effetti hit/impatto
+
+**Refactoring:**
+- ✅ Classe base Enemy
+- ✅ Classe base Bottle
+- ✅ WaveManager separato
+- ✅ ComboSystem separato
+- ✅ VisualEffects separato
+
 ### v1.0.0 (20 Dicembre 2025)
 **🎉 Release Iniziale Completa**
 
@@ -942,6 +1025,6 @@ npm run dev
 
 ---
 
-*Ultimo aggiornamento: 20 Dicembre 2025*  
-*Versione: 1.0.0*  
+*Ultimo aggiornamento: 26 Dicembre 2025*  
+*Versione: 1.1.0*  
 *Repository: https://github.com/MeloLM/Game_Shooter_CLM*

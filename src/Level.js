@@ -3,6 +3,9 @@ import { Player } from "./Scene/Player.js";
 import { Fly } from "./Enemies/Fly.js";
 import { Goblin } from "./Enemies/Goblin.js";
 import { Slime } from "./Enemies/Slime.js";
+import { TankEnemy } from "./Enemies/TankEnemy.js";
+import { SpeedEnemy } from "./Enemies/SpeedEnemy.js";
+import { RangedEnemy } from "./Enemies/RangedEnemy.js";
 import { Door } from "./Scene/Door.js";
 import { DeathAnim } from "./Scene/DeathAnim.js";
 import { RedBottle } from "./Scene/RedBottle.js";
@@ -11,7 +14,17 @@ import { BlueBottle } from "./Scene/BlueBottle.js";
 import { Shield } from "./Scene/Shield.js";
 import { GreenBottle } from "./Scene/GreenBottle.js";
 import { PurpleBottle } from "./Scene/PurpleBottle.js";
+import { OrangeBottle } from "./Scene/OrangeBottle.js";
+import { CyanBottle } from "./Scene/CyanBottle.js";
 import { Thunder } from "./Scene/Thunder.js";
+import { WaveManager } from "./WaveManager.js";
+import { ComboSystem } from "./ComboSystem.js";
+import { Minimap } from "./Minimap.js";
+import { VisualEffects } from "./VisualEffects.js";
+import { AchievementSystem } from "./AchievementSystem.js";
+import { DifficultyManager } from "./DifficultyManager.js";
+import { Shotgun } from "./Scene/Shotgun.js";
+import { Boomerang } from "./Scene/Boomerang.js";
 
 export class Level extends Scene{
   constructor() {
@@ -25,18 +38,33 @@ export class Level extends Scene{
   enemiesList = [
     (x, y) => new Slime(this, x, y),
     (x, y) => new Goblin(this, x, y),
-    (x, y) => new Fly(this, x, y ),
+    (x, y) => new Fly(this, x, y),
+    (x, y) => new TankEnemy(this, x, y),
+    (x, y) => new SpeedEnemy(this, x, y),
+    (x, y) => new RangedEnemy(this, x, y),
   ];
   enemies = [];
+  waveManager = null;
+  useWaveSystem = true; // Imposta a false per il vecchio sistema di spawn
   bottleList = [
     (x, y) => new RedBottle (this, x, y),
     (x, y) => new YellowBottle(this, x, y),
     (x, y) => new BlueBottle(this, x, y),
     (x, y) => new GreenBottle(this, x, y),
     (x, y) => new PurpleBottle(this, x, y, this.enemies),
+    (x, y) => new OrangeBottle(this, x, y),
+    (x, y) => new CyanBottle(this, x, y),
   ];
   bottles = [];
   attacks = [];
+  boomerangs = []; // Array separato per boomerang (hanno update)
+  comboSystem = null;
+  totalScore = 0; // Punteggio con moltiplicatore combo
+  minimap = null;
+  visualEffects = null;
+  achievementSystem = null;
+  potionsCollected = 0;
+  difficultyManager = null;
   immunity = false;
   immuneDuration = 7000;
   lastCollisionTime = 0;
@@ -56,10 +84,19 @@ export class Level extends Scene{
     this.enemies = [];
     this.attacks = [];
     this.bottles = [];
+    this.boomerangs = [];
     this.isPaused = false;
     this.survivalTime = 0;
     this.startTime = 0;
     this.enemyCounter = 0;
+    this.waveManager = null;
+    this.comboSystem = null;
+    this.totalScore = 0;
+    this.minimap = null;
+    this.visualEffects = null;
+    this.achievementSystem = null;
+    this.potionsCollected = 0;
+    this.difficultyManager = null;
   }
 
   //serve per caricare gli assets utilizzati in questo livello
@@ -104,6 +141,21 @@ export class Level extends Scene{
 
     // === HUD MIGLIORATO ===
     this.createHUD(wallLayer);
+    
+    // === SISTEMA COMBO ===
+    this.comboSystem = new ComboSystem(this);
+    
+    // === MINI-MAPPA ===
+    this.minimap = new Minimap(this, 640, 360);
+    
+    // === EFFETTI VISIVI ===
+    this.visualEffects = new VisualEffects(this);
+    
+    // === SISTEMA ACHIEVEMENT ===
+    this.achievementSystem = new AchievementSystem(this);
+    
+    // === DIFFICOLTÀ DINAMICA ===
+    this.difficultyManager = new DifficultyManager(this);
 
     this.player = new Player(this, 320, 0, "player_idle");
     this.player.setOrigin(0.5, 0.5);
@@ -133,19 +185,29 @@ export class Level extends Scene{
       }
     });    
 
-
-    this.time.addEvent({      
-      delay: 200,              
-      loop: true,
-      callback: () => {
-        let x = Phaser.Math.Between(0, 640);
-				let y = Phaser.Math.Between(0, 360);     
-        if(!this.cameras.main.getBounds().contains(x, y)){
-					let enemy = this.enemiesList[Phaser.Math.Between(0, this.enemiesList.length - 1)](x,y)
-					this.enemies = [...this.enemies, enemy];
-				}
-      },      
-    });
+    // === SISTEMA WAVE O SPAWN CLASSICO ===
+    if (this.useWaveSystem) {
+      // Nuovo sistema a wave
+      this.waveManager = new WaveManager(this);
+      // Avvia le wave dopo l'animazione iniziale
+      this.time.delayedCall(2000, () => {
+        this.waveManager.start();
+      });
+    } else {
+      // Vecchio sistema di spawn continuo
+      this.time.addEvent({      
+        delay: 200,              
+        loop: true,
+        callback: () => {
+          let x = Phaser.Math.Between(0, 640);
+          let y = Phaser.Math.Between(0, 360);     
+          if(!this.cameras.main.getBounds().contains(x, y)){
+            let enemy = this.enemiesList[Phaser.Math.Between(0, 2)](x,y) // Solo primi 3 nemici
+            this.enemies = [...this.enemies, enemy];
+          }
+        },      
+      });
+    }
 
     this.physics.add.collider(this.player, wallLayer);
 		this.physics.add.collider(this.player, this.door);
@@ -256,12 +318,37 @@ export class Level extends Scene{
         }
         powerUpName = 'Shield';
         powerUpColor = '#0000ff';        
-      } else if (bottle instanceof PurpleBottle) {   // Se la bottiglia è rossa, cura il giocatore        
+      } else if (bottle instanceof OrangeBottle) { // Shotgun arma
+        player.weaponType = 'shotgun';
+        powerUpName = 'Shotgun';
+        powerUpColor = '#ff8800';
+        // Durata 10 secondi
+        this.time.delayedCall(10000, () => {
+          if (player.weaponType === 'shotgun') {
+            player.weaponType = 'normal';
+          }
+        });
+      } else if (bottle instanceof CyanBottle) { // Boomerang arma
+        player.weaponType = 'boomerang';
+        powerUpName = 'Boomerang';
+        powerUpColor = '#00ffff';
+        // Durata 10 secondi
+        this.time.delayedCall(10000, () => {
+          if (player.weaponType === 'boomerang') {
+            player.weaponType = 'normal';
+          }
+        });
+      } else if (bottle instanceof PurpleBottle) {   // Se la bottiglia è viola colpisce tutti i nemici sullo schermo       
         this.enemies.forEach((enemy) => {
           new Thunder(this, enemy.x, enemy.y);
           enemy.die("thunder");
           this.enemyCounter++;
           this.scoreText.setText('You killed: ' + this.enemyCounter , {fontSize: 20, color: 'white'});
+          
+          // Notifica WaveManager per ogni nemico ucciso
+          if (this.waveManager) {
+            this.waveManager.onEnemyKilled();
+          }
         });
         powerUpName = 'Thunder';
         powerUpColor = '#800080';                      
@@ -275,6 +362,9 @@ export class Level extends Scene{
         '#0000ff': 0x0000ff, '#800080': 0x800080, '#ffffff': 0xffffff
       };
       this.showPickupEffect(bottle.x, bottle.y, colorMap[powerUpColor] || 0xffffff);
+      
+      // Incrementa contatore pozioni per achievement
+      this.potionsCollected++;
 
       const powerUpText = this.add.text(this.player.x, this.player.y - 50, powerUpName, {
         fontSize: '10px',
@@ -337,7 +427,8 @@ export class Level extends Scene{
 
     // Death Animation - Sistema HP nemici
     this.physics.collide(this.attacks, this.enemies, (attack, enemy)=>{
-      const attackDamage = this.player.power ? 15 : 25; // Laser = 15, Sword = 25
+      const baseDamage = this.player.power ? 15 : 25; // Laser = 15, Sword = 25
+      const attackDamage = this.player.getTotalDamage(baseDamage);
       const isDead = enemy.takeDamage(attackDamage);
       
       // Rimuovi l'attacco dall'array e distruggilo
@@ -346,10 +437,39 @@ export class Level extends Scene{
       
       if (isDead) {
         new DeathAnim(this, enemy.x, enemy.y);
+        
+        // Effetto particelle morte
+        if (this.visualEffects) {
+          // Determina tipo nemico per colore particelle
+          let enemyType = 'default';
+          if (enemy.constructor.name === 'Slime') enemyType = 'slime';
+          else if (enemy.constructor.name === 'Goblin') enemyType = 'goblin';
+          else if (enemy.constructor.name === 'Fly') enemyType = 'fly';
+          else if (enemy.constructor.name === 'TankEnemy') enemyType = 'tank';
+          else if (enemy.constructor.name === 'SpeedEnemy') enemyType = 'speed';
+          else if (enemy.constructor.name === 'RangedEnemy') enemyType = 'ranged';
+          
+          this.visualEffects.createDeathParticles(enemy.x, enemy.y, enemyType);
+        }
+        
+        // Dai XP al player
+        const xpReward = enemy.xpReward || 10;
+        this.player.addXP(xpReward);
+        
+        // Sistema combo - ottieni moltiplicatore
+        const comboMultiplier = this.comboSystem ? this.comboSystem.onKill() : 1;
+        const scoreGain = Math.floor(10 * comboMultiplier);
+        this.totalScore += scoreGain;
+        
         enemy.die();
         this.enemyCounter++;
-        console.log(`Kill: ${this.enemyCounter}`);
-        this.scoreText.setText('You killed: ' + this.enemyCounter, {fontSize: 20, color: 'white'});
+        console.log(`Kill: ${this.enemyCounter} | Score: ${this.totalScore} (x${comboMultiplier})`);
+        this.scoreText.setText('💀 ' + this.enemyCounter, {fontSize: 20, color: 'white'});
+        
+        // Notifica WaveManager
+        if (this.waveManager) {
+          this.waveManager.onEnemyKilled();
+        }
       }
     });
 
@@ -362,6 +482,38 @@ export class Level extends Scene{
         enemy.updateHPBar();
       }
     });
+    
+    // Aggiorna i boomerang
+    this.boomerangs.forEach((boomerang) => {
+      if (boomerang && boomerang.active && boomerang.update) {
+        boomerang.update();
+      }
+    });
+    // Rimuovi boomerang distrutti
+    this.boomerangs = this.boomerangs.filter(b => b && b.active);
+    
+    // Aggiorna mini-mappa
+    if (this.minimap) {
+      this.minimap.update();
+    }
+    
+    // Aggiorna effetti visivi (trail, ecc.)
+    if (this.visualEffects) {
+      this.visualEffects.update();
+    }
+    
+    // Check achievement ogni secondo circa
+    if (this.achievementSystem && Math.floor(this.time.now / 1000) !== this.lastAchievementCheck) {
+      this.lastAchievementCheck = Math.floor(this.time.now / 1000);
+      const stats = AchievementSystem.getStatsFromScene(this);
+      this.achievementSystem.checkAchievements(stats);
+    }
+    
+    // Aggiorna difficoltà dinamica
+    if (this.difficultyManager) {
+      const elapsedTime = (this.time.now - this.startTime) / 1000;
+      this.difficultyManager.update(elapsedTime, this.enemyCounter);
+    }
     
     // Aggiorna HUD
     this.updateHUD();
@@ -461,8 +613,22 @@ export class Level extends Scene{
 
     // Aggiorna arma
     if (this.player) {
-      this.weaponText.setText(this.player.power ? '🔫 Laser' : '⚔️ Spada');
-      this.weaponText.setColor(this.player.power ? '#ffff00' : '#ffffff');
+      let weaponName = '⚔️ Spada';
+      let weaponColor = '#ffffff';
+      
+      if (this.player.weaponType === 'shotgun') {
+        weaponName = '🔥 Shotgun';
+        weaponColor = '#ff8800';
+      } else if (this.player.weaponType === 'boomerang') {
+        weaponName = '🪃 Boomerang';
+        weaponColor = '#00ffff';
+      } else if (this.player.power) {
+        weaponName = '🔫 Laser';
+        weaponColor = '#ffff00';
+      }
+      
+      this.weaponText.setText(weaponName);
+      this.weaponText.setColor(weaponColor);
     }
 
     // Aggiorna HP bar
