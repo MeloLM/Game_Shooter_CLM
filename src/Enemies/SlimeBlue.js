@@ -12,6 +12,7 @@ export class SlimeBlue extends Physics.Arcade.Sprite {
   moveSpeed = 30; // Più lento
   xpReward = 15;
   hpBar;
+  isDying = false; // Flag per prevenire danno dopo la morte
 
   constructor(scene, x, y) {
     super(scene, x, y, "slime_blue_idle");
@@ -91,7 +92,7 @@ export class SlimeBlue extends Physics.Arcade.Sprite {
   }
 
   update(player) {
-    if (!this.active || !player) return;
+    if (!this.active || !player || this.isDying) return;
     
     const angle = Phaser.Math.Angle.Between(this.x, this.y, player.x, player.y);
     this.body.setVelocity(
@@ -114,6 +115,8 @@ export class SlimeBlue extends Physics.Arcade.Sprite {
   }
 
   takeDamage(dmg) {
+    if (this.isDying) return false; // Non prendere danno se sta morendo
+    
     this.currentHP -= dmg;
     this.updateHPBar();
     
@@ -126,17 +129,24 @@ export class SlimeBlue extends Physics.Arcade.Sprite {
   }
 
   die() {
+    if (this.isDying) return; // Previeni chiamate multiple
+    this.isDying = true;
+    
+    // Distruggi HP bar subito
+    if (this.hpBar) {
+      this.hpBar.destroy();
+      this.hpBar = null;
+    }
+    
     this.body.setVelocity(0, 0);
     this.clearTint();
     this.play("slime_blue_death_anim");
     
     // Salva riferimento per la callback
     const scene = this.scene;
-    const hpBar = this.hpBar;
     const self = this;
     
     this.once('animationcomplete', () => {
-      if (hpBar) hpBar.destroy();
       if (scene && scene.enemies) {
         const index = scene.enemies.indexOf(self);
         if (index > -1) scene.enemies.splice(index, 1);

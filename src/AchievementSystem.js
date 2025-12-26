@@ -236,11 +236,11 @@ export class AchievementSystem {
   showAchievementPopup(achievement) {
     // Posizione: angolo in basso a destra, più discreto
     const x = 560;
-    const y = 320;
+    const y = 310;
     
-    // Container sfondo più piccolo
-    const bg = this.scene.add.rectangle(x, y, 150, 35, 0x000000, 0.7);
-    bg.setStrokeStyle(1, 0xffd700);
+    // Container sfondo più piccolo con trasparenza aumentata
+    const bg = this.scene.add.rectangle(x, y, 150, 35, 0x000000, 0.5);
+    bg.setStrokeStyle(1, 0xffd700, 0.7);
     bg.setScrollFactor(0);
     bg.setDepth(200);
     bg.setAlpha(0);
@@ -275,7 +275,7 @@ export class AchievementSystem {
     
     this.scene.tweens.add({
       targets: [bg, title, desc],
-      alpha: 1,
+      alpha: { value: 0.85, duration: 300 }, // Fade in con trasparenza finale
       x: x,
       duration: 300,
       ease: 'Power2'

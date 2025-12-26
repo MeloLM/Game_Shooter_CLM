@@ -9,10 +9,6 @@
 
 ## 📖 GUIDA PER AI AGENT
 
-Questo README è progettato per essere una **guida completa** per qualsiasi AI agent che lavori su questo progetto. Contiene tutte le informazioni necessarie per capire l'architettura, aggiungere feature e risolvere bug.
-
-### Quick Reference per AI
-```
 FRAMEWORK: Phaser 3 (ES6 modules)
 ENTRY POINT: main.js → Level.js (gameplay principale)
 NEMICI: Estendi da Enemy.js (src/Enemies/)

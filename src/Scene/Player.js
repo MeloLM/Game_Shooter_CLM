@@ -11,7 +11,9 @@ export class Player extends Physics.Arcade.Sprite{
   baseSpeed = 80;
   maxHP = 1000; // HP massimi del giocatore
   currentHP = this.maxHP; // HP attuali del giocatore
+  displayHP = this.maxHP; // HP visualizzati (per smooth bar)
   hpBar; // Barra degli HP
+  hpTween = null; // Tween per smooth HP bar
   power = false;
   weaponType = 'normal'; // normal, shotgun, boomerang
   hasSpeedBoost = false; // Flag per evitare stack speed boost
@@ -144,15 +146,38 @@ export class Player extends Physics.Arcade.Sprite{
     const barHeight = 2;
     this.hpBar.fillRect(this.x - barWidth / 2, this.y - 8 - barHeight, barWidth, barHeight);
 
-    // Disegna la barra degli HP rossa sopra lo sfondo grigio
-    this.hpBar.fillStyle(0xff0000, 1); 
-    const hpWidth = barWidth * (this.currentHP / this.maxHP); // Larghezza proporzionale alla quantità di HP attuali
-    this.hpBar.fillRect(this.x - barWidth / 2, this.y - 8 - barHeight, hpWidth, barHeight);
+    // Disegna la barra degli HP con colore basato sulla percentuale
+    const hpPercent = this.displayHP / this.maxHP;
+    let color = 0x00ff00; // Verde
+    if (hpPercent < 0.3) color = 0xff0000; // Rosso
+    else if (hpPercent < 0.6) color = 0xffff00; // Giallo
+    
+    this.hpBar.fillStyle(color, 1); 
+    const hpWidth = barWidth * (this.displayHP / this.maxHP); // Larghezza proporzionale
+    this.hpBar.fillRect(this.x - barWidth / 2, this.y - 8 - barHeight, Math.max(0, hpWidth), barHeight);
+  }
+
+  // Smooth HP bar animation
+  animateHPBar() {
+    // Ferma tween precedente se esiste
+    if (this.hpTween) {
+      this.hpTween.stop();
+    }
+    
+    // Anima displayHP verso currentHP
+    this.hpTween = this.scene.tweens.add({
+      targets: this,
+      displayHP: this.currentHP,
+      duration: 300,
+      ease: 'Power2'
+    });
   }
 
    // Riduci gli HP del giocatore quando subisce danni
   takeDamage(dmg) {
-    this.currentHP -= dmg;  
+    this.currentHP -= dmg;
+    if (this.currentHP < 0) this.currentHP = 0;
+    this.animateHPBar(); // Smooth animation
   }
 
   // Aumenta gli HP del giocatore quando viene curato
@@ -162,11 +187,11 @@ export class Player extends Physics.Arcade.Sprite{
         if (this.currentHP > this.maxHP) {
             this.currentHP = this.maxHP;
         }
+        this.animateHPBar(); // Smooth animation
         console.log("Healed by", healAmount);
     } else {
         console.log("Full life");
     }
-    this.updateHPBar();
 }
 
   updateAnimation(){
