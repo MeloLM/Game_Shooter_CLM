@@ -7,8 +7,8 @@ export class Minimap {
   container;
   mapWidth = 60;
   mapHeight = 35;
-  mapX = 10;
-  mapY = 30;
+  mapX = 570;  // Angolo destro
+  mapY = 120;  // Spostato più in basso per evitare overlap con combo
   scale;
   
   // Elementi grafici

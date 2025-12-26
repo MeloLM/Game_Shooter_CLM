@@ -68,8 +68,8 @@ export class MainMenu extends Scene {
       this.scene.start('Level');
     });
 
-    // Istruzioni
-    const instructions = this.add.text(320, 280, 
+    // Istruzioni (spostato su dato che non c'è più bottone trofei)
+    const instructions = this.add.text(320, 270, 
       '🎮 CONTROLLI:\n' +
       'WASD - Movimento\n' +
       'CLICK - Attacca\n' +
@@ -100,4 +100,6 @@ export class MainMenu extends Scene {
       ease: 'Sine.easeInOut'
     });
   }
+
+
 }

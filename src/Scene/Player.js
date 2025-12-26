@@ -7,8 +7,8 @@ import { Boomerang } from "./Boomerang";
 
 
 export class Player extends Physics.Arcade.Sprite{
-  speed = 80;
-  baseSpeed = 80;
+  speed = 100;
+  baseSpeed = 100;
   maxHP = 1000; // HP massimi del giocatore
   currentHP = this.maxHP; // HP attuali del giocatore
   displayHP = this.maxHP; // HP visualizzati (per smooth bar)

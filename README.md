@@ -1,9 +1,58 @@
 # 🎮 KNIGHT SHOOTER - AI Development Bible
 
-> **Versione:** 1.2.1  
+> **Versione:** 1.4.0  
 > **Framework:** Phaser 3.80.1 | Vite 5.2.0  
 > **Tipo:** 2D Top-Down Shooter / Survival  
 > **Ultimo Aggiornamento:** 26 Dicembre 2025
+
+---
+
+## 📋 CHANGELOG v1.4.0
+
+### New Features
+- ✅ **Knockback**: Il player viene spinto indietro quando colpito dai nemici
+- ✅ **Trophy Progress**: Ora mostra il progresso verso il prossimo trofeo (es. `🗡️ 5/10`)
+- ✅ **Mobile Responsive**: Supporto landscape per dispositivi mobili (min 320x180, max 1280x720)
+- ✅ **Multi-touch**: Supporto fino a 3 tocchi simultanei
+
+### Bug Fix
+- ✅ Boss sprite ridimensionati (Giant Goblin 0.6x, Orc 0.7x) - ora visibili correttamente
+- ✅ Debug mode attivabile da main.js
+
+### Technical
+- Scale responsive: `Scale.FIT` con min/max bounds
+- Debug mode: `arcade.debug: true` in main.js
+
+---
+
+## 📋 CHANGELOG v1.3.2
+
+### UI Improvements
+- ✅ Combo UI spostata sotto la difficoltà (y: 100, a sinistra)
+- ✅ Trofei visibili durante la PAUSA (pannello con lista trofei sbloccati)
+- ✅ Trofei si resettano ogni nuova partita (non salvati)
+
+### Layout UI Gameplay (sinistra)
+```
+💀 Score          (y: 5)
+HP Bar            (y: 30-45)
+🏆 0/16           (y: 70 - Trofei partita)
+🗡️ 5/10          (y: 82 - Progresso prossimo trofeo)
+⚔️ Difficoltà    (y: 97)
+🔥 Combo x2       (y: 112 - solo quando attivo)
+```
+
+---
+
+## 📋 CHANGELOG v1.3.1
+
+### Bug Fix
+- ✅ Minimap spostata più in basso per evitare sovrapposizione con combo UI
+- ✅ Nemici ora spawnano dentro i bordi della mappa (non più fuori)
+- ✅ Aggiunto bounds checking per nemici (10-630 x, 10-350 y)
+- ✅ Trofei ora si aggiornano in tempo reale durante il gameplay
+- ✅ RedBottle non resetta più l'arma corrente
+- ✅ Boss ora chiamano update() correttamente
 
 ---
 
@@ -240,8 +289,8 @@ if (wave % 10 === 0) {
 | File | Chiave | Utilizzo |
 |------|--------|----------|
 | Menu_audio.wav | bgm_menu | MainMenu |
-| Main_theme.mp3.mp3 | bgm_main | Gameplay |
-| Boss_theme.mp3.mp3 | bgm_boss | Boss fight |
+| Main_theme.mp3 | bgm_main | Gameplay |
+| Boss_theme.mp3 | bgm_boss | Boss fight |
 
 ### API
 ```javascript
@@ -337,8 +386,8 @@ Game_Shooter_CLM-main/
     │
     ├── audio/
     │   ├── Menu_audio.wav
-    │   ├── Main_theme.mp3.mp3
-    │   └── Boss_theme.mp3.mp3
+    │   ├── Main_theme.mp3
+    │   └── Boss_theme.mp3
     │
     ├── player/             # Sprite player
     │
@@ -402,6 +451,17 @@ this.createBoss('giantGoblin', 400, 300);
 
 ## 📝 CHANGELOG
 
+### v1.3.0 (26 Dicembre 2025)
+- ✅ **Pannello Trofei** nel menu principale (bottone TROFEI)
+- ✅ Indicatore trofei nell'HUD al posto della difficoltà (🏆 X/16)
+- ✅ Contatore trofei nel GameOver
+- 🐛 Fix: Animazioni boss (frameWidth corretto per Giant Goblin e Orc)
+- 🐛 Fix: Boss update() non veniva chiamato (ora boss si muovono e attaccano)
+- 🐛 Fix: Tracking uccisioni Slime per achievement "Slime Hunter"
+- 🐛 Fix: Minimap spostata in alto a destra per evitare overlap
+- ✅ MainMenu ora ha bottone TROFEI con pannello completo
+- ✅ Tutti i 16 achievement visibili con stato sbloccato/bloccato
+
 ### v1.2.1 (26 Dicembre 2025)
 - 🐛 Fix: Slime HP bar rimaneva visibile dopo la morte
 - 🐛 Fix: Slime continuavano a prendere danno durante animazione morte
@@ -436,129 +496,37 @@ this.createBoss('giantGoblin', 400, 300);
 
 ---
 
-## 🔮 IDEE FUTURE (Roadmap Completa)
+## 🔮 IDEE FUTURE (20 Idee Semplici)
 
-### 🎯 Priorità Alta (Next Update)
-- [ ] **Sistema Oro/Monete** - Nemici droppano gold
-- [ ] **Negozio tra Wave** - Compra upgrade tra una wave e l'altra
-- [ ] **Upgrade Permanenti** - HP max, Danno, Velocità, Armor
-- [ ] **Nuovi Boss** - Dragone (wave 50), Lich (wave 100), Demon Lord (wave 150)
-- [ ] **Abilità Attive** - Dash, Ground Slam, Berserk Mode con cooldown
-- [ ] **Sistema Salvataggio** - LocalStorage per progressi e high score
+### 🎯 Priorità Alta (Facili da implementare)
+1. [ ] **Sistema Oro/Monete** - Nemici droppano gold per comprare upgrade
+2. [ ] **Pozione HP Maggiore** - Cura 500 HP invece di 200
+3. [ ] **Nuovo Nemico Ghost** - Nemico che attraversa i muri
+4. [ ] **Dash Ability** - Premi SPAZIO per scatto veloce con cooldown 3s
+5. [ ] **Indicatore Direzione Nemici** - Frecce rosse ai bordi schermo
 
-### 🎮 Gameplay Espanso
-- [ ] **Classi Giocatore** - Guerriero (tank), Mago (ranged), Arciere (speed), Paladino (balanced)
-- [ ] **Skill Tree** - Albero abilità per ogni classe
-- [ ] **Armi Permanenti** - Sblocca e equipaggia armi che persistono
-- [ ] **Secondary Weapon Slot** - Due armi equipaggiate, switch con Q
-- [ ] **Nemici che si Dividono** - Big Slime → 2 Medium → 4 Small
-- [ ] **Nemici Volanti** - Ignorano collisioni terreno
-- [ ] **Elite Enemies** - Aura colorata, 2x stats, drop garantito
-- [ ] **Mini-boss** - Wave 5, 15, 25... versioni potenziate di nemici normali
-- [ ] **Nemici con Shield** - Devono essere colpiti alle spalle
-- [ ] **Nemici Healer** - Curano altri nemici vicini
-- [ ] **Nemici Spawner** - Generano altri nemici finché vivi
+### 🎮 Gameplay (Medio)
+6. [ ] **Critical Hits** - 10% chance di danno doppio
+7. [ ] **Nemici Elite** - Versione potenziata con aura colorata
+8. [ ] **Arma Martello** - Attacco lento ma alta area e danno
+9. [ ] **Bonus Wave Clear** - HP bonus quando completi una wave
+10. [ ] **Speed Power-up Stack** - Può accumularsi fino a 3 volte
 
-### ⚔️ Combat System
-- [ ] **Status Effects:**
-  - 🔥 Burn - DOT 5s
-  - ❄️ Freeze - Slow 50% per 3s
-  - ⚡ Shock - Stun 1s
-  - ☠️ Poison - DOT 10s
-  - 💀 Curse - -50% healing
-- [ ] **Critical Hits** - 10% chance, 2x damage
-- [ ] **Armor System** - Riduzione danno percentuale
-- [ ] **Dodge/Roll** - Invincibilità breve, cooldown
-- [ ] **Parry** - Timing perfetto respinge proiettili
-- [ ] **Combo Attacks** - Sequenze di attacchi per bonus damage
+### ⚔️ Combat (Medio-Facile)
+11. [ ] **Knockback Nemici** - I nemici vengono spinti quando colpiti
+12. [ ] **Danno Over Time (Burn)** - Pozione fuoco che brucia nemici
+13. [ ] **Slow Effect (Freeze)** - Pozione ghiaccio che rallenta nemici
+14. [ ] **Area Attack** - Attacco circolare attorno al player
 
-### 🗺️ Mondo e Mappe
-- [ ] **Mappa Procedurale** - Ostacoli generati casualmente
-- [ ] **Biomi Diversi:**
-  - 🌲 Foresta - Nemici verdi, più Slime
-  - 🏰 Dungeon - Skeleton e Ghost
-  - 🌋 Vulcano - Fire enemies, lava pools
-  - ❄️ Tundra - Ice enemies, terreno scivoloso
-  - 🏜️ Deserto - Sandworm boss, tempeste di sabbia
-- [ ] **Ostacoli Interattivi** - Barili esplosivi, trappole attivabili
-- [ ] **Portali Teleport** - Fast travel sulla mappa
-- [ ] **Zone Sicure** - Aree dove i nemici non entrano (negozio)
-- [ ] **Secret Rooms** - Stanze nascoste con loot raro
-- [ ] **Trappole Ambientali** - Spine, lava, zone che rallentano
+### 🎨 Visual (Facile)
+15. [ ] **Particelle Sangue** - Effetto quando nemici prendono danno
+16. [ ] **Flash Screen Critico** - Screen flash giallo sui critical hit
+17. [ ] **Testo Danno Flottante** - Numeri che appaiono sopra i nemici
 
-### 🎁 Loot e Rewards
-- [ ] **Sistema Rarità:**
-  - ⬜ Common
-  - 🟢 Uncommon  
-  - 🔵 Rare
-  - 🟣 Epic
-  - 🟡 Legendary
-- [ ] **Casse del Tesoro** - Spawn casuali, richiedono chiave o tempo
-- [ ] **Daily Rewards** - Login giornaliero
-- [ ] **Loot Table per Nemico** - Drop specifici per tipo nemico
-- [ ] **Crafting Base** - Combina materiali per pozioni migliori
-
-### 🎨 Visual e Audio
-- [ ] **Animazioni Boss Speciali** - Attacchi unici animati
-- [ ] **Screen Shake Dinamico** - Intensità basata sul danno
-- [ ] **Hit Stop** - Freeze frame su colpi potenti
-- [ ] **Particle System Avanzato** - Blood, sparks, magic effects
-- [ ] **Day/Night Cycle** - Nemici più forti di notte, visibilità ridotta
-- [ ] **Weather Effects** - Pioggia, neve, nebbia
-- [ ] **Dynamic Soundtrack** - Musica che scala con l'intensità del combattimento
-- [ ] **Voice Lines** - Player reactions, enemy sounds
-- [ ] **UI Animations** - Transizioni smooth, feedback visivo
-
-### 📱 Technical e Platform
-- [ ] **Mobile Support:**
-  - Virtual joystick sinistra
-  - Attack button destra
-  - Ability buttons
-  - UI scalabile
-- [ ] **Gamepad Support** - Xbox/PlayStation controller
-- [ ] **Multiplayer Locale** - 2-4 player split screen
-- [ ] **Multiplayer Online** - Co-op via WebSocket/WebRTC
-- [ ] **Leaderboard Globale** - Firebase/Supabase backend
-- [ ] **Cloud Save** - Sincronizza tra dispositivi
-- [ ] **Replay System** - Registra e rivedi partite
-- [ ] **Screenshot/Clip** - Condividi momenti epici
-- [ ] **Mod Support** - Carica nemici/armi custom
-
-### 🏆 Meta-Game e Progression
-- [ ] **Account Level** - XP globale, rewards a milestone
-- [ ] **50+ Achievement** - Obiettivi nascosti e visibili
-- [ ] **Statistiche Complete:**
-  - Tempo totale giocato
-  - Nemici uccisi per tipo
-  - Danno totale inflitto/ricevuto
-  - Pozioni raccolte
-  - Record personali
-- [ ] **Season Pass** - Sfide settimanali/mensili
-- [ ] **Skin Sbloccabili** - Player, armi, effetti
-- [ ] **Titles/Badges** - Mostra achievements nel profilo
-- [ ] **Prestige System** - Reset per bonus permanenti
-
-### 🎲 Modalità di Gioco
-- [ ] **Classic Mode** - Modalità attuale, wave infinite
-- [ ] **Story Mode** - Progressione con dialoghi e lore
-- [ ] **Endless Mode** - No boss, solo sopravvivenza pura
-- [ ] **Boss Rush** - Solo boss, uno dopo l'altro, timer
-- [ ] **Roguelike Mode** - Scegli upgrade random tra wave
-- [ ] **Daily Challenge** - Seed fisso, classifica giornaliera
-- [ ] **Weekly Challenge** - Modificatori speciali
-- [ ] **Hardcore Mode** - Permadeath, no respawn
-- [ ] **Ironman Mode** - Un solo salvataggio, autosave
-- [ ] **Speed Run Mode** - Timer, wave fisse, leaderboard
-- [ ] **Sandbox/Practice** - Testa build e strategie
-
-### 🧪 Idee Sperimentali
-- [ ] **Pet System** - Companion che attacca/supporta
-- [ ] **Base Building** - Costruisci difese tra wave
-- [ ] **Territory Control** - Conquista zone della mappa
-- [ ] **PvP Arena** - 1v1 o 2v2 contro altri player
-- [ ] **Raid Bosses** - Boss multiplayer cooperativo
-- [ ] **Seasonal Events** - Halloween, Natale, etc.
-- [ ] **New Game+** - Ricomincia con bonus, nemici più forti
+### 🏆 Progressione (Medio)
+18. [ ] **Statistiche Fine Partita** - DPS, danno totale, nemici per tipo
+19. [ ] **Unlock Skins** - Colori diversi per il cavaliere (basati su score)
+20. [ ] **Tutorial Iniziale** - Popup che spiega i controlli alla prima partita
 
 ---
 

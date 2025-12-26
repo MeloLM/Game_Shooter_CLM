@@ -1,18 +1,108 @@
 /**
  * Sistema Achievement
  * Gestisce obiettivi e ricompense per le azioni del giocatore
+ * I trofei si resettano ogni partita
  */
 export class AchievementSystem {
   scene;
   achievements = [];
-  unlockedAchievements = [];
+  unlockedAchievements = []; // Resettato ogni partita
   achievementQueue = []; // Coda per mostrare achievement
   isShowingAchievement = false;
+  trophyText = null; // UI trofei durante il gioco
   
   constructor(scene) {
     this.scene = scene;
-    this.loadUnlocked();
+    // NON caricare da localStorage - resetta ogni partita
+    this.unlockedAchievements = [];
     this.initAchievements();
+    this.createTrophyUI();
+  }
+  
+  /**
+   * Crea l'UI dei trofei visibile durante il gameplay
+   */
+  createTrophyUI() {
+    // Container per trofei con progressi
+    this.trophyContainer = this.scene.add.container(10, 70);
+    this.trophyContainer.setScrollFactor(0);
+    this.trophyContainer.setDepth(50);
+    
+    // Testo principale trofei
+    this.trophyText = this.scene.add.text(0, 0, '🏆 0/16', {
+      fontFamily: 'Arial',
+      fontSize: '10px',
+      color: '#ffd700'
+    });
+    this.trophyContainer.add(this.trophyText);
+    
+    // Prossimo trofeo (progress)
+    this.nextTrophyText = this.scene.add.text(0, 12, '', {
+      fontFamily: 'Arial',
+      fontSize: '8px',
+      color: '#aaaaaa'
+    });
+    this.trophyContainer.add(this.nextTrophyText);
+  }
+  
+  /**
+   * Aggiorna l'UI dei trofei con progressi
+   */
+  updateTrophyUI() {
+    if (this.trophyText) {
+      const unlocked = this.getUnlockedCount();
+      const total = this.getTotalCount();
+      this.trophyText.setText(`🏆 ${unlocked}/${total}`);
+    }
+    
+    // Mostra progresso verso prossimo trofeo
+    if (this.nextTrophyText) {
+      const nextAch = this.getNextAchievementProgress();
+      if (nextAch) {
+        this.nextTrophyText.setText(`${nextAch.icon} ${nextAch.progress}`);
+      } else {
+        this.nextTrophyText.setText('');
+      }
+    }
+  }
+  
+  /**
+   * Ottieni progresso verso il prossimo achievement non sbloccato
+   */
+  getNextAchievementProgress() {
+    const stats = AchievementSystem.getStatsFromScene(this.scene);
+    
+    // Cerca primo achievement non sbloccato e mostra progresso
+    for (const ach of this.achievements) {
+      if (!this.isUnlocked(ach.id)) {
+        let progress = '';
+        
+        if (ach.id.startsWith('kill_') && !ach.id.includes('slime')) {
+          const target = parseInt(ach.id.split('_')[1]);
+          progress = `${stats.totalKills}/${target}`;
+        } else if (ach.id === 'kill_slime_25') {
+          progress = `${stats.slimeKills}/25`;
+        } else if (ach.id.startsWith('survive_')) {
+          const target = parseInt(ach.id.split('_')[1]);
+          progress = `${Math.floor(stats.survivalTime)}/${target}s`;
+        } else if (ach.id.startsWith('wave_')) {
+          const target = parseInt(ach.id.split('_')[1]);
+          progress = `${stats.waveReached}/${target}`;
+        } else if (ach.id.startsWith('combo_')) {
+          const target = parseInt(ach.id.split('_')[1]);
+          progress = `${stats.maxCombo}/${target}`;
+        } else if (ach.id.startsWith('potions_')) {
+          const target = parseInt(ach.id.split('_')[1]);
+          progress = `${stats.potionsCollected}/${target}`;
+        } else if (ach.id.startsWith('level_')) {
+          const target = parseInt(ach.id.split('_')[1]);
+          progress = `Lv ${stats.playerLevel}/${target}`;
+        }
+        
+        return { icon: ach.icon, name: ach.name, progress };
+      }
+    }
+    return null;
   }
   
   /**
@@ -163,20 +253,17 @@ export class AchievementSystem {
   }
   
   /**
-   * Carica achievement sbloccati dal localStorage
+   * NON usato - i trofei si resettano ogni partita
    */
   loadUnlocked() {
-    const saved = localStorage.getItem('achievements_unlocked');
-    if (saved) {
-      this.unlockedAchievements = JSON.parse(saved);
-    }
+    // Disabilitato - reset ogni partita
   }
   
   /**
-   * Salva achievement sbloccati
+   * NON usato - i trofei si resettano ogni partita
    */
   saveUnlocked() {
-    localStorage.setItem('achievements_unlocked', JSON.stringify(this.unlockedAchievements));
+    // Disabilitato - reset ogni partita
   }
   
   /**
@@ -205,7 +292,9 @@ export class AchievementSystem {
     if (this.isUnlocked(achievement.id)) return;
     
     this.unlockedAchievements.push(achievement.id);
-    this.saveUnlocked();
+    
+    // Aggiorna UI trofei (propria)
+    this.updateTrophyUI();
     
     // Aggiungi alla coda di visualizzazione
     this.achievementQueue.push(achievement);

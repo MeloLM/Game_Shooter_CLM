@@ -29,9 +29,9 @@ export class OrcBoss extends Physics.Arcade.Sprite {
     scene.add.existing(this);
     scene.physics.add.existing(this);
     
-    // Boss enorme
-    this.setScale(1.8);
-    this.body.setSize(45, 55);
+    // Boss scala ridotta per visibilità
+    this.setScale(0.7);
+    this.body.setSize(50, 60);
 
     this.hpBar = scene.add.graphics();
     this.updateHPBar();

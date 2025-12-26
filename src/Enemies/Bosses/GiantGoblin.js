@@ -27,9 +27,9 @@ export class GiantGoblin extends Physics.Arcade.Sprite {
     scene.add.existing(this);
     scene.physics.add.existing(this);
     
-    // Boss è più grande
-    this.setScale(1.5);
-    this.body.setSize(40, 50);
+    // Boss scala ridotta per visibilità
+    this.setScale(0.6);
+    this.body.setSize(60, 70);
 
     this.hpBar = scene.add.graphics();
     this.updateHPBar();

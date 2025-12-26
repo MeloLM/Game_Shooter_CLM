@@ -83,10 +83,10 @@ export class DifficultyManager {
    * Crea l'indicatore di difficoltà nell'UI
    */
   createUI() {
-    this.difficultyText = this.scene.add.text(10, 70, '', {
+    this.difficultyText = this.scene.add.text(10, 85, '', {
       fontFamily: 'Arial',
       fontSize: '10px',
-      color: '#888888'
+      color: '#ff6600'
     });
     this.difficultyText.setScrollFactor(0);
     this.difficultyText.setDepth(50);
@@ -97,14 +97,8 @@ export class DifficultyManager {
    * Aggiorna l'UI della difficoltà
    */
   updateUI() {
-    const stars = '⭐'.repeat(Math.min(Math.floor(this.currentDifficulty), 5));
     const diffName = this.getDifficultyName();
-    this.difficultyText.setText(`Difficoltà: ${diffName}`);
-    
-    // Colore in base alla difficoltà
-    const colors = ['#00ff00', '#88ff00', '#ffff00', '#ff8800', '#ff0000'];
-    const colorIndex = Math.min(Math.floor(this.currentDifficulty) - 1, 4);
-    this.difficultyText.setColor(colors[Math.max(0, colorIndex)]);
+    this.difficultyText.setText(`⚔️ ${diffName}`);
   }
   
   /**

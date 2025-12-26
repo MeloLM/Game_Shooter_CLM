@@ -76,11 +76,21 @@ export class GameOver extends Scene {
     });
     highScoreText.setOrigin(0.5);
 
+    // Mostra trofei sbloccati
+    const saved = localStorage.getItem('achievements_unlocked');
+    const unlocked = saved ? JSON.parse(saved) : [];
+    const trophyText = this.add.text(320, 220, `🏆 Trofei: ${unlocked.length}/16`, {
+      fontFamily: 'Arial',
+      fontSize: '12px',
+      color: '#ffd700'
+    });
+    trophyText.setOrigin(0.5);
+
     // Bottone RIPROVA
-    const retryButton = this.add.rectangle(320, 260, 160, 45, 0x4a8a4a);
+    const retryButton = this.add.rectangle(320, 270, 160, 45, 0x4a8a4a);
     retryButton.setInteractive({ useHandCursor: true });
     
-    const retryText = this.add.text(320, 260, '🔄 RIPROVA', {
+    const retryText = this.add.text(320, 270, '🔄 RIPROVA', {
       fontFamily: 'Arial',
       fontSize: '20px',
       color: '#ffffff',
@@ -102,10 +112,10 @@ export class GameOver extends Scene {
     });
 
     // Bottone MENU
-    const menuButton = this.add.rectangle(320, 315, 160, 45, 0x4a4a8a);
+    const menuButton = this.add.rectangle(320, 325, 160, 45, 0x4a4a8a);
     menuButton.setInteractive({ useHandCursor: true });
     
-    const menuText = this.add.text(320, 315, '🏠 MENU', {
+    const menuText = this.add.text(320, 325, '🏠 MENU', {
       fontFamily: 'Arial',
       fontSize: '20px',
       color: '#ffffff',

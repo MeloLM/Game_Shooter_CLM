@@ -196,7 +196,7 @@ export class WaveManager {
       text = `WAVE ${this.currentWave}\n⚡ New: Speed & Ranged!`;
       color = '#ff00ff';
     } else if (this.currentWave === 15) {
-      text = `WAVE ${this.currentWave}\n�️ New: Tank Enemy!`;
+      text = `WAVE ${this.currentWave}\n🛡️ New: Tank Enemy!`;
       color = '#8B4513';
     }
     
@@ -254,26 +254,27 @@ export class WaveManager {
   spawnEnemy() {
     if (!this.scene || !this.scene.enemies) return;
     
-    // Trova posizione spawn fuori dalla camera
+    // Trova posizione spawn ai bordi MA dentro la mappa (evita nemici fuori bounds)
     let x, y;
     const side = Phaser.Math.Between(0, 3);
+    const margin = 20; // Margine dal bordo
     
     switch(side) {
       case 0: // Top
-        x = Phaser.Math.Between(0, 640);
-        y = -20;
+        x = Phaser.Math.Between(margin, 640 - margin);
+        y = margin;
         break;
       case 1: // Right
-        x = 660;
-        y = Phaser.Math.Between(0, 360);
+        x = 640 - margin;
+        y = Phaser.Math.Between(margin, 360 - margin);
         break;
       case 2: // Bottom
-        x = Phaser.Math.Between(0, 640);
-        y = 380;
+        x = Phaser.Math.Between(margin, 640 - margin);
+        y = 360 - margin;
         break;
       case 3: // Left
-        x = -20;
-        y = Phaser.Math.Between(0, 360);
+        x = margin;
+        y = Phaser.Math.Between(margin, 360 - margin);
         break;
     }
     

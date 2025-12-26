@@ -97,6 +97,7 @@ export class Enemy extends Physics.Arcade.Sprite {
   
   /**
    * Logica di morte del nemico
+   * NOTA: XP viene già data in Level.js, non duplicare qui
    */
   die(cause = "attack") {
     if (this.hpBar) {
@@ -109,10 +110,8 @@ export class Enemy extends Physics.Arcade.Sprite {
       this.scene.enemies.splice(index, 1);
     }
     
-    // Dai XP al player se esiste il sistema
-    if (this.scene.player && this.scene.player.addXP) {
-      this.scene.player.addXP(this.xpReward);
-    }
+    // XP già gestita in Level.js (player.addXP chiamato là)
+    // Non chiamare qui per evitare XP doppia
     
     this.destroy();
   }

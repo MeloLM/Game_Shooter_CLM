@@ -35,35 +35,35 @@ export class ComboSystem {
    * Crea l'UI per il combo
    */
   createComboUI() {
-    // Testo combo (centro-destra)
-    this.comboText = this.scene.add.text(630, 40, '', {
+    // Testo combo (sotto la difficoltà, a sinistra)
+    this.comboText = this.scene.add.text(10, 100, '', {
       fontFamily: 'Arial',
-      fontSize: '16px',
+      fontSize: '12px',
       color: '#ffcc00',
       fontStyle: 'bold',
       stroke: '#000000',
       strokeThickness: 2
     });
-    this.comboText.setOrigin(1, 0);
+    this.comboText.setOrigin(0, 0);
     this.comboText.setScrollFactor(0);
     this.comboText.setDepth(50);
     this.comboText.setAlpha(0);
 
     // Testo moltiplicatore
-    this.multiplierText = this.scene.add.text(630, 58, '', {
+    this.multiplierText = this.scene.add.text(10, 115, '', {
       fontFamily: 'Arial',
-      fontSize: '12px',
+      fontSize: '9px',
       color: '#ffffff',
       stroke: '#000000',
       strokeThickness: 1
     });
-    this.multiplierText.setOrigin(1, 0);
+    this.multiplierText.setOrigin(0, 0);
     this.multiplierText.setScrollFactor(0);
     this.multiplierText.setDepth(50);
     this.multiplierText.setAlpha(0);
 
     // Barra timer combo
-    this.comboTimerBar = this.scene.add.rectangle(580, 75, 100, 4, 0xffcc00);
+    this.comboTimerBar = this.scene.add.rectangle(60, 130, 80, 4, 0xffcc00);
     this.comboTimerBar.setOrigin(0.5, 0.5);
     this.comboTimerBar.setScrollFactor(0);
     this.comboTimerBar.setDepth(50);

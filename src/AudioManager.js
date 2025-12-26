@@ -22,8 +22,8 @@ export class AudioManager {
     try {
       // Background Music
       this.scene.load.audio('bgm_menu', 'assets/audio/Menu_audio.wav');
-      this.scene.load.audio('bgm_main', 'assets/audio/Main_theme.mp3.mp3');
-      this.scene.load.audio('bgm_boss', 'assets/audio/Boss_theme.mp3.mp3');
+      this.scene.load.audio('bgm_main', 'assets/audio/Main_theme.mp3');
+      this.scene.load.audio('bgm_boss', 'assets/audio/Boss_theme.mp3');
     } catch (e) {
       console.log('Audio files not found - continuing without audio');
     }

@@ -11,12 +11,29 @@ import { GameOver } from "./src/GameOver";
   physics:{
     default: 'arcade',
     arcade:{
-      debug: false
+      debug: true  // DEBUG MODE ATTIVO
     }
   },
   scale:{
     autoCenter: Scale.CENTER_BOTH,
-    mode: Scale.FIT
+    mode: Scale.FIT,
+    // Responsive per mobile landscape
+    min: {
+      width: 320,
+      height: 180
+    },
+    max: {
+      width: 1280,
+      height: 720
+    }
   },
-  pixelArt: true
+  pixelArt: true,
+  // Ottimizzazioni mobile
+  input: {
+    activePointers: 3  // Supporto multi-touch
+  },
+  render: {
+    antialias: false,
+    pixelArt: true
+  }
  })

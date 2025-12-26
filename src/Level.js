@@ -1,4 +1,4 @@
-import { Scene, Text } from "phaser";
+import { Scene } from "phaser";
 import { Player } from "./Scene/Player.js";
 import { Fly } from "./Enemies/Fly.js";
 import { Goblin } from "./Enemies/Goblin.js";
@@ -69,7 +69,7 @@ export class Level extends Scene{
     { weight: 5, create: (x, y) => new CyanBottle(this, x, y) },      // Boomerang - molto raro
   ];
   bottleList = [
-    (x, y) => new RedBottle (this, x, y),
+    (x, y) => new RedBottle(this, x, y),
     (x, y) => new YellowBottle(this, x, y),
     (x, y) => new BlueBottle(this, x, y),
     (x, y) => new GreenBottle(this, x, y),
@@ -155,18 +155,18 @@ export class Level extends Scene{
     // this.load.spritesheet("skeleton_attack", "assets/enemy/Skeleton_knight_sprite/Skeleton_Crusader_1/PNG/PNG Sequences/Slashing/0_Crusader_Slashing_000.png", {frameWidth: 64, frameHeight: 64});
     // this.load.spritesheet("skeleton_death", "assets/enemy/Skeleton_knight_sprite/Skeleton_Crusader_1/PNG/PNG Sequences/Dying/0_Crusader_Dying_000.png", {frameWidth: 64, frameHeight: 64});
     
-    // Boss sprites - Giant Goblin
-    this.load.spritesheet("boss_goblin_idle", "assets/bosses/Bosses_sprite/Giant Goblin/PNG/Spritesheets/Front - Idle.png", {frameWidth: 100, frameHeight: 100});
-    this.load.spritesheet("boss_goblin_walk", "assets/bosses/Bosses_sprite/Giant Goblin/PNG/Spritesheets/Front - Walking.png", {frameWidth: 100, frameHeight: 100});
-    this.load.spritesheet("boss_goblin_attack", "assets/bosses/Bosses_sprite/Giant Goblin/PNG/Spritesheets/Front - Attacking.png", {frameWidth: 100, frameHeight: 100});
-    this.load.spritesheet("boss_goblin_death", "assets/bosses/Bosses_sprite/Giant Goblin/PNG/Spritesheets/Dying.png", {frameWidth: 100, frameHeight: 100});
+    // Boss sprites - Giant Goblin (frame sizes from actual spritesheets)
+    this.load.spritesheet("boss_goblin_idle", "assets/bosses/Bosses_sprite/Giant Goblin/PNG/Spritesheets/Front - Idle.png", {frameWidth: 150, frameHeight: 150});
+    this.load.spritesheet("boss_goblin_walk", "assets/bosses/Bosses_sprite/Giant Goblin/PNG/Spritesheets/Front - Walking.png", {frameWidth: 150, frameHeight: 150});
+    this.load.spritesheet("boss_goblin_attack", "assets/bosses/Bosses_sprite/Giant Goblin/PNG/Spritesheets/Front - Attacking.png", {frameWidth: 150, frameHeight: 150});
+    this.load.spritesheet("boss_goblin_death", "assets/bosses/Bosses_sprite/Giant Goblin/PNG/Spritesheets/Dying.png", {frameWidth: 150, frameHeight: 150});
     
-    // Boss sprites - Orc
-    this.load.spritesheet("boss_orc_idle", "assets/bosses/Orc_boss_sprite/PNG/Orc1/Without_shadow/orc1_idle_without_shadow.png", {frameWidth: 100, frameHeight: 100});
-    this.load.spritesheet("boss_orc_walk", "assets/bosses/Orc_boss_sprite/PNG/Orc1/Without_shadow/orc1_walk_without_shadow.png", {frameWidth: 100, frameHeight: 100});
-    this.load.spritesheet("boss_orc_run", "assets/bosses/Orc_boss_sprite/PNG/Orc1/Without_shadow/orc1_run_without_shadow.png", {frameWidth: 100, frameHeight: 100});
-    this.load.spritesheet("boss_orc_attack", "assets/bosses/Orc_boss_sprite/PNG/Orc1/Without_shadow/orc1_attack_without_shadow.png", {frameWidth: 100, frameHeight: 100});
-    this.load.spritesheet("boss_orc_death", "assets/bosses/Orc_boss_sprite/PNG/Orc1/Without_shadow/orc1_death_without_shadow.png", {frameWidth: 100, frameHeight: 100});
+    // Boss sprites - Orc (frame sizes from actual spritesheets)
+    this.load.spritesheet("boss_orc_idle", "assets/bosses/Orc_boss_sprite/PNG/Orc1/Without_shadow/orc1_idle_without_shadow.png", {frameWidth: 96, frameHeight: 96});
+    this.load.spritesheet("boss_orc_walk", "assets/bosses/Orc_boss_sprite/PNG/Orc1/Without_shadow/orc1_walk_without_shadow.png", {frameWidth: 96, frameHeight: 96});
+    this.load.spritesheet("boss_orc_run", "assets/bosses/Orc_boss_sprite/PNG/Orc1/Without_shadow/orc1_run_without_shadow.png", {frameWidth: 96, frameHeight: 96});
+    this.load.spritesheet("boss_orc_attack", "assets/bosses/Orc_boss_sprite/PNG/Orc1/Without_shadow/orc1_attack_without_shadow.png", {frameWidth: 96, frameHeight: 96});
+    this.load.spritesheet("boss_orc_death", "assets/bosses/Orc_boss_sprite/PNG/Orc1/Without_shadow/orc1_death_without_shadow.png", {frameWidth: 96, frameHeight: 96});
 
     // Weapons
     this.load.spritesheet("sword", "assets/player/sword.png", {frameWidth: 16, frameHeight: 16});
@@ -327,6 +327,37 @@ export class Level extends Scene{
     this.pauseInstructions.setDepth(101);
     this.pauseInstructions.setVisible(false);
 
+    // Pannello trofei per la pausa
+    this.pauseTrophyPanel = this.add.container(320, 280);
+    this.pauseTrophyPanel.setScrollFactor(0);
+    this.pauseTrophyPanel.setDepth(101);
+    this.pauseTrophyPanel.setVisible(false);
+    
+    // Sfondo pannello trofei
+    const trophyBg = this.add.rectangle(0, 0, 400, 100, 0x1a1a2e, 0.9);
+    trophyBg.setStrokeStyle(2, 0xffd700);
+    this.pauseTrophyPanel.add(trophyBg);
+    
+    // Titolo trofei
+    const trophyTitle = this.add.text(0, -35, '🏆 TROFEI PARTITA', {
+      fontFamily: 'Arial',
+      fontSize: '14px',
+      color: '#ffd700',
+      fontStyle: 'bold'
+    });
+    trophyTitle.setOrigin(0.5);
+    this.pauseTrophyPanel.add(trophyTitle);
+    
+    // Testo trofei (sarà aggiornato in togglePause)
+    this.pauseTrophyText = this.add.text(0, 5, '', {
+      fontFamily: 'Arial',
+      fontSize: '10px',
+      color: '#ffffff',
+      align: 'center'
+    });
+    this.pauseTrophyText.setOrigin(0.5);
+    this.pauseTrophyPanel.add(this.pauseTrophyText);
+
     // === DAMAGE FLASH OVERLAY ===
     this.damageFlash = this.add.rectangle(320, 180, 640, 360, 0xff0000, 0);
     this.damageFlash.setScrollFactor(0);
@@ -355,7 +386,20 @@ export class Level extends Scene{
 		}
 
     this.enemies.forEach((enemy)=> {
-      this.physics.moveToObject(enemy, this.player, 40);
+      // Chiama update() se il nemico ha il metodo (boss hanno logica custom)
+      if (enemy.update && typeof enemy.update === 'function') {
+        enemy.update(this.player);
+      } else {
+        // Fallback per nemici senza update custom
+        this.physics.moveToObject(enemy, this.player, enemy.moveSpeed || 40);
+      }
+      
+      // Mantieni nemici dentro i bounds della mappa
+      if (enemy.x < 10) enemy.x = 10;
+      if (enemy.x > 630) enemy.x = 630;
+      if (enemy.y < 10) enemy.y = 10;
+      if (enemy.y > 350) enemy.y = 350;
+      
       if (enemy.x > this.player.x) {
         enemy.setFlipX(true)
       } else {
@@ -379,7 +423,7 @@ export class Level extends Scene{
         powerUpColor = '#ffa500';
         console.log("change Weapon")
       } else if (bottle instanceof RedBottle) {   // Se la bottiglia è rossa, cura il giocatore
-        player.power = false;
+        // NON resettare power - mantieni arma corrente
         player.heal();
         powerUpName = 'Heal';
         powerUpColor = '#ff0000';
@@ -387,7 +431,7 @@ export class Level extends Scene{
         // FIX: Usa flag per evitare stack di speed boost
         if (!this.player.hasSpeedBoost) {
           this.player.hasSpeedBoost = true;
-          const speedBoost = 120;
+          const speedBoost = 130;
           const originalSpeed = this.player.baseSpeed;
           this.player.speed = originalSpeed + speedBoost;
           powerUpName = 'Speed';
@@ -495,6 +539,23 @@ export class Level extends Scene{
       if(this.immunity == false){
         this.player.takeDamage(enemy.enemyDmg);
         
+        // === KNOCKBACK ===
+        // Calcola direzione opposta al nemico
+        const knockbackForce = 200;
+        const angle = Phaser.Math.Angle.Between(enemy.x, enemy.y, player.x, player.y);
+        const knockbackX = Math.cos(angle) * knockbackForce;
+        const knockbackY = Math.sin(angle) * knockbackForce;
+        
+        // Applica knockback
+        player.setVelocity(knockbackX, knockbackY);
+        
+        // Reset velocità dopo breve tempo
+        this.time.delayedCall(150, () => {
+          if (player.body) {
+            player.setVelocity(0, 0);
+          }
+        });
+        
         // === FEEDBACK VISIVI ===
         // Screen shake
         this.cameras.main.shake(100, 0.01);
@@ -534,16 +595,22 @@ export class Level extends Scene{
       if (isDead) {
         new DeathAnim(this, enemy.x, enemy.y);
         
+        // Tracking uccisioni per tipo (per achievement)
+        const enemyName = enemy.constructor.name;
+        if (enemyName.includes('Slime')) {
+          this.slimeKills++;
+        }
+        
         // Effetto particelle morte
         if (this.visualEffects) {
           // Determina tipo nemico per colore particelle
           let enemyType = 'default';
-          if (enemy.constructor.name === 'Slime') enemyType = 'slime';
-          else if (enemy.constructor.name === 'Goblin') enemyType = 'goblin';
-          else if (enemy.constructor.name === 'Fly') enemyType = 'fly';
-          else if (enemy.constructor.name === 'TankEnemy') enemyType = 'tank';
-          else if (enemy.constructor.name === 'SpeedEnemy') enemyType = 'speed';
-          else if (enemy.constructor.name === 'RangedEnemy') enemyType = 'ranged';
+          if (enemyName === 'Slime' || enemyName.includes('Slime')) enemyType = 'slime';
+          else if (enemyName === 'Goblin') enemyType = 'goblin';
+          else if (enemyName === 'Fly') enemyType = 'fly';
+          else if (enemyName === 'TankEnemy') enemyType = 'tank';
+          else if (enemyName === 'SpeedEnemy') enemyType = 'speed';
+          else if (enemyName === 'RangedEnemy') enemyType = 'ranged';
           
           this.visualEffects.createDeathParticles(enemy.x, enemy.y, enemyType);
         }
@@ -603,6 +670,8 @@ export class Level extends Scene{
       this.lastAchievementCheck = Math.floor(this.time.now / 1000);
       const stats = AchievementSystem.getStatsFromScene(this);
       this.achievementSystem.checkAchievements(stats);
+      // Aggiorna UI trofei con progressi
+      this.achievementSystem.updateTrophyUI();
     }
     
     // Aggiorna difficoltà dinamica
@@ -617,7 +686,9 @@ export class Level extends Scene{
   }
 
   updateShieldVisibility() {
-    this.shield.setVisible(this.immunity);
+    if (this.shield) {
+      this.shield.setVisible(this.immunity);
+    }
   }
 
   togglePause() {
@@ -629,12 +700,42 @@ export class Level extends Scene{
       this.pauseOverlay.setVisible(true);
       this.pauseText.setVisible(true);
       this.pauseInstructions.setVisible(true);
+      
+      // Mostra pannello trofei con stato attuale
+      if (this.pauseTrophyPanel && this.achievementSystem) {
+        this.pauseTrophyPanel.setVisible(true);
+        this.updatePauseTrophies();
+      }
     } else {
       // Riprendi il gioco
       this.physics.resume();
       this.pauseOverlay.setVisible(false);
       this.pauseText.setVisible(false);
       this.pauseInstructions.setVisible(false);
+      if (this.pauseTrophyPanel) {
+        this.pauseTrophyPanel.setVisible(false);
+      }
+    }
+  }
+  
+  /**
+   * Aggiorna il pannello trofei nella pausa
+   */
+  updatePauseTrophies() {
+    if (!this.achievementSystem || !this.pauseTrophyText) return;
+    
+    const unlocked = this.achievementSystem.unlockedAchievements;
+    const total = this.achievementSystem.getTotalCount();
+    
+    if (unlocked.length === 0) {
+      this.pauseTrophyText.setText('Nessun trofeo sbloccato ancora.\nUccidi nemici, sopravvivi e fai combo!');
+    } else {
+      // Mostra trofei sbloccati
+      const trophyNames = unlocked.map(id => {
+        const ach = this.achievementSystem.achievements.find(a => a.id === id);
+        return ach ? `${ach.icon} ${ach.name}` : id;
+      });
+      this.pauseTrophyText.setText(`Sbloccati: ${unlocked.length}/${total}\n${trophyNames.join(' | ')}`);
     }
   }
 
@@ -686,7 +787,7 @@ export class Level extends Scene{
     this.hpBarFill.setScrollFactor(0);
     this.hpBarFill.setDepth(hudDepth + 1);
 
-    this.hpText = this.add.text(320, 350, '1000/1000', {
+    this.hpText = this.add.text(320, 340, '1000/1000', {
       fontFamily: 'Arial',
       fontSize: '10px',
       color: '#ffffff'
