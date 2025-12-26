@@ -3,9 +3,15 @@ import { Player } from "./Scene/Player.js";
 import { Fly } from "./Enemies/Fly.js";
 import { Goblin } from "./Enemies/Goblin.js";
 import { Slime } from "./Enemies/Slime.js";
+import { SlimeGreen } from "./Enemies/SlimeGreen.js";
+import { SlimeBlue } from "./Enemies/SlimeBlue.js";
+import { SlimeRed } from "./Enemies/SlimeRed.js";
 import { TankEnemy } from "./Enemies/TankEnemy.js";
 import { SpeedEnemy } from "./Enemies/SpeedEnemy.js";
 import { RangedEnemy } from "./Enemies/RangedEnemy.js";
+import { SkeletonKnight } from "./Enemies/SkeletonKnight.js";
+import { GiantGoblin } from "./Enemies/Bosses/GiantGoblin.js";
+import { OrcBoss } from "./Enemies/Bosses/OrcBoss.js";
 import { Door } from "./Scene/Door.js";
 import { DeathAnim } from "./Scene/DeathAnim.js";
 import { RedBottle } from "./Scene/RedBottle.js";
@@ -23,6 +29,7 @@ import { Minimap } from "./Minimap.js";
 import { VisualEffects } from "./VisualEffects.js";
 import { AchievementSystem } from "./AchievementSystem.js";
 import { DifficultyManager } from "./DifficultyManager.js";
+import { AudioManager } from "./AudioManager.js";
 import { Shotgun } from "./Scene/Shotgun.js";
 import { Boomerang } from "./Scene/Boomerang.js";
 
@@ -35,13 +42,17 @@ export class Level extends Scene{
 	targetPosStartAnimation = 64;
 	door;
   player;
+  audioManager = null;
   enemiesList = [
-    (x, y) => new Slime(this, x, y),
-    (x, y) => new Goblin(this, x, y),
-    (x, y) => new Fly(this, x, y),
-    (x, y) => new TankEnemy(this, x, y),
-    (x, y) => new SpeedEnemy(this, x, y),
-    (x, y) => new RangedEnemy(this, x, y),
+    (x, y) => new SlimeGreen(this, x, y),   // 0 - slimeGreen
+    (x, y) => new Goblin(this, x, y),       // 1 - goblin
+    (x, y) => new Fly(this, x, y),          // 2 - fly
+    (x, y) => new TankEnemy(this, x, y),    // 3 - tank
+    (x, y) => new SpeedEnemy(this, x, y),   // 4 - speed
+    (x, y) => new RangedEnemy(this, x, y),  // 5 - ranged
+    (x, y) => new SlimeBlue(this, x, y),    // 6 - slimeBlue
+    (x, y) => new SlimeRed(this, x, y),     // 7 - slimeRed
+    (x, y) => new SkeletonKnight(this, x, y), // 8 - skeleton
   ];
   enemies = [];
   waveManager = null;
@@ -112,30 +123,74 @@ export class Level extends Scene{
 
   //serve per caricare gli assets utilizzati in questo livello
   preload() {
+    // Player sprites
     this.load.spritesheet("knight_idle", "assets/player/knight_idle.png", {frameWidth: 16, frameHeight: 16});
     this.load.spritesheet("knight_run", "assets/player/knight_run.png", {frameWidth: 16, frameHeight: 16});
     
+    // Enemy base sprites
     this.load.spritesheet("fly", "assets/enemy/fly.png", {frameWidth: 16, frameHeight: 16});
     this.load.spritesheet("goblin", "assets/enemy/goblin.png", {frameWidth: 16, frameHeight: 16});
     this.load.spritesheet("slime", "assets/enemy/slime.png", {frameWidth: 16, frameHeight: 16});
 
+    // New Slime sprites (Slime1 = Green, usa come base per tutti)
+    this.load.spritesheet("slime_green_idle", "assets/enemy/Slime_sprite_pack/PNG/Slime1/Without_shadow/Slime1_Idle_without_shadow.png", {frameWidth: 64, frameHeight: 64});
+    this.load.spritesheet("slime_green_run", "assets/enemy/Slime_sprite_pack/PNG/Slime1/Without_shadow/Slime1_Run_without_shadow.png", {frameWidth: 64, frameHeight: 64});
+    this.load.spritesheet("slime_green_death", "assets/enemy/Slime_sprite_pack/PNG/Slime1/Without_shadow/Slime1_Death_without_shadow.png", {frameWidth: 64, frameHeight: 64});
+    
+    // Slime Blue (usa Slime2 come base)
+    this.load.spritesheet("slime_blue_idle", "assets/enemy/Slime_sprite_pack/PNG/Slime2/Without_shadow/Slime2_Idle_without_shadow.png", {frameWidth: 64, frameHeight: 64});
+    this.load.spritesheet("slime_blue_run", "assets/enemy/Slime_sprite_pack/PNG/Slime2/Without_shadow/Slime2_Run_without_shadow.png", {frameWidth: 64, frameHeight: 64});
+    this.load.spritesheet("slime_blue_death", "assets/enemy/Slime_sprite_pack/PNG/Slime2/Without_shadow/Slime2_Death_without_shadow.png", {frameWidth: 64, frameHeight: 64});
+    
+    // Slime Red (usa Slime3 come base)
+    this.load.spritesheet("slime_red_idle", "assets/enemy/Slime_sprite_pack/PNG/Slime3/Without_shadow/Slime3_Idle_without_shadow.png", {frameWidth: 64, frameHeight: 64});
+    this.load.spritesheet("slime_red_run", "assets/enemy/Slime_sprite_pack/PNG/Slime3/Without_shadow/Slime3_Run_without_shadow.png", {frameWidth: 64, frameHeight: 64});
+    this.load.spritesheet("slime_red_death", "assets/enemy/Slime_sprite_pack/PNG/Slime3/Without_shadow/Slime3_Death_without_shadow.png", {frameWidth: 64, frameHeight: 64});
+    
+    // Skeleton Knight sprites
+    this.load.spritesheet("skeleton_idle", "assets/enemy/Skeleton_knight_sprite/Skeleton_Crusader_1/PNG/PNG Sequences/Idle/0_Crusader_Idle_000.png", {frameWidth: 64, frameHeight: 64});
+    this.load.spritesheet("skeleton_walk", "assets/enemy/Skeleton_knight_sprite/Skeleton_Crusader_1/PNG/PNG Sequences/Walking/0_Crusader_Walking_000.png", {frameWidth: 64, frameHeight: 64});
+    this.load.spritesheet("skeleton_attack", "assets/enemy/Skeleton_knight_sprite/Skeleton_Crusader_1/PNG/PNG Sequences/Slashing/0_Crusader_Slashing_000.png", {frameWidth: 64, frameHeight: 64});
+    this.load.spritesheet("skeleton_death", "assets/enemy/Skeleton_knight_sprite/Skeleton_Crusader_1/PNG/PNG Sequences/Dying/0_Crusader_Dying_000.png", {frameWidth: 64, frameHeight: 64});
+    
+    // Boss sprites - Giant Goblin
+    this.load.spritesheet("boss_goblin_idle", "assets/bosses/Bosses_sprite/Giant Goblin/PNG/Spritesheets/Front - Idle.png", {frameWidth: 100, frameHeight: 100});
+    this.load.spritesheet("boss_goblin_walk", "assets/bosses/Bosses_sprite/Giant Goblin/PNG/Spritesheets/Front - Walking.png", {frameWidth: 100, frameHeight: 100});
+    this.load.spritesheet("boss_goblin_attack", "assets/bosses/Bosses_sprite/Giant Goblin/PNG/Spritesheets/Front - Attacking.png", {frameWidth: 100, frameHeight: 100});
+    this.load.spritesheet("boss_goblin_death", "assets/bosses/Bosses_sprite/Giant Goblin/PNG/Spritesheets/Dying.png", {frameWidth: 100, frameHeight: 100});
+    
+    // Boss sprites - Orc
+    this.load.spritesheet("boss_orc_idle", "assets/bosses/Orc_boss_sprite/PNG/Orc1/Without_shadow/orc1_idle_without_shadow.png", {frameWidth: 100, frameHeight: 100});
+    this.load.spritesheet("boss_orc_walk", "assets/bosses/Orc_boss_sprite/PNG/Orc1/Without_shadow/orc1_walk_without_shadow.png", {frameWidth: 100, frameHeight: 100});
+    this.load.spritesheet("boss_orc_run", "assets/bosses/Orc_boss_sprite/PNG/Orc1/Without_shadow/orc1_run_without_shadow.png", {frameWidth: 100, frameHeight: 100});
+    this.load.spritesheet("boss_orc_attack", "assets/bosses/Orc_boss_sprite/PNG/Orc1/Without_shadow/orc1_attack_without_shadow.png", {frameWidth: 100, frameHeight: 100});
+    this.load.spritesheet("boss_orc_death", "assets/bosses/Orc_boss_sprite/PNG/Orc1/Without_shadow/orc1_death_without_shadow.png", {frameWidth: 100, frameHeight: 100});
+
+    // Weapons
     this.load.spritesheet("sword", "assets/player/sword.png", {frameWidth: 16, frameHeight: 16});
     this.load.spritesheet("laser", "assets/player/laser.png", {frameWidth: 16, frameHeight: 16});
 
+    // Potions
     this.load.spritesheet("potion", "assets/potions/red_potion.png", {frameWidth: 16, frameHeight: 16});
     this.load.spritesheet("yellow_potion", "assets/potions/yellow_potion.png", {frameWidth: 16, frameHeight: 16});
     this.load.spritesheet("blue_potion", "assets/potions/azure_potion.png", {frameWidth: 16, frameHeight: 16});
     this.load.spritesheet("green_potion", "assets/potions/green_potion.png", {frameWidth: 16, frameHeight: 16});
     this.load.spritesheet("purple_potion", "assets/potions/purple_potion.png", {frameWidth: 16, frameHeight: 16});
 
+    // Effects
     this.load.spritesheet("death", "assets/enemy/explosion-6.png", {frameWidth: 48, frameHeight: 48});
     this.load.spritesheet("thunder", "assets/enemy/electro_ray.png", {frameWidth: 64, frameHeight: 64});
     this.load.spritesheet("shield1", "assets/player/shield1.png", {frameWidth: 64, frameHeight: 64});
 
+    // Map and UI
     this.load.spritesheet("door", "assets/door.png", { frameWidth: 32, frameHeight: 32 })
     this.load.tilemapTiledJSON("tilemap", "assets/Map.json")
 		this.load.image("shooter", "assets/tilesheet.png")
     this.load.image("pause_btn", "assets/pauseBtn.png");
+    
+    // Audio
+    this.audioManager = new AudioManager(this);
+    this.audioManager.preloadSounds();
   }
 
   //serve per costruire il livello e le sue entità
@@ -149,6 +204,10 @@ export class Level extends Scene{
 		let wallLayer = this.map.createLayer("Walls", "shooter");
 		wallLayer.setCollisionBetween(1, wallLayer.tilesTotal);
 		this.map.createLayer("Decorations", "shooter");
+
+    // === AUDIO ===
+    this.audioManager.initSounds();
+    this.audioManager.playBGM();
 
     // === HUD MIGLIORATO ===
     this.createHUD(wallLayer);
@@ -708,6 +767,24 @@ export class Level extends Scene{
         duration: 300,
         onComplete: () => particle.destroy()
       });
+    }
+  }
+
+  /**
+   * Crea un boss del tipo specificato
+   * @param {string} type - 'goblin' o 'orc'
+   * @param {number} x - posizione X
+   * @param {number} y - posizione Y
+   * @returns {GiantGoblin|OrcBoss} - istanza del boss
+   */
+  createBoss(type, x, y) {
+    switch(type) {
+      case 'goblin':
+        return new GiantGoblin(this, x, y);
+      case 'orc':
+        return new OrcBoss(this, x, y);
+      default:
+        return new GiantGoblin(this, x, y);
     }
   }
 }

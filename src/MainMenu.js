@@ -1,4 +1,5 @@
 import { Scene } from "phaser";
+import { AudioManager } from "./AudioManager.js";
 
 export class MainMenu extends Scene {
   constructor() {
@@ -8,9 +9,17 @@ export class MainMenu extends Scene {
   preload() {
     // Carica assets per il menu
     this.load.image("menu_bg", "assets/tilesheet.png");
+    
+    // Carica audio
+    this.audioManager = new AudioManager(this);
+    this.audioManager.preloadSounds();
   }
 
   create() {
+    // Inizializza e avvia audio menu
+    this.audioManager.initSounds();
+    this.audioManager.playMenuBGM();
+    
     // Sfondo
     this.add.rectangle(320, 180, 640, 360, 0x1a1a2e);
 
@@ -55,6 +64,7 @@ export class MainMenu extends Scene {
       playText.setScale(1);
     });
     playButton.on('pointerdown', () => {
+      this.audioManager.stopBGM();
       this.scene.start('Level');
     });
 

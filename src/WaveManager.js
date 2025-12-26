@@ -2,12 +2,14 @@
  * Sistema di gestione delle Wave (ondate) di nemici
  * 
  * Progressione:
- * - Wave 1-3: Solo Slime
- * - Wave 4-6: Slime + Fly
- * - Wave 7-10: Slime + Fly + Goblin
- * - Wave 11+: Tutti i nemici + Speed + Ranged
- * - Wave 15+: Tutti + Tank
- * - Boss ogni 10 wave
+ * - Wave 1-3: Solo Slime Verde
+ * - Wave 4-6: Slime (tutti i tipi) + Fly
+ * - Wave 7-9: + Goblin
+ * - Wave 10: BOSS Giant Goblin
+ * - Wave 11-14: + Speed + Ranged
+ * - Wave 15-19: + Tank + Skeleton
+ * - Wave 20: BOSS Orc
+ * - Wave 21+: Tutti i nemici + Boss ogni 10 wave
  */
 export class WaveManager {
   scene;
@@ -15,20 +17,27 @@ export class WaveManager {
   enemiesInWave = 0;
   enemiesKilledInWave = 0;
   waveActive = false;
-  timeBetweenWaves = 5000; // 5 secondi tra una wave e l'altra
+  timeBetweenWaves = 5000;
   baseEnemiesPerWave = 5;
-  spawnDelay = 1500; // Delay base tra spawn
+  spawnDelay = 1500;
   waveText;
   waveAnnouncement;
   
+  // Boss tracking
+  bossActive = false;
+  currentBoss = null;
+  
   // Configurazione nemici per wave
   enemyConfigs = {
-    slime: { minWave: 1, weight: 30 },
-    fly: { minWave: 4, weight: 25 },
+    slimeGreen: { minWave: 1, weight: 30 },
+    slimeBlue: { minWave: 4, weight: 20 },
+    slimeRed: { minWave: 4, weight: 15 },
+    fly: { minWave: 4, weight: 20 },
     goblin: { minWave: 7, weight: 20 },
-    speed: { minWave: 11, weight: 15 },
+    speed: { minWave: 11, weight: 12 },
     ranged: { minWave: 11, weight: 10 },
-    tank: { minWave: 15, weight: 5 }
+    tank: { minWave: 15, weight: 5 },
+    skeleton: { minWave: 15, weight: 8 }
   };
   
   constructor(scene) {
@@ -81,6 +90,12 @@ export class WaveManager {
     this.enemiesKilledInWave = 0;
     this.waveActive = true;
     
+    // Boss wave ogni 10
+    if (this.currentWave % 10 === 0) {
+      this.startBossWave();
+      return;
+    }
+    
     // Calcola numero nemici (aumenta con le wave)
     this.enemiesInWave = this.baseEnemiesPerWave + Math.floor(this.currentWave * 1.5);
     
@@ -95,6 +110,71 @@ export class WaveManager {
   }
   
   /**
+   * Inizia una wave con boss
+   */
+  startBossWave() {
+    this.bossActive = true;
+    this.enemiesInWave = 1; // Solo il boss
+    
+    // Cambia musica a boss theme
+    if (this.scene.audioManager) {
+      this.scene.audioManager.playBossBGM();
+    }
+    
+    // Mostra annuncio boss
+    this.showWaveAnnouncement();
+    this.updateWaveUI();
+    
+    // Spawn boss dopo breve delay
+    this.scene.time.delayedCall(2000, () => {
+      this.spawnBoss();
+    });
+  }
+  
+  /**
+   * Spawna il boss appropriato per la wave
+   */
+  spawnBoss() {
+    // Posizione centro-alto della mappa
+    const x = 320;
+    const y = 50;
+    
+    let boss;
+    
+    // Wave 10, 30, 50... = Giant Goblin
+    // Wave 20, 40, 60... = Orc Boss
+    if ((this.currentWave / 10) % 2 === 0) {
+      // Orc Boss
+      boss = this.scene.createBoss('orc', x, y);
+    } else {
+      // Giant Goblin
+      boss = this.scene.createBoss('goblin', x, y);
+    }
+    
+    if (boss) {
+      this.currentBoss = boss;
+      this.scene.enemies.push(boss);
+    }
+  }
+  
+  /**
+   * Chiamato quando il boss viene sconfitto
+   */
+  bossDefeated() {
+    this.bossActive = false;
+    this.currentBoss = null;
+    
+    // Torna alla musica normale
+    if (this.scene.audioManager) {
+      this.scene.audioManager.playBGM();
+    }
+    
+    // Completa la wave
+    this.enemiesKilledInWave = this.enemiesInWave;
+    this.waveComplete();
+  }
+  
+  /**
    * Mostra l'annuncio della nuova wave
    */
   showWaveAnnouncement() {
@@ -103,10 +183,11 @@ export class WaveManager {
     
     // Wave speciali
     if (this.currentWave % 10 === 0) {
-      text = `⚠️ BOSS WAVE ${this.currentWave} ⚠️`;
+      const bossName = (this.currentWave / 10) % 2 === 0 ? 'ORC WARLORD' : 'GIANT GOBLIN';
+      text = `⚠️ BOSS WAVE ${this.currentWave} ⚠️\n💀 ${bossName} 💀`;
       color = '#ff0000';
     } else if (this.currentWave === 4) {
-      text = `WAVE ${this.currentWave}\n🦟 New Enemy: Fly!`;
+      text = `WAVE ${this.currentWave}\n🔵🔴 New: Slime Blue & Red!`;
       color = '#00ffff';
     } else if (this.currentWave === 7) {
       text = `WAVE ${this.currentWave}\n👺 New Enemy: Goblin!`;
@@ -115,7 +196,7 @@ export class WaveManager {
       text = `WAVE ${this.currentWave}\n⚡ New: Speed & Ranged!`;
       color = '#ff00ff';
     } else if (this.currentWave === 15) {
-      text = `WAVE ${this.currentWave}\n🛡️ New Enemy: Tank!`;
+      text = `WAVE ${this.currentWave}\n💀🛡️ New: Skeleton & Tank!`;
       color = '#8B4513';
     }
     
@@ -238,21 +319,24 @@ export class WaveManager {
     const enemyCreators = this.scene.enemiesList;
     
     switch(type) {
-      case 'slime':
-        return enemyCreators[0](x, y);
+      case 'slimeGreen':
+        return enemyCreators[0] ? enemyCreators[0](x, y) : null;
+      case 'slimeBlue':
+        return enemyCreators[6] ? enemyCreators[6](x, y) : enemyCreators[0](x, y);
+      case 'slimeRed':
+        return enemyCreators[7] ? enemyCreators[7](x, y) : enemyCreators[0](x, y);
       case 'goblin':
-        return enemyCreators[1](x, y);
+        return enemyCreators[1] ? enemyCreators[1](x, y) : null;
       case 'fly':
-        return enemyCreators[2](x, y);
+        return enemyCreators[2] ? enemyCreators[2](x, y) : null;
       case 'tank':
-        if (enemyCreators[3]) return enemyCreators[3](x, y);
-        return enemyCreators[1](x, y); // Fallback a goblin
+        return enemyCreators[3] ? enemyCreators[3](x, y) : enemyCreators[1](x, y);
       case 'speed':
-        if (enemyCreators[4]) return enemyCreators[4](x, y);
-        return enemyCreators[2](x, y); // Fallback a fly
+        return enemyCreators[4] ? enemyCreators[4](x, y) : enemyCreators[2](x, y);
       case 'ranged':
-        if (enemyCreators[5]) return enemyCreators[5](x, y);
-        return enemyCreators[1](x, y); // Fallback a goblin
+        return enemyCreators[5] ? enemyCreators[5](x, y) : enemyCreators[1](x, y);
+      case 'skeleton':
+        return enemyCreators[8] ? enemyCreators[8](x, y) : enemyCreators[1](x, y);
       default:
         return enemyCreators[0](x, y);
     }
