@@ -16,9 +16,11 @@ export class MainMenu extends Scene {
   }
 
   create() {
-    // Inizializza e avvia audio menu
+    // Inizializza audio menu (ma non avvia ancora per policy browser)
     this.audioManager.initSounds();
-    this.audioManager.playMenuBGM();
+    
+    // Flag per tracking primo click
+    this.audioStarted = false;
     
     // Sfondo
     this.add.rectangle(320, 180, 640, 360, 0x1a1a2e);
@@ -64,6 +66,11 @@ export class MainMenu extends Scene {
       playText.setScale(1);
     });
     playButton.on('pointerdown', () => {
+      // Avvia audio al primo click (per policy browser)
+      if (!this.audioStarted) {
+        this.audioManager.playMenuBGM();
+        this.audioStarted = true;
+      }
       this.audioManager.stopBGM();
       this.scene.start('Level');
     });
@@ -84,7 +91,12 @@ export class MainMenu extends Scene {
       trophyButton.setFillStyle(0xaa8a4a);
       trophyText.setScale(1.1);
     });
-    trophyButton.on('pointerout', () => {
+    tr// Avvia audio al primo click (per policy browser)
+      if (!this.audioStarted) {
+        this.audioManager.playMenuBGM();
+        this.audioStarted = true;
+      }
+      ophyButton.on('pointerout', () => {
       trophyButton.setFillStyle(0x8a6a2a);
       trophyText.setScale(1);
     });
