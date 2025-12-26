@@ -3,7 +3,7 @@
  * Comportamento: Resistente, attacchi potenti, appare nelle wave avanzate
  * Stats: HP 80, DMG 35, Speed medio
  */
-export class SkeletonKnight extends Physics.Arcade.Sprite {
+export class SkeletonKnight extends Phaser.Physics.Arcade.Sprite {
   maxHP = 80;
   currentHP = 80;
   enemyDmg = 35;
