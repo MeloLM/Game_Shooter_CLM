@@ -46,6 +46,17 @@ export class Level extends Scene{
   enemies = [];
   waveManager = null;
   useWaveSystem = true; // Imposta a false per il vecchio sistema di spawn
+  // Lista pozioni con pesi per spawn (più alto = più comune)
+  // Pozioni arma (Orange, Cyan) hanno peso basso = rare
+  bottleWeights = [
+    { weight: 25, create: (x, y) => new RedBottle(this, x, y) },      // Heal - comune
+    { weight: 15, create: (x, y) => new YellowBottle(this, x, y) },   // Laser - medio
+    { weight: 20, create: (x, y) => new BlueBottle(this, x, y) },     // Shield - comune
+    { weight: 20, create: (x, y) => new GreenBottle(this, x, y) },    // Speed - comune
+    { weight: 10, create: (x, y) => new PurpleBottle(this, x, y, this.enemies) }, // Thunder - raro
+    { weight: 5, create: (x, y) => new OrangeBottle(this, x, y) },    // Shotgun - molto raro
+    { weight: 5, create: (x, y) => new CyanBottle(this, x, y) },      // Boomerang - molto raro
+  ];
   bottleList = [
     (x, y) => new RedBottle (this, x, y),
     (x, y) => new YellowBottle(this, x, y),
@@ -171,15 +182,25 @@ export class Level extends Scene{
       delay: 2000,
       loop: true,
       callback : () => {
-        let randomIndex = Phaser.Math.Between(0, this.bottleList.length - 1);
-        let randomBottle = this.bottles[randomIndex];
+        // Sistema pesi per spawn pozioni (armi rare)
+        const totalWeight = this.bottleWeights.reduce((sum, b) => sum + b.weight, 0);
+        let random = Phaser.Math.Between(1, totalWeight);
+        let selectedBottle = null;
+        
+        for (const bottleConfig of this.bottleWeights) {
+          random -= bottleConfig.weight;
+          if (random <= 0) {
+            selectedBottle = bottleConfig;
+            break;
+          }
+        }
 
         let x = Phaser.Math.Between(0, this.map.widthInPixels);
         let y = Phaser.Math.Between(0, this.map.heightInPixels - 30);
 
-        if (!wallLayer.getTileAtWorldXY(x, y)) {
-          let bottle = this.bottleList[randomIndex](x,y)
-					this.bottles = [...this.bottles, bottle];
+        if (!wallLayer.getTileAtWorldXY(x, y) && selectedBottle) {
+          let bottle = selectedBottle.create(x, y);
+          this.bottles = [...this.bottles, bottle];
         }
 
       }
@@ -302,14 +323,23 @@ export class Level extends Scene{
         powerUpName = 'Heal';
         powerUpColor = '#ff0000';
       } else if (bottle instanceof GreenBottle) { // Se la bottliglia è verde aumenta la velocità del giocatore
-        const speedBoost = 120;
-        this.player.speed += speedBoost;
-        powerUpName = 'Speed';
-        powerUpColor = '#00ff00';                
-        this.time.delayedCall(5000, () => {
-          this.player.speed -= speedBoost; // Fix: ora rimuove la stessa quantità aggiunta
-        });
-        console.log(this.player.speed);
+        // FIX: Usa flag per evitare stack di speed boost
+        if (!this.player.hasSpeedBoost) {
+          this.player.hasSpeedBoost = true;
+          const speedBoost = 120;
+          const originalSpeed = this.player.baseSpeed;
+          this.player.speed = originalSpeed + speedBoost;
+          powerUpName = 'Speed';
+          powerUpColor = '#00ff00';                
+          this.time.delayedCall(5000, () => {
+            this.player.speed = this.player.baseSpeed; // Reset a velocità base
+            this.player.hasSpeedBoost = false;
+          });
+        } else {
+          powerUpName = 'Speed (già attivo)';
+          powerUpColor = '#88ff88';
+        }
+        console.log('Speed:', this.player.speed);
       } else if (bottle instanceof BlueBottle) { // Se la bottiglie è blu, fornisce immunità        
         if(!this.immunity){
           this.immunity = true;

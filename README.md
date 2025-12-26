@@ -27,10 +27,10 @@
 
 ## 🔧 TODO - BUG DA FIXARE
 
-### Priorità Alta
-- [ ] **Bug Velocità Player:** Il personaggio perde velocità nel tempo (probabilmente speed boost non resettato correttamente)
-- [ ] **Achievement Invadenti:** I popup degli achievement sono troppo grandi/frequenti, rendere più discreti
-- [ ] **Spawn Armi Frequente:** Le pozioni arma (Shotgun/Boomerang) spawnano troppo spesso, bilanciare la probabilità
+### ✅ Risolti (26 Dicembre 2025)
+- [x] **Bug Velocità Player:** Fixato - ora usa `hasSpeedBoost` flag e `baseSpeed` per reset corretto
+- [x] **Achievement Invadenti:** Fixato - popup più piccoli (150x35px), in basso a destra, durata 2s
+- [x] **Spawn Armi Frequente:** Fixato - sistema pesi: Shotgun/Boomerang hanno peso 5 (vs 25 per Heal)
 
 ### Da Verificare
 - [ ] Aggiungere nuovi tipi di nemici (sprites necessari)

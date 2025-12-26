@@ -231,32 +231,24 @@ export class AchievementSystem {
   }
   
   /**
-   * Mostra popup achievement
+   * Mostra popup achievement - versione discreta in basso a destra
    */
   showAchievementPopup(achievement) {
-    const x = 320;
-    const y = 100;
+    // Posizione: angolo in basso a destra, più discreto
+    const x = 560;
+    const y = 320;
     
-    // Container sfondo
-    const bg = this.scene.add.rectangle(x, y, 250, 60, 0x000000, 0.8);
-    bg.setStrokeStyle(2, 0xffd700);
+    // Container sfondo più piccolo
+    const bg = this.scene.add.rectangle(x, y, 150, 35, 0x000000, 0.7);
+    bg.setStrokeStyle(1, 0xffd700);
     bg.setScrollFactor(0);
     bg.setDepth(200);
     bg.setAlpha(0);
     
-    // Icona
-    const icon = this.scene.add.text(x - 100, y, achievement.icon, {
-      fontSize: '32px'
-    });
-    icon.setOrigin(0.5);
-    icon.setScrollFactor(0);
-    icon.setDepth(201);
-    icon.setAlpha(0);
-    
-    // Titolo
-    const title = this.scene.add.text(x + 10, y - 12, '🏆 ' + achievement.name, {
+    // Testo combinato icona + nome (più compatto)
+    const title = this.scene.add.text(x, y - 5, `${achievement.icon} ${achievement.name}`, {
       fontFamily: 'Arial',
-      fontSize: '14px',
+      fontSize: '10px',
       color: '#ffd700',
       fontStyle: 'bold'
     });
@@ -265,36 +257,39 @@ export class AchievementSystem {
     title.setDepth(201);
     title.setAlpha(0);
     
-    // Descrizione
-    const desc = this.scene.add.text(x + 10, y + 10, achievement.description, {
+    // Descrizione più piccola
+    const desc = this.scene.add.text(x, y + 8, achievement.description, {
       fontFamily: 'Arial',
-      fontSize: '10px',
-      color: '#ffffff'
+      fontSize: '8px',
+      color: '#cccccc'
     });
     desc.setOrigin(0.5);
     desc.setScrollFactor(0);
     desc.setDepth(201);
     desc.setAlpha(0);
     
-    // Animazione entrata
+    // Animazione entrata più veloce da destra
+    bg.x = x + 50;
+    title.x = x + 50;
+    desc.x = x + 50;
+    
     this.scene.tweens.add({
-      targets: [bg, icon, title, desc],
+      targets: [bg, title, desc],
       alpha: 1,
-      y: y + 20,
-      duration: 500,
-      ease: 'Back.out'
+      x: x,
+      duration: 300,
+      ease: 'Power2'
     });
     
-    // Animazione uscita dopo 3 secondi
-    this.scene.time.delayedCall(3000, () => {
+    // Animazione uscita dopo 2 secondi (più veloce)
+    this.scene.time.delayedCall(2000, () => {
       this.scene.tweens.add({
-        targets: [bg, icon, title, desc],
+        targets: [bg, title, desc],
         alpha: 0,
-        y: y - 20,
-        duration: 300,
+        x: x + 50,
+        duration: 200,
         onComplete: () => {
           bg.destroy();
-          icon.destroy();
           title.destroy();
           desc.destroy();
           

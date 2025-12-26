@@ -14,6 +14,7 @@ export class Player extends Physics.Arcade.Sprite{
   hpBar; // Barra degli HP
   power = false;
   weaponType = 'normal'; // normal, shotgun, boomerang
+  hasSpeedBoost = false; // Flag per evitare stack speed boost
   
   // === SISTEMA XP E LEVEL ===
   level = 1;
