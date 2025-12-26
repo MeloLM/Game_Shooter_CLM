@@ -1,6 +1,6 @@
 # 🎮 KNIGHT SHOOTER - AI Development Bible
 
-> **Versione:** 1.2.0  
+> **Versione:** 1.2.1  
 > **Framework:** Phaser 3.80.1 | Vite 5.2.0  
 > **Tipo:** 2D Top-Down Shooter / Survival  
 > **Ultimo Aggiornamento:** 26 Dicembre 2025
@@ -402,10 +402,20 @@ this.createBoss('giantGoblin', 400, 300);
 
 ## 📝 CHANGELOG
 
+### v1.2.1 (26 Dicembre 2025)
+- 🐛 Fix: Slime HP bar rimaneva visibile dopo la morte
+- 🐛 Fix: Slime continuavano a prendere danno durante animazione morte
+- 🐛 Fix: Achievement non si sbloccavano (lastAchievementCheck non inizializzato)
+- 🐛 Fix: Musica gameplay rimaneva attiva in GameOver
+- ✅ GameOver ora riproduce musica menu
+- ✅ Player HP bar ora ha animazione smooth (tween 300ms)
+- ✅ HP bar player cambia colore: verde >60%, giallo 30-60%, rosso <30%
+- ✅ Achievement popup con trasparenza aumentata
+
 ### v1.2.0 (26 Dicembre 2025)
 - ✅ 3 nuovi tipi di Slime (Green, Blue, Red) con sprite animati
 - ✅ Boss system: Giant Goblin e Orc ogni 10 wave
-- ✅ Skeleton Knight enemy
+- ✅ Skeleton Knight enemy (ARCHIVED - sprites da sistemare)
 - ✅ Sistema audio completo (menu, gameplay, boss)
 - ✅ README trasformato in AI Development Bible
 

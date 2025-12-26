@@ -1,4 +1,5 @@
 import { Scene } from "phaser";
+import { AudioManager } from "./AudioManager.js";
 
 export class GameOver extends Scene {
   constructor() {
@@ -11,7 +12,17 @@ export class GameOver extends Scene {
     this.survivalTime = data.time || 0;
   }
 
+  preload() {
+    // Carica audio per menu music
+    this.audioManager = new AudioManager(this);
+    this.audioManager.preloadSounds();
+  }
+
   create() {
+    // Inizializza e avvia musica menu
+    this.audioManager.initSounds();
+    this.audioManager.playMenuBGM();
+    
     // Sfondo scuro
     this.add.rectangle(320, 180, 640, 360, 0x1a0a0a);
 
@@ -86,6 +97,7 @@ export class GameOver extends Scene {
       retryText.setScale(1);
     });
     retryButton.on('pointerdown', () => {
+      if (this.audioManager) this.audioManager.stopAllBGM();
       this.scene.start('Level');
     });
 
@@ -110,6 +122,7 @@ export class GameOver extends Scene {
       menuText.setScale(1);
     });
     menuButton.on('pointerdown', () => {
+      if (this.audioManager) this.audioManager.stopAllBGM();
       this.scene.start('MainMenu');
     });
 

@@ -119,6 +119,8 @@ export class Level extends Scene{
     this.achievementSystem = null;
     this.potionsCollected = 0;
     this.difficultyManager = null;
+    this.lastAchievementCheck = 0; // Per check achievement ogni secondo
+    this.slimeKills = 0; // Tracking slime kills per achievement
   }
 
   //serve per caricare gli assets utilizzati in questo livello
@@ -504,6 +506,11 @@ export class Level extends Scene{
       if (this.player.currentHP <= 0) {
         // Calcola tempo di sopravvivenza
         this.survivalTime = (this.time.now - this.startTime) / 1000;
+        
+        // Ferma la musica prima di andare al GameOver
+        if (this.audioManager) {
+          this.audioManager.stopAllBGM();
+        }
         
         // Vai alla scena GameOver passando i dati
         this.scene.start('GameOver', {
