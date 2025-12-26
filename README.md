@@ -588,88 +588,57 @@ git checkout <commit_hash> -- src/NomeFile.js
 
 ---
 
-## 🚀 DEPLOY ONLINE
+## 🚀 DEPLOY SU VERCEL
 
-### Opzione 1: Vercel (Consigliato - Gratis)
+### Cos'è la Build?
+
+La **build** è il processo che trasforma il tuo codice sorgente in file ottimizzati per la produzione:
+
+1. **`npm run dev`**: Avvia server locale per sviluppo (hot reload, niente ottimizzazioni)
+2. **`npm run build`**: Crea la build di produzione nella cartella `dist/`
+   - Minifica JavaScript/CSS (file più piccoli)
+   - Ottimizza immagini e assets
+   - Bundla tutti i moduli in pochi file
+   - Rimuove codice non usato (tree-shaking)
+3. **`npm run preview`**: Anteprima locale della build (come sarà online)
+
+**IMPORTANTE**: Vite copia **SOLO** i file dentro `public/` nella build finale. Gli assets devono stare in `public/assets/`.
+
+### Deploy su Vercel (Automatico)
 
 1. **Vai su** [vercel.com](https://vercel.com) e accedi con GitHub
 2. **Clicca** "Add New Project"
-3. **Importa** il repository `Game_Shooter_CLM`
-4. **Impostazioni Build**:
+3. **Importa** il repository `Game_Shooter_CLM-main`
+4. **Impostazioni Build** (rilevate automaticamente):
    - Framework Preset: `Vite`
    - Build Command: `npm run build`
    - Output Directory: `dist`
 5. **Clicca** "Deploy"
-6. **Fatto!** Il gioco sarà live su `https://game-shooter-clm.vercel.app`
+6. **Fatto!** Vercel fa la build automaticamente e rileva i push su GitHub
 
-### Opzione 2: Netlify (Gratis)
+### Verifica Build Locale Prima del Deploy
 
-1. **Vai su** [netlify.com](https://netlify.com) e accedi con GitHub
-2. **Clicca** "Add new site" → "Import an existing project"
-3. **Seleziona** GitHub e il repository
-4. **Impostazioni**:
-   - Build command: `npm run build`
-   - Publish directory: `dist`
-5. **Clicca** "Deploy site"
-
-### Opzione 3: GitHub Pages (Gratis)
-
-1. **Build locale**:
-   ```bash
-   npm run build
-   ```
-
-2. **Installa gh-pages**:
-   ```bash
-   npm install -D gh-pages
-   ```
-
-3. **Aggiungi a package.json** (scripts):
-   ```json
-   "deploy": "npm run build && gh-pages -d dist"
-   ```
-
-4. **Configura vite.config.js** (crea se non esiste):
-   ```javascript
-   import { defineConfig } from 'vite'
-   export default defineConfig({
-     base: '/Game_Shooter_CLM/'
-   })
-   ```
-
-5. **Deploy**:
-   ```bash
-   npm run deploy
-   ```
-
-6. **Abilita GitHub Pages**: Settings → Pages → Source: `gh-pages` branch
-
-### Opzione 4: itch.io (Per giochi)
-
-1. **Build locale**:
-   ```bash
-   npm run build
-   ```
-
-2. **Vai su** [itch.io](https://itch.io) e crea un account
-3. **Crea nuovo progetto**: Dashboard → Create new project
-4. **Imposta**:
-   - Kind of project: HTML
-   - Upload: Zippa la cartella `dist` e caricala
-   - Spunta "This file will be played in the browser"
-5. **Pubblica**
-
-### Comandi Utili
 ```bash
-# Sviluppo locale
-npm run dev
-
-# Build per produzione
+# 1. Testa la build
 npm run build
 
-# Anteprima build
+# 2. Anteprima (apri http://localhost:4173)
 npm run preview
+
+# 3. Se tutto funziona, pusha su GitHub
+git push
+
+# 4. Vercel rileva il push e fa deploy automatico
 ```
+
+### Troubleshooting Build
+
+**Errore: Assets non trovati (404)**
+- Sposta `assets/` dentro `public/`: `public/assets/`
+- Vite copia SOLO `public/` nella build
+
+**Errore: Out of memory**
+- Aumenta memoria Node: `NODE_OPTIONS=--max-old-space-size=4096 npm run build`
 
 ---
 
