@@ -1,9 +1,20 @@
 # 🎮 KNIGHT SHOOTER - AI Development Bible
 
-> **Versione:** 1.4.0  
+> **Versione:** 1.5.0  
 > **Framework:** Phaser 3.80.1 | Vite 5.2.0  
 > **Tipo:** 2D Top-Down Shooter / Survival  
 > **Ultimo Aggiornamento:** 26 Dicembre 2025
+
+---
+
+## 📋 CHANGELOG v1.5.0
+
+### New Features
+- ✅ **Trophy Screen**: Nuova schermata dedicata ai trofei accessibile dal menu principale
+- ✅ **Hitbox uniformate**: Tutti i nemici ora hanno hitbox standard 12x12 come gli slime
+
+### Bug Fix
+- ✅ Nemici TankEnemy, SpeedEnemy, RangedEnemy avevano hitbox troppo grandi
 
 ---
 
@@ -17,11 +28,6 @@
 
 ### Bug Fix
 - ✅ Boss sprite ridimensionati (Giant Goblin 0.6x, Orc 0.7x) - ora visibili correttamente
-- ✅ Debug mode attivabile da main.js
-
-### Technical
-- Scale responsive: `Scale.FIT` con min/max bounds
-- Debug mode: `arcade.debug: true` in main.js
 
 ---
 
@@ -603,6 +609,91 @@ git checkout <commit_hash> -- src/NomeFile.js
 - [ ] Import aggiunti dove necessario
 - [ ] Nessun `console.log` di debug lasciato
 - [ ] README aggiornato se necessario
+
+---
+
+## 🚀 DEPLOY ONLINE
+
+### Opzione 1: Vercel (Consigliato - Gratis)
+
+1. **Vai su** [vercel.com](https://vercel.com) e accedi con GitHub
+2. **Clicca** "Add New Project"
+3. **Importa** il repository `Game_Shooter_CLM`
+4. **Impostazioni Build**:
+   - Framework Preset: `Vite`
+   - Build Command: `npm run build`
+   - Output Directory: `dist`
+5. **Clicca** "Deploy"
+6. **Fatto!** Il gioco sarà live su `https://game-shooter-clm.vercel.app`
+
+### Opzione 2: Netlify (Gratis)
+
+1. **Vai su** [netlify.com](https://netlify.com) e accedi con GitHub
+2. **Clicca** "Add new site" → "Import an existing project"
+3. **Seleziona** GitHub e il repository
+4. **Impostazioni**:
+   - Build command: `npm run build`
+   - Publish directory: `dist`
+5. **Clicca** "Deploy site"
+
+### Opzione 3: GitHub Pages (Gratis)
+
+1. **Build locale**:
+   ```bash
+   npm run build
+   ```
+
+2. **Installa gh-pages**:
+   ```bash
+   npm install -D gh-pages
+   ```
+
+3. **Aggiungi a package.json** (scripts):
+   ```json
+   "deploy": "npm run build && gh-pages -d dist"
+   ```
+
+4. **Configura vite.config.js** (crea se non esiste):
+   ```javascript
+   import { defineConfig } from 'vite'
+   export default defineConfig({
+     base: '/Game_Shooter_CLM/'
+   })
+   ```
+
+5. **Deploy**:
+   ```bash
+   npm run deploy
+   ```
+
+6. **Abilita GitHub Pages**: Settings → Pages → Source: `gh-pages` branch
+
+### Opzione 4: itch.io (Per giochi)
+
+1. **Build locale**:
+   ```bash
+   npm run build
+   ```
+
+2. **Vai su** [itch.io](https://itch.io) e crea un account
+3. **Crea nuovo progetto**: Dashboard → Create new project
+4. **Imposta**:
+   - Kind of project: HTML
+   - Upload: Zippa la cartella `dist` e caricala
+   - Spunta "This file will be played in the browser"
+5. **Pubblica**
+
+### Comandi Utili
+```bash
+# Sviluppo locale
+npm run dev
+
+# Build per produzione
+npm run build
+
+# Anteprima build
+npm run preview
+```
 
 ---
 

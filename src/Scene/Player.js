@@ -188,9 +188,6 @@ export class Player extends Physics.Arcade.Sprite{
             this.currentHP = this.maxHP;
         }
         this.animateHPBar(); // Smooth animation
-        console.log("Healed by", healAmount);
-    } else {
-        console.log("Full life");
     }
 }
 
@@ -291,8 +288,6 @@ export class Player extends Physics.Arcade.Sprite{
     
     // Effetto Level Up
     this.showLevelUpEffect();
-    
-    console.log(`LEVEL UP! Now level ${this.level}`);
   }
   
   /**

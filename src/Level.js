@@ -421,7 +421,6 @@ export class Level extends Scene{
         player.power = true;
         powerUpName = 'Laser';
         powerUpColor = '#ffa500';
-        console.log("change Weapon")
       } else if (bottle instanceof RedBottle) {   // Se la bottiglia è rossa, cura il giocatore
         // NON resettare power - mantieni arma corrente
         player.heal();
@@ -444,7 +443,6 @@ export class Level extends Scene{
           powerUpName = 'Speed (già attivo)';
           powerUpColor = '#88ff88';
         }
-        console.log('Speed:', this.player.speed);
       } else if (bottle instanceof BlueBottle) { // Se la bottiglie è blu, fornisce immunità        
         if(!this.immunity){
           this.immunity = true;
@@ -525,7 +523,6 @@ export class Level extends Scene{
 
     // Rimuove la bottiglia dall'array bottles
       this.bottles = this.bottles.filter(b => b !== bottle);      
-      console.log(`your speed: ${this.player.speed}`);
       return this.enemyCounter;
     });
 
@@ -579,7 +576,6 @@ export class Level extends Scene{
           time: this.survivalTime
         });
       }
-      console.log(player.currentHP);
     })
 
     // Death Animation - Sistema HP nemici
@@ -626,7 +622,6 @@ export class Level extends Scene{
         
         enemy.die();
         this.enemyCounter++;
-        console.log(`Kill: ${this.enemyCounter} | Score: ${this.totalScore} (x${comboMultiplier})`);
         this.scoreText.setText('💀 ' + this.enemyCounter, {fontSize: 20, color: 'white'});
         
         // Notifica WaveManager

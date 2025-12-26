@@ -27,6 +27,10 @@ export class Enemy extends Physics.Arcade.Sprite {
     scene.add.existing(this);
     scene.physics.add.existing(this);
     
+    // Hitbox standard come gli slime (piccola e centrata)
+    this.body.setSize(12, 12);
+    this.body.setOffset(10, 10);
+    
     // Barra HP del nemico
     this.hpBar = scene.add.graphics();
     this.updateHPBar();

@@ -68,14 +68,35 @@ export class MainMenu extends Scene {
       this.scene.start('Level');
     });
 
-    // Istruzioni (spostato su dato che non c'è più bottone trofei)
-    const instructions = this.add.text(320, 270, 
-      '🎮 CONTROLLI:\n' +
-      'WASD - Movimento\n' +
-      'CLICK - Attacca\n' +
-      'ESC/P - Pausa', {
+    // Bottone TROFEI
+    const trophyButton = this.add.rectangle(320, 255, 140, 35, 0x8a6a2a);
+    trophyButton.setInteractive({ useHandCursor: true });
+    
+    const trophyText = this.add.text(320, 255, '🏆 TROFEI', {
       fontFamily: 'Arial',
-      fontSize: '12px',
+      fontSize: '16px',
+      color: '#ffffff',
+      fontStyle: 'bold'
+    });
+    trophyText.setOrigin(0.5);
+
+    trophyButton.on('pointerover', () => {
+      trophyButton.setFillStyle(0xaa8a4a);
+      trophyText.setScale(1.1);
+    });
+    trophyButton.on('pointerout', () => {
+      trophyButton.setFillStyle(0x8a6a2a);
+      trophyText.setScale(1);
+    });
+    trophyButton.on('pointerdown', () => {
+      this.scene.start('TrophyScreen', { from: 'MainMenu' });
+    });
+
+    // Istruzioni
+    const instructions = this.add.text(320, 305, 
+      '🎮 WASD - Movimento | CLICK - Attacca | ESC - Pausa', {
+      fontFamily: 'Arial',
+      fontSize: '10px',
       color: '#888888',
       align: 'center'
     });
