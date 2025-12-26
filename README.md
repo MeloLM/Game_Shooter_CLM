@@ -1,9 +1,39 @@
 # 🎮 KNIGHT SHOOTER - AI Development Bible
 
-> **Versione:** 1.6.0  
+> **Versione:** 1.7.0  
 > **Framework:** Phaser 3.80.1 | Vite 5.2.0  
 > **Tipo:** 2D Top-Down Shooter / Survival  
-> **Ultimo Aggiornamento:** 26 Dicembre 2025
+> **Ultimo Aggiornamento:** 27 Dicembre 2025
+
+---
+
+## 📋 CHANGELOG v1.7.0
+
+### 📱 Mobile Support & Settings
+- ✅ **Mobile Controls**: Frecce direzionali touch per dispositivi mobile
+- ✅ **Settings Menu**: Nuova schermata impostazioni accessibile dal menu principale
+  - Bottone "MENU" in alto a sinistra per tornare al menu principale
+  - UI compatta e ben organizzata
+- ✅ **Toggle Mobile Controls**: Abilita/disabilita controlli touch nelle impostazioni
+- ✅ **Toggle Music/SFX**: Controllo audio separato per musica e effetti
+- ✅ **Toggle Particles**: Opzione per disabilitare particelle (performance)
+
+### ⚡ Performance Optimizations
+- ✅ **Loading Bar**: Barra di caricamento durante il preload degli assets
+- ✅ **Minimap Optimized**: Aggiornamento ogni 3 frame invece che ogni frame
+- ✅ **Particles Toggle**: Gli effetti particelle rispettano le impostazioni utente
+- ✅ **AudioContext Fix**: Risolto warning browser per autoplay audio
+
+### 🔧 Code Quality
+- ✅ **Settings Persistence**: Impostazioni salvate in localStorage
+- ✅ **AudioManager Settings**: Musica rispetta impostazioni utente
+- ✅ **VisualEffects Settings**: Particelle rispettano impostazioni utente
+- ✅ **Console.log Cleanup**: Rimossi log di debug rimanenti
+- ✅ **UI/UX Improvements**: Bottone menu posizionato strategicamente in alto a sinistra
+
+### Nuovi File
+- `src/Settings.js` - Schermata impostazioni con UI migliorata
+- `src/MobileControls.js` - Controlli touch per mobile
 
 ---
 
@@ -68,6 +98,14 @@ Un **survival shooter 2D** dove controlli un cavaliere che deve sopravvivere a o
 | **Mouse Click** | Attacca |
 | **ESC / P** | Pausa |
 
+### Controlli Mobile (Touch)
+| Controllo | Azione |
+|-----------|--------|
+| **D-Pad** | Movimento (frecce direzionali) |
+| **⚔️ Button** | Attacca |
+
+> 💡 I controlli touch sono abilitabili da Impostazioni nel menu principale
+
 ---
 
 ## 🏗️ ARCHITETTURA COMPLETA
@@ -77,8 +115,14 @@ Un **survival shooter 2D** dove controlli un cavaliere che deve sopravvivere a o
 main.js
    ↓
 MainMenu.js ──[Play]──→ Level.js ──[Death]──→ GameOver.js
-                              ↑                    │
-                              └────[Retry]─────────┘
+     │                        ↑                    │
+     │                        └────[Retry]─────────┘
+     │
+     ├──[Settings]──→ Settings.js
+     │                    │
+     │                    └────[Back]──→ MainMenu.js
+     │
+     └──[Trofei]───→ TrophyScreen.js
 ```
 
 ### Dependency Graph
@@ -90,8 +134,9 @@ Level.js (MAIN SCENE)
 ├── AchievementSystem.js → 16 achievement con popup
 ├── DifficultyManager.js → Scala difficoltà con wave
 ├── Minimap.js          → Mini-mappa in basso a destra
-├── VisualEffects.js    → Effetti particellari
-├── AudioManager.js     → Musica e SFX
+├── VisualEffects.js    → Effetti particellari (rispetta settings)
+├── AudioManager.js     → Musica e SFX (rispetta settings)
+├── MobileControls.js   → Controlli touch per mobile
 │
 ├── Enemies/
 │   ├── Enemy.js        → CLASSE BASE (tutti i nemici estendono questa)

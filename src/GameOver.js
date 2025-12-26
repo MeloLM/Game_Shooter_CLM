@@ -19,9 +19,11 @@ export class GameOver extends Scene {
   }
 
   create() {
-    // Inizializza e avvia musica menu
+    // Inizializza audio (ma NON avvia - policy browser)
     this.audioManager.initSounds();
-    this.audioManager.playMenuBGM();
+    
+    // Flag per tracking primo click
+    this.audioStarted = false;
     
     // Sfondo scuro
     this.add.rectangle(320, 180, 640, 360, 0x1a0a0a);
@@ -107,6 +109,11 @@ export class GameOver extends Scene {
       retryText.setScale(1);
     });
     retryButton.on('pointerdown', () => {
+      // Avvia audio al primo click (per policy browser)
+      if (!this.audioStarted) {
+        this.audioManager.playMenuBGM();
+        this.audioStarted = true;
+      }
       if (this.audioManager) this.audioManager.stopAllBGM();
       this.scene.start('Level');
     });
@@ -132,6 +139,11 @@ export class GameOver extends Scene {
       menuText.setScale(1);
     });
     menuButton.on('pointerdown', () => {
+      // Avvia audio al primo click (per policy browser)
+      if (!this.audioStarted) {
+        this.audioManager.playMenuBGM();
+        this.audioStarted = true;
+      }
       if (this.audioManager) this.audioManager.stopAllBGM();
       this.scene.start('MainMenu');
     });

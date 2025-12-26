@@ -3,12 +3,13 @@ import { Level } from "./src/Level";
 import { MainMenu } from "./src/MainMenu";
 import { GameOver } from "./src/GameOver";
 import { TrophyScreen } from "./src/TrophyScreen";
+import { Settings } from "./src/Settings";
  
 
  new Game({
   width: 640,
   height: 360,
-  scene: [MainMenu, Level, GameOver, TrophyScreen],
+  scene: [MainMenu, Level, GameOver, TrophyScreen, Settings],
   physics:{
     default: 'arcade',
     arcade:{

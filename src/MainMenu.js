@@ -104,8 +104,37 @@ export class MainMenu extends Scene {
       this.scene.start('TrophyScreen', { from: 'MainMenu' });
     });
 
+    // Bottone IMPOSTAZIONI
+    const settingsButton = this.add.rectangle(320, 295, 160, 35, 0x4a6a4a);
+    settingsButton.setInteractive({ useHandCursor: true });
+    
+    const settingsText = this.add.text(320, 295, '⚙️ IMPOSTAZIONI', {
+      fontFamily: 'Arial',
+      fontSize: '16px',
+      color: '#ffffff',
+      fontStyle: 'bold'
+    });
+    settingsText.setOrigin(0.5);
+
+    settingsButton.on('pointerover', () => {
+      settingsButton.setFillStyle(0x6a8a6a);
+      settingsText.setScale(1.1);
+    });
+    settingsButton.on('pointerout', () => {
+      settingsButton.setFillStyle(0x4a6a4a);
+      settingsText.setScale(1);
+    });
+    settingsButton.on('pointerdown', () => {
+      // Avvia audio al primo click (per policy browser)
+      if (!this.audioStarted) {
+        this.audioManager.playMenuBGM();
+        this.audioStarted = true;
+      }
+      this.scene.start('Settings', { from: 'MainMenu' });
+    });
+
     // Istruzioni
-    const instructions = this.add.text(320, 305, 
+    const instructions = this.add.text(320, 340, 
       '🎮 WASD - Movimento | CLICK - Attacca | ESC - Pausa', {
       fontFamily: 'Arial',
       fontSize: '10px',
@@ -116,7 +145,7 @@ export class MainMenu extends Scene {
 
     // High Score (se disponibile)
     const highScore = localStorage.getItem('knightShooter_highScore') || 0;
-    const highScoreText = this.add.text(320, 340, `🏆 High Score: ${highScore}`, {
+    const highScoreText = this.add.text(320, 360, `🏆 High Score: ${highScore}`, {
       fontFamily: 'Arial',
       fontSize: '14px',
       color: '#ffd700'

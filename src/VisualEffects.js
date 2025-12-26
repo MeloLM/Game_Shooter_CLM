@@ -8,9 +8,26 @@ export class VisualEffects {
   scene;
   trails = [];
   particles = [];
+  particlesEnabled = true;  // Rispetta impostazioni utente
   
   constructor(scene) {
     this.scene = scene;
+    this.loadSettings();
+  }
+  
+  /**
+   * Carica impostazioni particelle da localStorage
+   */
+  loadSettings() {
+    try {
+      const saved = localStorage.getItem('knightShooter_settings');
+      if (saved) {
+        const settings = JSON.parse(saved);
+        this.particlesEnabled = settings.particles !== false;
+      }
+    } catch (e) {
+      this.particlesEnabled = true;
+    }
   }
   
   /**
@@ -92,6 +109,8 @@ export class VisualEffects {
    * @param {string} enemyType - Tipo di nemico per variare colore
    */
   createDeathParticles(x, y, enemyType = 'default') {
+    // Skip se particelle disabilitate
+    if (!this.particlesEnabled) return;
     // Colori in base al tipo di nemico
     const colors = {
       slime: [0x00ff00, 0x88ff88, 0x44aa44],
@@ -154,6 +173,9 @@ export class VisualEffects {
    * Crea effetto impatto quando un proiettile colpisce
    */
   createHitEffect(x, y, color = 0xffffff) {
+    // Skip se particelle disabilitate
+    if (!this.particlesEnabled) return;
+    
     // Scintille
     for (let i = 0; i < 6; i++) {
       const angle = Math.random() * Math.PI * 2;
@@ -189,6 +211,9 @@ export class VisualEffects {
    * Crea effetto polvere/movimento
    */
   createDustEffect(x, y) {
+    // Skip se particelle disabilitate
+    if (!this.particlesEnabled) return;
+    
     for (let i = 0; i < 3; i++) {
       const dust = this.scene.add.circle(
         x + (Math.random() - 0.5) * 8,

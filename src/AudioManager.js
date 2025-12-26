@@ -15,6 +15,29 @@ export class AudioManager {
     this.sfxVolume = 0.5;
     this.sounds = {};
     this.currentBGM = null;
+    
+    // Carica impostazioni utente
+    this.loadSettings();
+  }
+  
+  /**
+   * Carica impostazioni audio da localStorage
+   */
+  loadSettings() {
+    try {
+      const saved = localStorage.getItem('knightShooter_settings');
+      if (saved) {
+        const settings = JSON.parse(saved);
+        // Se musica è disabilitata, muta
+        if (settings.music === false) {
+          this.isMuted = true;
+        }
+        // SFX setting (per usi futuri)
+        this.sfxEnabled = settings.sfx !== false;
+      }
+    } catch (e) {
+      // Impostazioni default
+    }
   }
 
   // Carica tutti i suoni (chiamare in preload)
@@ -25,7 +48,7 @@ export class AudioManager {
       this.scene.load.audio('bgm_main', 'assets/audio/Main_theme.mp3');
       this.scene.load.audio('bgm_boss', 'assets/audio/Boss_theme.mp3');
     } catch (e) {
-      console.log('Audio files not found - continuing without audio');
+      // Audio files not available - continue silently
     }
   }
 
@@ -56,7 +79,7 @@ export class AudioManager {
         });
       }
     } catch (e) {
-      console.log('Error initializing audio:', e);
+      // Error initializing audio - continue silently
     }
   }
 

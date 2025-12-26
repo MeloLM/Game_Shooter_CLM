@@ -18,6 +18,10 @@ export class Minimap {
   enemyDots = [];
   bottleDots = [];
   
+  // Ottimizzazione: aggiorna ogni N frame
+  updateFrequency = 3;  // Aggiorna ogni 3 frame
+  frameCounter = 0;
+  
   constructor(scene, mapPixelWidth = 640, mapPixelHeight = 360) {
     this.scene = scene;
     this.scale = {
@@ -86,11 +90,19 @@ export class Minimap {
   
   /**
    * Aggiorna la mini-mappa (chiamare ogni frame)
+   * Ottimizzato: aggiorna solo ogni N frame per performance
    */
   update() {
     if (!this.scene || !this.scene.player) return;
     
-    // Aggiorna posizione player
+    // Ottimizzazione: salta frame per ridurre carico
+    this.frameCounter++;
+    if (this.frameCounter < this.updateFrequency) {
+      return;
+    }
+    this.frameCounter = 0;
+    
+    // Aggiorna posizione player (sempre)
     const playerPos = this.worldToMap(this.scene.player.x, this.scene.player.y);
     this.playerDot.setPosition(playerPos.x, playerPos.y);
     

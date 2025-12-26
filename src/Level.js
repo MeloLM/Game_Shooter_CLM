@@ -29,6 +29,7 @@ import { AchievementSystem } from "./AchievementSystem.js";
 import { DifficultyManager } from "./DifficultyManager.js";
 import { AudioManager } from "./AudioManager.js";
 import { Boomerang } from "./Scene/Boomerang.js";
+import { MobileControls } from "./MobileControls.js";
 
 export class Level extends Scene{
   constructor() {
@@ -84,6 +85,7 @@ export class Level extends Scene{
   achievementSystem = null;
   potionsCollected = 0;
   difficultyManager = null;
+  mobileControls = null;
   immunity = false;
   immuneDuration = 7000;
   lastCollisionTime = 0;
@@ -116,12 +118,59 @@ export class Level extends Scene{
     this.achievementSystem = null;
     this.potionsCollected = 0;
     this.difficultyManager = null;
+    this.mobileControls = null;
     this.lastAchievementCheck = 0; // Per check achievement ogni secondo
     this.slimeKills = 0; // Tracking slime kills per achievement
   }
 
   //serve per caricare gli assets utilizzati in questo livello
   preload() {
+    // === LOADING BAR ===
+    const progressBar = this.add.graphics();
+    const progressBox = this.add.graphics();
+    const width = this.cameras.main.width;
+    const height = this.cameras.main.height;
+    
+    progressBox.fillStyle(0x222222, 0.8);
+    progressBox.fillRect(width / 2 - 160, height / 2 - 25, 320, 50);
+    
+    const loadingText = this.add.text(width / 2, height / 2 - 50, 'Caricamento...', {
+      font: '20px Arial',
+      color: '#ffffff'
+    });
+    loadingText.setOrigin(0.5, 0.5);
+    
+    const percentText = this.add.text(width / 2, height / 2, '0%', {
+      font: '18px Arial',
+      color: '#ffffff'
+    });
+    percentText.setOrigin(0.5, 0.5);
+    
+    const assetText = this.add.text(width / 2, height / 2 + 40, '', {
+      font: '12px Arial',
+      color: '#cccccc'
+    });
+    assetText.setOrigin(0.5, 0.5);
+    
+    this.load.on('progress', function (value) {
+      progressBar.clear();
+      progressBar.fillStyle(0x4CAF50, 1);
+      progressBar.fillRect(width / 2 - 150, height / 2 - 15, 300 * value, 30);
+      percentText.setText(parseInt(value * 100) + '%');
+    });
+    
+    this.load.on('fileprogress', function (file) {
+      assetText.setText('Caricamento: ' + file.key);
+    });
+    
+    this.load.on('complete', function () {
+      progressBar.destroy();
+      progressBox.destroy();
+      loadingText.destroy();
+      percentText.destroy();
+      assetText.destroy();
+    });
+    
     // Player sprites
     this.load.spritesheet("knight_idle", "assets/player/knight_idle.png", {frameWidth: 16, frameHeight: 16});
     this.load.spritesheet("knight_run", "assets/player/knight_run.png", {frameWidth: 16, frameHeight: 16});
@@ -226,9 +275,15 @@ export class Level extends Scene{
     // === DIFFICOLTÀ DINAMICA ===
     this.difficultyManager = new DifficultyManager(this);
 
+    // === CONTROLLI MOBILE ===
+    // Verrà inizializzato dopo il player
+
     this.player = new Player(this, 320, 0, "player_idle");
     this.player.setOrigin(0.5, 0.5);
     this.player.setBodySize(8 , 10);
+    
+    // Inizializza controlli mobile dopo il player
+    this.mobileControls = new MobileControls(this, this.player);
     
     this.door = new Door(this, 320, 16, "door");
 
@@ -381,6 +436,18 @@ export class Level extends Scene{
 				this.door.play("door");
 			}      
 		}
+
+    // === CONTROLLI MOBILE ===
+    if (this.mobileControls && this.mobileControls.enabled && !this.startAnimation) {
+      const move = this.mobileControls.getMovement();
+      if (move.x !== 0 || move.y !== 0) {
+        this.player.setVelocityX(move.x * this.player.speed);
+        this.player.setVelocityY(move.y * this.player.speed);
+        this.player.updateAnimation();
+        if (move.x < 0) this.player.setFlipX(true);
+        else if (move.x > 0) this.player.setFlipX(false);
+      }
+    }
 
     this.enemies.forEach((enemy)=> {
       // Chiama update() se il nemico ha il metodo (boss hanno logica custom)
