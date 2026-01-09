@@ -21,6 +21,7 @@ FIND_FILE = {
   
   "player/giocatore":    "src/entities/Player.js",
   "nemico base":         "src/entities/enemies/Enemy.js",
+  "assassin/stealth":    "src/entities/enemies/Assassin.js",
   "goblin":              "src/entities/enemies/Goblin.js",
   "slime verde":         "src/entities/enemies/SlimeGreen.js",
   "slime blu":           "src/entities/enemies/SlimeBlue.js",
@@ -47,6 +48,9 @@ FIND_FILE = {
   "pozione viola/thunder":"src/entities/items/PurpleBottle.js",
   "pozione arancio/shotgun":"src/entities/items/OrangeBottle.js",
   "pozione cyan/boomerang":"src/entities/items/CyanBottle.js",
+  "pozione bianca/frenzy":"src/entities/items/WhiteBottle.js",
+  "pozione rosa/magnet": "src/entities/items/PinkBottle.js",
+  "moneta/coin":         "src/entities/items/Coin.js",
   "porta/door":          "src/entities/items/Door.js",
   
   "wave/ondate":         "src/managers/WaveManager.js",
@@ -56,16 +60,24 @@ FIND_FILE = {
   "difficoltà":          "src/managers/DifficultyManager.js",
   "combo":               "src/managers/ComboSystem.js",
   "eventi globali":      "src/managers/EventBus.js",
+  "pausa":               "src/managers/PauseManager.js",
+  "collisioni":          "src/managers/CollisionManager.js",
+  "salvataggio":         "src/managers/SaveSystem.js",
+  "shop/negozio":        "src/managers/ShopSystem.js",
+  "asset loading":       "src/managers/AssetLoader.js",
   
   "minimap":             "src/ui/Minimap.js",
   "controlli mobile":    "src/ui/MobileControls.js",
   "effetti visivi":      "src/ui/VisualEffects.js",
   "barra salute":        "src/ui/HealthBar.js",
   "numeri danno":        "src/ui/DamageText.js",
+  "HUD manager":         "src/ui/HUDManager.js",
   
   "costanti":            "src/utils/Constants.js",
   "config wave":         "src/utils/GameConfig.js",
   "funzioni math":       "src/utils/MathHelpers.js",
+  "factory entities":    "src/utils/EntityFactories.js",
+  "object pooling":      "src/utils/ObjectPool.js",
   
   "entry point":         "main.js",
   "html":                "index.html",

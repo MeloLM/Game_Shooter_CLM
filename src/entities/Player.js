@@ -112,6 +112,11 @@ export class Player extends Physics.Arcade.Sprite{
 
     // ATTACK
     scene.input.on('pointerdown', (pointer)=>{
+      // Blocca attacchi durante la pausa
+      if (scene.pauseManager && scene.pauseManager.getIsPaused()) {
+        return;
+      }
+      
       let angle = Phaser.Math.Angle.Between(this.x, this.y, pointer.worldX, pointer.worldY);
       
       // Sistema armi avanzato

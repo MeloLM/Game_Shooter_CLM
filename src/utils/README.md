@@ -2,11 +2,15 @@
 
 Funzioni helper riutilizzabili e configurazioni.
 
-## Struttura
+## Struttura Attuale
 
-- **Constants.js** - Valori costanti e nomi eventi ✅
-- **GameConfig.js** - Configurazioni di bilanciamento ✅
-- **MathHelpers.js** - Funzioni matematiche utility ✅
+| File | Descrizione | Stato |
+|------|-------------|-------|
+| **Constants.js** | Valori costanti e nomi eventi | ✅ |
+| **GameConfig.js** | Configurazioni bilanciamento wave | ✅ |
+| **MathHelpers.js** | Funzioni matematiche utility | ✅ |
+| **EntityFactories.js** | Factory per creare nemici/items | ✅ |
+| **ObjectPool.js** | Object pooling per performance | ✅ NEW |
 
 ## Constants.js
 
@@ -26,12 +30,6 @@ this.scene.events.emit(EVENTS.ENEMY_KILLED, data);
 this.audioManager.play(AUDIO.SFX.ENEMY_DEATH);
 ```
 
-### Benefici:
-- ✅ Typo-safe (refactoring automatico)
-- ✅ Single source of truth
-- ✅ Facile da modificare
-- ✅ Autocomplete in IDE
-
 ## GameConfig.js
 
 Configurazioni di bilanciamento per waves e difficulty.
@@ -50,30 +48,44 @@ const goblinStats = ENEMY_TYPES.Goblin;
 const health = goblinStats.health * DIFFICULTY.HARD.enemyHealth;
 ```
 
-### Modificare Bilanciamento:
-Tutti i valori per bilanciare il gioco sono qui:
-- Numero nemici per wave
-- Statistiche base nemici
-- Drop rates items
-- Moltiplicatori difficoltà
+## EntityFactories.js
+
+Factory functions per creare nemici e items.
+
+### Uso:
+```javascript
+import { createEnemyFactories, createBottleFactories } from '../utils/EntityFactories.js';
+
+// Get all enemy factories
+const enemyFactories = createEnemyFactories(scene);
+const enemy = enemyFactories[0](x, y); // Creates SlimeGreen
+
+// Get weighted bottle factories
+const bottleFactories = createBottleFactories(scene);
+```
+
+## ObjectPool.js
+
+Sistema di object pooling per migliorare le performance.
+
+### Uso:
+```javascript
+import { PoolManager, setupCommonPools } from '../utils/ObjectPool.js';
+
+// Setup
+this.poolManager = new PoolManager(this);
+setupCommonPools(this, this.poolManager);
+
+// Spawn
+const projectile = this.poolManager.spawn('projectile', x, y);
+
+// Despawn
+this.poolManager.despawn('projectile', projectile);
+```
 
 ## MathHelpers.js
 
 Funzioni matematiche comuni.
-
-### Uso:
-```javascript
-import { getDistance, getAngle, clamp } from '../utils/MathHelpers.js';
-
-// Distance between two objects
-const dist = getDistance(player, enemy);
-
-// Angle to target
-const angle = getAngle(this, target);
-
-// Clamp value
-const health = clamp(newHealth, 0, maxHealth);
-```
 
 ### Funzioni Disponibili:
 - `getDistance(obj1, obj2)` - Distanza euclidea
@@ -82,8 +94,6 @@ const health = clamp(newHealth, 0, maxHealth);
 - `randomInt(min, max)` - Random integer
 - `clamp(value, min, max)` - Limita valore
 - `lerp(start, end, t)` - Interpolazione lineare
-- `pointInCircle(px, py, cx, cy, r)` - Collision check
-- `normalize(x, y)` - Normalizza vettore
 
 ## Best Practices
 
@@ -96,11 +106,3 @@ const health = clamp(newHealth, 0, maxHealth);
 - Hardcodare valori nei file di gioco
 - Duplicare funzioni matematiche
 - Mettere logica di gioco qui (solo utility)
-
-## File Completi
-
-- [x] Constants.js ✅
-- [x] GameConfig.js ✅
-- [x] MathHelpers.js ✅
-
-Tutti i file base sono stati creati!

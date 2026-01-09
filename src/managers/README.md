@@ -2,26 +2,36 @@
 
 Contiene tutta la logica di gioco "invisibile".
 
-## Struttura
+## Struttura Attuale
 
-- **WaveManager.js** - Gestione spawn nemici e wave
-- **GameManager.js** - Score, XP, livello, stato globale ✅
-- **AudioManager.js** - Controllo centralizzato audio
-- **AchievementSystem.js** - Sistema achievement
-- **EventBus.js** - Hub eventi centralizzato (opzionale) ✅
+| File | Descrizione | Stato |
+|------|-------------|-------|
+| **WaveManager.js** | Gestione spawn nemici e wave | ✅ |
+| **GameManager.js** | Score, XP, livello, stato globale | ✅ |
+| **AudioManager.js** | Controllo centralizzato audio | ✅ |
+| **AchievementSystem.js** | Sistema trofei/achievement | ✅ |
+| **EventBus.js** | Hub eventi centralizzato con debug | ✅ |
+| **PauseManager.js** | Gestione pausa gioco | ✅ |
+| **CollisionManager.js** | Gestione collisioni fisiche | ✅ |
+| **ComboSystem.js** | Sistema combo kill | ✅ |
+| **DifficultyManager.js** | Scaling difficoltà dinamico | ✅ |
+| **AssetLoader.js** | Caricamento asset centralizzato | ✅ |
+| **SaveSystem.js** | Salvataggio highscores/settings | ✅ NEW |
+| **ShopSystem.js** | Shop upgrade tra wave | ✅ NEW |
 
 ## Responsabilità
 
 I Manager devono:
-- Gestire logica pura senza rappresentazione visiva
-- Ascoltare eventi del gioco
-- Aggiornare stato interno
-- Emettere nuovi eventi per UI
+- ✅ Gestire logica pura senza rappresentazione visiva
+- ✅ Ascoltare eventi del gioco
+- ✅ Aggiornare stato interno
+- ✅ Emettere nuovi eventi per UI
+- ❌ NON manipolare direttamente elementi visivi
 
 ## Pattern
 
 ```javascript
-export default class MyManager {
+export class MyManager {
   constructor(scene) {
     this.scene = scene;
     this.setupEventListeners();
@@ -47,27 +57,10 @@ export default class MyManager {
 ## Event Flow Example
 
 ```
-Enemy.die() 
-  → emits ENEMY_DIED
-    → WaveManager listens → decrements count → emits WAVE_COMPLETED
-    → GameManager listens → adds score → emits SCORE_CHANGED
-    → AudioManager listens → plays SFX
-    → AchievementSystem listens → checks achievements
-      → HUD listens → updates display
+Enemy.die()
+    → emit('ENEMY_KILLED')
+    → WaveManager.onEnemyKilled()
+    → GameManager.addScore()
+    → emit('SCORE_CHANGED')
+    → HUD.updateScore()
 ```
-
-## File da Migrare
-
-- [ ] src/WaveManager.js → managers/WaveManager.js (refactor)
-- [x] managers/GameManager.js (nuovo file) ✅
-- [ ] src/AudioManager.js → managers/AudioManager.js
-- [ ] src/AchievementSystem.js → managers/AchievementSystem.js
-- [x] managers/EventBus.js (opzionale) ✅
-
-## File Esistenti da Refactorare
-
-I seguenti file esistono ma devono essere refactored per usare il pattern Event-Driven:
-
-- src/WaveManager.js (rimuovere riferimenti diretti a UI)
-- src/AudioManager.js (implementare event listeners)
-- src/AchievementSystem.js (implementare event listeners)

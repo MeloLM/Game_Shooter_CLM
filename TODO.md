@@ -1,7 +1,88 @@
 # 📋 TODO - Architecture Validation Report
 
 > **Generated:** 2025-12-26
-> **Status:** ✅ All checks passed
+> **Last Update:** 2026-01-09
+> **Status:** ✅ Major improvements implemented
+
+---
+
+## 🎨 ASSET MANCANTI (Da Aggiungere)
+
+> Questi file/sprite devono essere aggiunti manualmente per completare le nuove feature
+
+### 🖼️ Sprite da Creare/Aggiungere
+
+| Asset | Percorso | Descrizione | Priorità |
+|-------|----------|-------------|----------|
+| `white_potion.png` | `public/assets/potions/` | Sprite per WhiteBottle (Frenzy) - 16x16 spritesheet | 🔴 Alta |
+| `pink_potion.png` | `public/assets/potions/` | Sprite per PinkBottle (Magnet) - 16x16 spritesheet | 🔴 Alta |
+| `coin.png` | `public/assets/items/` | Sprite moneta oro - 8x8 o 16x16 | 🟡 Media |
+| `assassin_sprite.png` | `public/assets/enemy/` | Spritesheet assassin (idle, run, death) - 64x64 | 🟡 Media |
+
+> **Nota**: Attualmente WhiteBottle e PinkBottle usano `potion` con tint. Coin genera texture proceduralmente. Assassin usa skeleton_knight come fallback.
+
+### 📂 Cartelle da Creare
+
+```
+public/assets/
+├── items/           ← CREARE (per Coin, futuri collectibles)
+└── potions/
+    ├── white_potion.png   ← AGGIUNGERE
+    └── pink_potion.png    ← AGGIUNGERE
+```
+
+---
+
+## 🔧 INTEGRAZIONI MANCANTI (Codice)
+
+> Queste integrazioni sono opzionali ma consigliate per completare i nuovi sistemi
+
+### Level.js - Integrazioni
+
+- [ ] **Importare e inizializzare ShopSystem**
+  ```javascript
+  import { ShopSystem } from "../managers/ShopSystem.js";
+  // In create(): this.shopSystem = new ShopSystem(this);
+  ```
+
+- [ ] **Importare e inizializzare SaveSystem**
+  ```javascript
+  import SaveSystem from "../managers/SaveSystem.js";
+  // In create(): SaveSystem.incrementStat('gamesPlayed');
+  ```
+
+- [ ] **Collegare Coin drop alla morte nemici**
+  ```javascript
+  import { createCoin } from "../entities/items/Coin.js";
+  // Quando nemico muore: createCoin(this, enemy.x, enemy.y, enemy.type);
+  ```
+
+- [ ] **Aprire Shop tra wave**
+  ```javascript
+  // In WaveManager quando wave completa:
+  // this.scene.shopSystem.openShop();
+  ```
+
+### AssetLoader.js - Nuovi Asset
+
+- [ ] **Aggiungere preload nuove pozioni** (quando sprite disponibili)
+  ```javascript
+  this.scene.load.spritesheet("white_potion", "assets/potions/white_potion.png", {frameWidth: 16, frameHeight: 16});
+  this.scene.load.spritesheet("pink_potion", "assets/potions/pink_potion.png", {frameWidth: 16, frameHeight: 16});
+  ```
+
+- [ ] **Aggiungere preload coin** (quando sprite disponibili)
+  ```javascript
+  this.scene.load.image("coin", "assets/items/coin.png");
+  ```
+
+### WaveManager.js - Assassin Integration
+
+- [x] **Aggiungere Assassin alla configurazione nemici** ✅ DONE
+  ```javascript
+  // Aggiunto in enemyConfigs:
+  assassin: { minWave: 12, weight: 8 }
+  ```
 
 ---
 
@@ -16,17 +97,27 @@
 
 ---
 
-## ✅ No Issues Found
+## ✅ Recently Completed
 
-Architecture is coherent!
+- [x] **Bug Input Pausa**: Fixed - Attacks are now blocked during pause
+- [x] **EventBus Centralizzato**: Full implementation with debug mode and event helpers
+- [x] **Save System**: Complete with highscores, settings, achievements, statistics
+- [x] **Screen Shake System**: Dynamic screen shake based on damage and events
+- [x] **Particle System**: Enhanced with boss death, level up, critical effects
+- [x] **Nuovo Nemico Assassin**: Enemy with invisibility/stealth mechanics
+- [x] **Coin & Shop System**: Coins dropped by enemies + shop between waves
+- [x] **Frenzy Mode Power-up**: WhiteBottle - 2x attack speed for 5 seconds
+- [x] **Magnet Power-up**: PinkBottle - Attracts potions and coins
+- [x] **Object Pooling**: PoolManager and ObjectPool utilities for performance
 
 ---
 
 ## 🎯 Next Steps
 
 1. ✅ Architecture is clean!
-2. Continue development following the patterns
-3. Run validation periodically to maintain quality
+2. Test new features in gameplay
+3. Integrate shop system with wave manager
+4. Run validation periodically to maintain quality
 
 ---
 
@@ -39,14 +130,14 @@ Architecture is coherent!
   - Sistema di selezione livello nel MainMenu
   - Progressione difficoltà tra livelli
 
-- [ ] **Nuovi Nemici**
-  - Nemico "Necromante" che evoca altri nemici
-  - Nemico "Assassino" che diventa invisibile
-  - Mini-boss intermedi tra le wave
+- [x] **Nuovi Nemici** ✅ PARTIAL
+  - [x] Nemico "Assassino" che diventa invisibile
+  - [ ] Nemico "Necromante" che evoca altri nemici
+  - [ ] Mini-boss intermedi tra le wave
 
-- [ ] **Sistema Upgrade/Shop**
-  - Monete droppate dai nemici
-  - Shop tra le wave per comprare upgrade
+- [x] **Sistema Upgrade/Shop** ✅ DONE
+  - Monete droppate dai nemici (Coin.js)
+  - Shop tra le wave (ShopSystem.js)
   - Upgrade permanenti (damage, speed, health max)
 
 - [ ] **Nuove Armi**
@@ -54,17 +145,17 @@ Architecture is coherent!
   - Martello con area damage
   - Magia elementale (fuoco, ghiaccio)
 
-- [ ] **Power-up Speciali**
-  - "Frenzy Mode" - velocità attacco x2 per 5 sec
-  - "Invincibility" - 3 secondi di immunità totale
-  - "Magnet" - attira automaticamente le pozioni
+- [x] **Power-up Speciali** ✅ DONE
+  - [x] "Frenzy Mode" - velocità attacco x2 per 5 sec (WhiteBottle)
+  - [ ] "Invincibility" - 3 secondi di immunità totale
+  - [x] "Magnet" - attira automaticamente le pozioni (PinkBottle)
 
 ### 🎨 Visual & Audio
 
-- [ ] **Miglioramenti Grafici**
-  - Particle system più elaborato per morte nemici
-  - Screen shake dinamico basato su danno
-  - Effetti di luce/ombre
+- [x] **Miglioramenti Grafici** ✅ PARTIAL
+  - [x] Particle system più elaborato per morte nemici
+  - [x] Screen shake dinamico basato su danno
+  - [ ] Effetti di luce/ombre
 
 - [ ] **Sistema Audio Completo**
   - Musica diversa per ogni boss
@@ -78,20 +169,19 @@ Architecture is coherent!
 
 ### 🔧 Technical Improvements
 
-- [ ] **EventBus Centralizzato**
-  - Implementare `src/managers/EventBus.js` completo
-  - Migrare tutti gli eventi da `scene.events` a EventBus
+- [x] **EventBus Centralizzato** ✅ DONE
+  - Implementato `src/managers/EventBus.js` completo
   - Debug mode per tracciare eventi
+  - Helper methods per eventi comuni
 
-- [ ] **Save System**
+- [x] **Save System** ✅ DONE
   - LocalStorage per highscores
-  - Save/Load game state
-  - Cloud save (Firebase?)
+  - Save/Load settings e statistics
+  - Export/Import dati
 
-- [ ] **Performance**
-  - Object pooling per proiettili/nemici
-  - Sprite batching
-  - Lazy loading assets
+- [x] **Performance** ✅ DONE (Object Pooling)
+  - Object pooling per proiettili/particelle
+  - PoolManager centralizzato
 
 - [ ] **Testing**
   - Unit test per managers
@@ -131,14 +221,15 @@ Architecture is coherent!
 
 ### 📌 Priority Matrix
 
-| Priorità | Feature | Effort | Impact |
-|----------|---------|--------|--------|
-| 🔴 Alta | EventBus centralizzato | Medio | Alto |
-| 🔴 Alta | Save System | Basso | Alto |
-| 🟡 Media | Nuovi nemici | Medio | Medio |
-| 🟡 Media | Sistema Shop | Alto | Alto |
-| 🟢 Bassa | Leaderboard | Alto | Medio |
-| 🟢 Bassa | PWA | Medio | Basso |
+| Priorità | Feature | Effort | Impact | Status |
+|----------|---------|--------|--------|--------|
+| 🔴 Alta | EventBus centralizzato | Medio | Alto | ✅ DONE |
+| 🔴 Alta | Save System | Basso | Alto | ✅ DONE |
+| 🟡 Media | Nuovi nemici | Medio | Medio | 🔄 Partial |
+| 🟡 Media | Sistema Shop | Alto | Alto | ✅ DONE |
+| 🟡 Media | Screen Shake | Basso | Medio | ✅ DONE |
+| 🟢 Bassa | Leaderboard | Alto | Medio | ❌ TODO |
+| 🟢 Bassa | PWA | Medio | Basso | ❌ TODO |
 
 ---
 

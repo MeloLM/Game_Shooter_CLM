@@ -123,6 +123,7 @@ STRUCTURE = {
       },
       
       specialized: [
+        "Assassin.js",       // Stealth enemy - NEW
         "Goblin.js",
         "Slime.js",
         "SlimeRed.js",
@@ -167,13 +168,17 @@ STRUCTURE = {
       path: "src/entities/items/",
       files: [
         "Bottle.js",           // Base class
+        "Coin.js",             // Currency - NEW
+        "Door.js",             // Door entity
         "RedBottle.js",        // Health
-        "BlueBottle.js",       // Mana
+        "BlueBottle.js",       // Shield
         "GreenBottle.js",      // Speed
-        "YellowBottle.js",     // Damage
-        "PurpleBottle.js",     // Shield
-        "OrangeBottle.js",     // XP
-        "CyanBottle.js"        // Rare
+        "YellowBottle.js",     // Laser
+        "PurpleBottle.js",     // Thunder
+        "OrangeBottle.js",     // Shotgun
+        "CyanBottle.js",       // Boomerang
+        "WhiteBottle.js",      // Frenzy Mode - NEW
+        "PinkBottle.js"        // Magnet - NEW
       ],
       base_interface: {
         methods: [
@@ -284,13 +289,59 @@ STRUCTURE = {
     },
     
     EventBus.js: {
-      purpose: "Central event hub (optional)",
-      note: "Can use scene.events instead",
+      purpose: "Central event hub with debug mode",
       methods: [
         "emit(eventName, data)",
         "on(eventName, callback)",
         "off(eventName, callback)",
-        "once(eventName, callback)"
+        "once(eventName, callback)",
+        "setDebugMode(enabled)",
+        "getEventHistory()"
+      ]
+    },
+    
+    SaveSystem.js: {
+      purpose: "Persistent storage management",
+      methods: [
+        "getHighscores()",
+        "addHighscore(data)",
+        "saveSettings(settings)",
+        "loadSettings()",
+        "saveAchievements(ids)",
+        "loadAchievements()",
+        "updateStatistics(stats)"
+      ]
+    },
+    
+    ShopSystem.js: {
+      purpose: "In-game shop between waves",
+      properties: [
+        "coins",
+        "upgrades[]"
+      ],
+      methods: [
+        "open()",
+        "close()",
+        "purchaseUpgrade(id)",
+        "addCoins(amount)"
+      ]
+    },
+    
+    PauseManager.js: {
+      purpose: "Game pause handling",
+      methods: [
+        "toggle()",
+        "pause()",
+        "resume()",
+        "getIsPaused()"
+      ],
+      emits: ["pauseStateChanged"]
+    },
+    
+    CollisionManager.js: {
+      purpose: "Physics collision setup",
+      methods: [
+        "setupCollisions()"
       ]
     }
   },
@@ -338,6 +389,36 @@ STRUCTURE = {
         "render()"
       ],
       updates_on: "scene.update"
+    },
+    
+    VisualEffects.js: {
+      purpose: "Particle effects and screen shake",
+      methods: [
+        "screenShake(intensity, duration)",
+        "playerDamageShake(damagePercent)",
+        "enemyKillShake(enemyType)",
+        "createDeathParticles(x, y, type)",
+        "createBossDeathEffect(x, y)",
+        "createLevelUpEffect(x, y)"
+      ]
+    },
+    
+    HUDManager.js: {
+      purpose: "Centralized HUD management",
+      methods: [
+        "create(depth)",
+        "updateScore(score)",
+        "updateWave(wave)"
+      ]
+    },
+    
+    MobileControls.js: {
+      purpose: "Touch controls for mobile",
+      methods: [
+        "getMovement()",
+        "enable()",
+        "disable()"
+      ]
     }
   },
   
@@ -388,6 +469,24 @@ STRUCTURE = {
           "randomRange(min, max)",
           "clamp(value, min, max)"
         ]
+      }
+    },
+    
+    EntityFactories.js: {
+      purpose: "Factory functions for entities",
+      exports: {
+        functions: [
+          "createEnemyFactories(scene)",
+          "createBottleFactories(scene)"
+        ]
+      }
+    },
+    
+    ObjectPool.js: {
+      purpose: "Object pooling for performance",
+      exports: {
+        classes: ["ObjectPool", "PoolManager"],
+        functions: ["setupCommonPools(scene, poolManager)"]
       }
     }
   }

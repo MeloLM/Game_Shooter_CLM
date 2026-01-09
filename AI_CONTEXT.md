@@ -9,7 +9,7 @@
 | Proprietà | Valore |
 |-----------|--------|
 | **Nome** | Knight Shooter - Survival Arena |
-| **Versione** | 1.6.1 |
+| **Versione** | 1.7.0 |
 | **Tipo** | 2D Top-Down Shooter / Survival |
 | **Framework** | Phaser 3.80.1 |
 | **Build Tool** | Vite 5.2.0 |
@@ -189,8 +189,12 @@ Game_Shooter_CLM-main/
 │   │   ├── AchievementSystem.js # 16 achievement
 │   │   ├── DifficultyManager.js # Scaling difficoltà
 │   │   ├── AudioManager.js     # Musica e SFX
+│   │   ├── SaveSystem.js       # 🆕 Persistenza localStorage
+│   │   ├── ShopSystem.js       # 🆕 Shop upgrade tra wave
+│   │   ├── PauseManager.js     # Gestione pausa
+│   │   ├── CollisionManager.js # Gestione collisioni
 │   │   ├── Minimap.js          # Mini-mappa
-│   │   └── VisualEffects.js    # Particelle, effetti
+│   │   └── VisualEffects.js    # Particelle, screen shake
 │   │
 │   ├── 📂 Enemies/         # Classi nemici
 │   │   ├── Enemy.js        # ⭐ CLASSE BASE (tutti estendono)
@@ -204,6 +208,7 @@ Game_Shooter_CLM-main/
 │   │   ├── SpeedEnemy.js   # Nemico velocissimo
 │   │   ├── RangedEnemy.js  # Spara proiettili
 │   │   ├── SkeletonKnight.js # Skeleton melee
+│   │   ├── Assassin.js       # 🆕 Nemico stealth (invisibilità)
 │   │   └── 📂 Bosses/
 │   │       ├── GiantGoblin.js  # Boss wave 10,30,50...
 │   │       └── OrcBoss.js      # Boss wave 20,40,60...
@@ -225,7 +230,11 @@ Game_Shooter_CLM-main/
 │       ├── GreenBottle.js  # Speed
 │       ├── PurpleBottle.js # Thunder
 │       ├── OrangeBottle.js # Shotgun
-│       └── CyanBottle.js   # Boomerang
+│       ├── OrangeBottle.js # Shotgun
+│       ├── CyanBottle.js   # Boomerang
+│       ├── WhiteBottle.js  # 🆕 Frenzy Mode (2x attack speed)
+│       ├── PinkBottle.js   # 🆕 Magnet (attrae pozioni/coins)
+│       └── Coin.js         # 🆕 Moneta per shop
 │
 └── 📂 public/              # Assets statici (copiati in build)
     │
@@ -351,6 +360,14 @@ export class NuovoNemico extends Enemy {
 | SpeedEnemy | 15 | 10 | 100 | 12 | slimeRed_* | 11 |
 | RangedEnemy | 35 | 15 | 25 | 18 | slimeGreen_* | 11 |
 | SkeletonKnight | 80 | 35 | 35 | 25 | skeleton_* | 15 |
+| Assassin | 60 | 45 | 50 | 35 | assassin_* | 18 |
+
+### Nemico Speciale: Assassin
+
+L'Assassin è un nemico con meccanica stealth:
+- **Invisibilità ciclica**: diventa invisibile ogni 5 secondi per 3 secondi
+- **Danno ridotto se invisibile**: infligge 50% danno quando è invisibile
+- **Forzato visibile**: quando colpito, diventa visibile per 2 secondi
 
 ### Boss
 
@@ -374,6 +391,17 @@ export class NuovoNemico extends Enemy {
 | 🟣 Viola | PurpleBottle | purple_bottle | Thunder (kill all screen) | istant |
 | 🟠 Arancione | OrangeBottle | orange_bottle | Shotgun (3 proiettili) | 10s |
 | 🩵 Cyan | CyanBottle | cyan_bottle | Boomerang (ritorna) | 10s |
+| ⚪ Bianco | WhiteBottle | white_bottle | Frenzy Mode (2x attack) | 5s |
+| 🩷 Rosa | PinkBottle | pink_bottle | Magnet (attrae oggetti) | 8s |
+
+### Nuovo Sistema: Coins
+
+I nemici droppano **Coin** che possono essere usate nel **ShopSystem**:
+- Slime base: 1-2 coins
+- Nemici speciali: 3-5 coins
+- Boss: 50-100 coins
+
+Le coins sono attratte dal player se ha il power-up Magnet attivo.
 
 ### Spawn Pozioni
 
@@ -515,6 +543,125 @@ this.audioManager.stopAllBGM();     // Stop tutto
 | `knightShooter_highScore` | number | Record uccisioni |
 | `achievements_unlocked` | string[] | Array ID achievement |
 | `player_history` | object | { gamesPlayed, highScore } |
+
+### 🆕 SaveSystem.js
+
+Nuovo sistema centralizzato per la persistenza:
+
+```javascript
+import SaveSystem from './managers/SaveSystem.js';
+
+// Salvataggio
+SaveSystem.saveHighscore(score);
+SaveSystem.saveSetting('volume', 0.5);
+SaveSystem.unlockAchievement('first_blood');
+
+// Caricamento
+const highscore = SaveSystem.loadHighscore();
+const settings = SaveSystem.loadSettings();
+const achievements = SaveSystem.loadAchievements();
+
+// Export/Import (backup)
+const backup = SaveSystem.exportAllData();
+SaveSystem.importAllData(backup);
+```
+
+---
+
+## 🛒 SISTEMA SHOP (Nuovo)
+
+### ShopSystem.js
+
+Shop accessibile tra le wave per spendere coins:
+
+| Upgrade | Costo | Effetto |
+|---------|-------|---------|
+| Cura | 10 coins | +100 HP |
+| Danno+ | 25 coins | +10% danno permanente |
+| Velocità+ | 20 coins | +5% velocità permanente |
+| Max HP+ | 30 coins | +50 HP massimi |
+| Scudo | 50 coins | Shield temporaneo |
+
+```javascript
+// Apertura shop
+this.shopSystem = new ShopSystem(this);
+this.shopSystem.openShop();
+
+// Acquisto
+this.shopSystem.purchaseUpgrade('damage');
+```
+
+---
+
+## 📡 EVENT BUS SYSTEM
+
+### EventBus.js
+
+Sistema eventi centralizzato con debug mode:
+
+```javascript
+import { EventBus } from './managers/EventBus.js';
+
+// Emissione eventi
+EventBus.emit('enemyKilled', { enemy, killer, points });
+EventBus.emitEnemyKilled(enemy, killer, points);
+
+// Ascolto eventi  
+EventBus.on('enemyKilled', (data) => { ... });
+
+// Debug mode (logga tutti gli eventi)
+EventBus.setDebugMode(true);
+
+// Cronologia eventi
+const history = EventBus.getEventHistory();
+```
+
+---
+
+## ✨ VISUAL EFFECTS (Aggiornato)
+
+### Screen Shake
+
+```javascript
+// Shake generico
+this.visualEffects.screenShake(intensity, duration);
+
+// Shake specifici
+this.visualEffects.playerDamageShake(damagePercent); // 0-100
+this.visualEffects.enemyKillShake('boss'); // o 'normal'
+```
+
+### Particle Effects
+
+```javascript
+this.visualEffects.createDeathParticles(x, y, 'slime');
+this.visualEffects.createBossDeathEffect(x, y);
+this.visualEffects.createLevelUpEffect(x, y);
+this.visualEffects.createCriticalEffect(x, y);
+```
+
+---
+
+## 🏊 OBJECT POOLING
+
+### ObjectPool.js
+
+Ottimizzazione performance per oggetti frequenti:
+
+```javascript
+import { PoolManager, setupCommonPools } from './utils/ObjectPool.js';
+
+// Setup pools comuni
+this.poolManager = new PoolManager();
+setupCommonPools(this, this.poolManager);
+
+// Uso
+const bullet = this.poolManager.get('bullets', x, y);
+this.poolManager.release('bullets', bullet);
+
+// Statistiche
+const stats = this.poolManager.getStats();
+```
 
 ---
 

@@ -2,50 +2,63 @@
 
 Questa cartella contiene tutte le scene del gioco.
 
-## Struttura
+## Struttura Attuale
 
-- **Boot.js** - Precarica tutti gli asset globali
-- **MainMenu.js** - Menu principale (da migrare da src/)
-- **Level.js** - Scena di gameplay principale (da migrare da src/)
-- **HUD.js** - Overlay UI che mostra punteggio, salute, wave
-- **GameOver.js** - Schermata di fine partita (da migrare da src/)
+| File | Descrizione | Stato |
+|------|-------------|-------|
+| **Boot.js** | Precarica tutti gli asset globali | ✅ |
+| **MainMenu.js** | Menu principale del gioco | ✅ |
+| **Level.js** | Scena di gameplay principale (Orchestrator) | ✅ |
+| **HUD.js** | Overlay UI (punteggio, salute, wave) | ✅ |
+| **GameOver.js** | Schermata di fine partita | ✅ |
+| **Settings.js** | Impostazioni audio e grafiche | ✅ |
+| **TrophyScreen.js** | Schermata trofei/achievement | ✅ |
 
 ## Responsabilità
 
 Le scene devono SOLO:
-- Inizializzare il gioco (create)
-- Aggiornare il ciclo di gioco (update)
-- Orchestrare i Manager
-- NON contenere logica di business complessa
+- ✅ Inizializzare il gioco (`create`)
+- ✅ Aggiornare il ciclo di gioco (`update`)
+- ✅ Orchestrare i Manager
+- ❌ NON contenere logica di business complessa
 
 ## Pattern
 
 ```javascript
-export default class MyScene extends Phaser.Scene {
+import { Player } from '../entities/Player.js';
+import { WaveManager } from '../managers/WaveManager.js';
+
+export class MyScene extends Phaser.Scene {
   constructor() {
     super({ key: 'MyScene' });
   }
 
   create() {
     // 1. Setup managers
-    this.gameManager = new GameManager(this);
+    this.waveManager = new WaveManager(this);
+    this.pauseManager = new PauseManager(this);
     
     // 2. Create entities
     this.player = new Player(this, x, y);
     
     // 3. Setup event listeners
-    this.events.on('SOME_EVENT', this.handler, this);
+    this.events.on('ENEMY_KILLED', this.onEnemyKilled, this);
   }
 
   update(time, delta) {
-    // Update entities and managers
-    this.gameManager.update(delta);
+    // Check pause state
+    if (this.pauseManager.getIsPaused()) return;
+    
+    // Update systems
+    this.player.update();
   }
 }
 ```
 
-## File da Migrare
+## Scene Flow
 
-- [ ] src/MainMenu.js → scenes/MainMenu.js
-- [ ] src/Level.js → scenes/Level.js (refactor)
-- [ ] src/GameOver.js → scenes/GameOver.js
+```
+Boot → MainMenu → Level ↔ Settings
+                    ↓
+               GameOver → TrophyScreen
+```

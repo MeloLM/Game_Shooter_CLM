@@ -13,6 +13,7 @@ import { Fly } from "../entities/enemies/Fly.js";
 import { TankEnemy } from "../entities/enemies/TankEnemy.js";
 import { SpeedEnemy } from "../entities/enemies/SpeedEnemy.js";
 import { RangedEnemy } from "../entities/enemies/RangedEnemy.js";
+import { Assassin } from "../entities/enemies/Assassin.js";
 import { RedBottle } from "../entities/items/RedBottle.js";
 import { YellowBottle } from "../entities/items/YellowBottle.js";
 import { BlueBottle } from "../entities/items/BlueBottle.js";
@@ -20,6 +21,8 @@ import { GreenBottle } from "../entities/items/GreenBottle.js";
 import { PurpleBottle } from "../entities/items/PurpleBottle.js";
 import { OrangeBottle } from "../entities/items/OrangeBottle.js";
 import { CyanBottle } from "../entities/items/CyanBottle.js";
+import { WhiteBottle } from "../entities/items/WhiteBottle.js";
+import { PinkBottle } from "../entities/items/PinkBottle.js";
 
 /**
  * Crea la lista di factory per i nemici
@@ -36,6 +39,7 @@ export function createEnemyFactories(scene) {
     (x, y) => new RangedEnemy(scene, x, y),
     (x, y) => new SlimeBlue(scene, x, y),
     (x, y) => new SlimeRed(scene, x, y),
+    (x, y) => new Assassin(scene, x, y),
   ];
 }
 
@@ -53,5 +57,7 @@ export function createBottleFactories(scene) {
     { weight: 10, create: (x, y) => new PurpleBottle(scene, x, y, scene.enemies) }, // Thunder - raro
     { weight: 5, create: (x, y) => new OrangeBottle(scene, x, y) },    // Shotgun - molto raro
     { weight: 5, create: (x, y) => new CyanBottle(scene, x, y) },      // Boomerang - molto raro
+    { weight: 4, create: (x, y) => new WhiteBottle(scene, x, y) },     // Frenzy - molto raro
+    { weight: 4, create: (x, y) => new PinkBottle(scene, x, y) },      // Magnet - molto raro
   ];
 }

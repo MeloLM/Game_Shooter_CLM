@@ -36,7 +36,8 @@ export class WaveManager {
     goblin: { minWave: 7, weight: 20 },
     speed: { minWave: 11, weight: 12 },
     ranged: { minWave: 11, weight: 10 },
-    tank: { minWave: 15, weight: 5 }
+    tank: { minWave: 15, weight: 5 },
+    assassin: { minWave: 12, weight: 8 }  // Nemico stealth
     // skeleton: { minWave: 15, weight: 8 } // ARCHIVED: Sprites not ready
   };
   
