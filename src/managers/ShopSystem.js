@@ -12,6 +12,13 @@ export class ShopSystem {
   shopContainer = null;
   coinDisplay = null;
 
+  // Scroll
+  scrollContainer = null;
+  maskGraphics = null;
+  scrollY = 0;
+  isDragging = false;
+  lastY = 0;
+
   // Catalogo upgrade disponibili
   upgrades = [
     {
@@ -159,9 +166,6 @@ export class ShopSystem {
     title.setOrigin(0.5);
     this.shopContainer.add(title);
 
-    // Icona Shop (Carrello) - Se disponibile, altrimenti testo
-    // if (this.scene.textures.exists('shop_icon')) ...
-
     // Coin display container
     const coinBg = this.scene.add.rectangle(0, -90, 150, 30, 0x000000, 0.5);
     this.shopContainer.add(coinBg);
@@ -180,6 +184,51 @@ export class ShopSystem {
     });
     this.coinDisplay.setOrigin(0, 0.5);
     this.shopContainer.add(this.coinDisplay);
+
+    // --- SCROLLABLE AREA SETUP ---
+    const maskX = centerX - 240;
+    const maskY = centerY - 80;
+    const maskW = 480;
+    const maskH = 220;
+
+    // Maschera
+    this.maskGraphics = this.scene.make.graphics();
+    this.maskGraphics.fillStyle(0xffffff);
+    this.maskGraphics.fillRect(maskX, maskY, maskW, maskH);
+    const mask = new Phaser.Display.Masks.GeometryMask(this.scene, this.maskGraphics);
+
+    // Container scorrevole
+    this.scrollContainer = this.scene.add.container(0, 0);
+    this.shopContainer.add(this.scrollContainer);
+    this.scrollContainer.setMask(mask);
+
+    // Input area for scrolling (invisible rect over the list)
+    const hitArea = this.scene.add.rectangle(0, 30, maskW, maskH, 0x000000, 0); // Relative to center
+    hitArea.setInteractive();
+    this.shopContainer.add(hitArea);
+
+    // Scroll Logic
+    this.scene.input.on('wheel', (pointer, gameObjects, deltaX, deltaY, deltaZ) => {
+      if (this.isOpen) this.scroll(deltaY * 0.5);
+    });
+
+    // Drag Logic
+    this.scene.input.on('pointerdown', (pointer) => {
+      if (this.isOpen && hitArea.getBounds().contains(pointer.x, pointer.y)) {
+        this.isDragging = true;
+        this.lastY = pointer.y;
+      }
+    });
+    this.scene.input.on('pointerup', () => {
+      this.isDragging = false;
+    });
+    this.scene.input.on('pointermove', (pointer) => {
+      if (this.isOpen && this.isDragging) {
+        const dy = this.lastY - pointer.y;
+        this.scroll(dy);
+        this.lastY = pointer.y;
+      }
+    });
 
     // Upgrade buttons
     this.createUpgradeButtons();
@@ -202,112 +251,94 @@ export class ShopSystem {
   }
 
   /**
+   * Gestisce lo scroll
+   */
+  scroll(amount) {
+    if (!this.scrollContainer) return;
+
+    this.scrollY -= amount;
+
+    // Bounds
+    const contentHeight = this.upgrades.length * 60; // 60px height per item
+    const viewHeight = 220;
+    const minScroll = -(contentHeight - viewHeight) - 20; // extra padding
+    const maxScroll = 0;
+
+    if (minScroll > 0) {
+      this.scrollY = 0; // Content fits perfectly
+    } else {
+      this.scrollY = Phaser.Math.Clamp(this.scrollY, minScroll, maxScroll);
+    }
+
+    this.scrollContainer.y = this.scrollY;
+  }
+
+  /**
    * Crea bottoni upgrade
    */
   createUpgradeButtons() {
     const startY = -60;
-    const spacing = 45;
+    const spacing = 55;
+
+    // Clear old
+    this.scrollContainer.removeAll(true);
 
     this.upgrades.forEach((upgrade, index) => {
       const y = startY + (index * spacing);
 
-      // Button background with hover effect
-      const btnBg = this.scene.add.rectangle(0, y, 460, 40, 0x2a2a4e, 1);
+      // Container per singolo item
+      const itemCont = this.scene.add.container(0, y);
+
+      // Background Item
+      const btnBg = this.scene.add.rectangle(0, 0, 440, 50, 0x2a2a4e, 1);
       btnBg.setStrokeStyle(1, 0x444488);
       btnBg.setInteractive({ useHandCursor: true });
-
-      // Icon selection based on ID
-      let iconKey = 'potion'; // default
-      let iconFrame = null;
-
-      if (upgrade.id === 'heal_small') { iconKey = 'potion'; }
-      else if (upgrade.id === 'heal_full') { iconKey = 'red_potion'; } // Assuming red_potion exists or use potion with tint
-      else if (upgrade.id === 'damage_up') { iconKey = 'sword'; }
-      else if (upgrade.id === 'speed_up') { iconKey = 'blue_potion'; } // Placeholder for speed
-      else if (upgrade.id === 'max_hp_up') { iconKey = 'green_potion'; }
-      else if (upgrade.id === 'shield_time') { iconKey = 'shield1'; }
+      itemCont.add(btnBg);
 
       // Icon
+      let iconKey = 'potion';
+      if (upgrade.id === 'damage_up') iconKey = 'sword';
+      else if (upgrade.id === 'max_hp_up') iconKey = 'green_potion';
+      else if (upgrade.id === 'heal_full') iconKey = 'red_potion';
+      else if (upgrade.id === 'shield_time') iconKey = 'shield1';
+      else if (upgrade.id === 'speed_up') iconKey = 'blue_potion';
+
       try {
-        const icon = this.scene.add.image(-200, y, iconKey, iconFrame);
-        icon.setDisplaySize(24, 24);
-        this.shopContainer.add(icon);
+        const icon = this.scene.add.image(-200, 0, iconKey).setDisplaySize(32, 32);
+        itemCont.add(icon);
       } catch (e) {
-        // Fallback text if image fails
-        const iconText = this.scene.add.text(-200, y, '⚡', { fontSize: '20px' });
-        iconText.setOrigin(0.5);
-        this.shopContainer.add(iconText);
+        itemCont.add(this.scene.add.text(-200, 0, '⚡').setOrigin(0.5));
       }
 
-      // Hover effects
-      btnBg.on('pointerover', () => {
-        btnBg.setFillStyle(0x3a3a6e);
-        this.scene.tweens.add({
-          targets: [nameText, costText],
-          scale: 1.1,
-          duration: 100
-        });
+      // Texts
+      const nameText = this.scene.add.text(-170, -15, upgrade.name, {
+        fontFamily: 'Arial', fontSize: '18px', color: '#ffffff', fontStyle: 'bold'
       });
-      btnBg.on('pointerout', () => {
-        btnBg.setFillStyle(0x2a2a4e);
-        this.scene.tweens.add({
-          targets: [nameText, costText],
-          scale: 1,
-          duration: 100
-        });
-      });
+      itemCont.add(nameText);
 
-      // Click handler
+      const descText = this.scene.add.text(-170, 8, upgrade.description, {
+        fontFamily: 'Arial', fontSize: '12px', color: '#aaaaaa'
+      });
+      itemCont.add(descText);
+
+      // Cost
+      const costContainer = this.scene.add.container(160, 0);
+      const costIcon = this.scene.add.image(-15, 0, 'coin').setDisplaySize(16, 16);
+      const costText = this.scene.add.text(5, 0, `${upgrade.cost}`, {
+        fontFamily: 'Arial', fontSize: '18px', color: '#ffd700', fontStyle: 'bold'
+      }).setOrigin(0, 0.5);
+
+      costContainer.add([costIcon, costText]);
+      itemCont.add(costContainer);
+
+      // Events
+      btnBg.on('pointerover', () => { btnBg.setFillStyle(0x3a3a6e); });
+      btnBg.on('pointerout', () => { btnBg.setFillStyle(0x2a2a4e); });
       btnBg.on('pointerdown', () => {
-        this.purchaseUpgrade(upgrade);
-        // Little bounce
-        this.scene.tweens.add({
-          targets: btnBg,
-          scaleX: 0.98,
-          scaleY: 0.98,
-          duration: 50,
-          yoyo: true
-        });
+        if (!this.isDragging) this.purchaseUpgrade(upgrade);
       });
 
-      this.shopContainer.add(btnBg);
-      // Bring other text in front if needed, but container order matters.
-      // Since we add bg last in loop, need to be careful.
-      // Re-ordering logic: Add BG first, then text/icons on top.
-      this.shopContainer.sendToBack(btnBg); // Ensure text is on top if added after? No, added sequentially.
-
-      // We added BG first in this block, so text needs to be added AFTER bg.
-
-      // Upgrade name
-      const nameText = this.scene.add.text(-180, y - 8, upgrade.name.replace(/^[^\w\s]+/, ''), { // Strip emoji prefix if we use icons
-        fontFamily: 'Arial',
-        fontSize: '16px',
-        color: '#ffffff',
-        fontStyle: 'bold'
-      });
-      this.shopContainer.add(nameText);
-
-      // Description
-      const descText = this.scene.add.text(-180, y + 10, upgrade.description, {
-        fontFamily: 'Arial',
-        fontSize: '12px',
-        color: '#aaaaaa'
-      });
-      this.shopContainer.add(descText);
-
-      // Cost Icon & Text
-      const costIcon = this.scene.add.image(140, y, 'coin');
-      costIcon.setDisplaySize(14, 14);
-      this.shopContainer.add(costIcon);
-
-      const costText = this.scene.add.text(160, y, `${upgrade.cost}`, {
-        fontFamily: 'Arial',
-        fontSize: '16px',
-        color: '#ffd700',
-        fontStyle: 'bold'
-      });
-      costText.setOrigin(0, 0.5);
-      this.shopContainer.add(costText);
+      this.scrollContainer.add(itemCont);
     });
   }
 

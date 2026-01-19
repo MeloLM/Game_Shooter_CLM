@@ -29,35 +29,24 @@ export class MainMenu extends Scene {
     this.add.rectangle(320, 180, 640, 360, 0x1a1a2e);
 
     // Titolo del gioco
-    // Titolo del gioco (con ombreggiatura più marcata)
-    const titleShadow = this.add.text(324, 84, '⚔️ KNIGHT SHOOTER ⚔️', {
-      fontFamily: 'Arial Black',
-      fontSize: '42px',
-      color: '#000000',
+    // Titolo del gioco (Simple, Clean)
+    const title = this.add.text(320, 80, 'KNIGHT SHOOTER', {
+      fontFamily: 'Verdana, sans-serif',
+      fontSize: '32px',
+      color: '#ffffff',
       fontStyle: 'bold'
-    });
-    titleShadow.setOrigin(0.5);
-    titleShadow.setAlpha(0.5);
-
-    const title = this.add.text(320, 80, '⚔️ KNIGHT SHOOTER ⚔️', {
-      fontFamily: 'Arial Black',
-      fontSize: '42px',
-      color: '#ffd700',
-      fontStyle: 'bold',
-      stroke: '#8a6a2a',
-      strokeThickness: 6
     });
     title.setOrigin(0.5);
 
-    // Coin decorativa che ruota
+    // Coin decorativa (keep them, they are fine)
     if (this.textures.exists('coin')) {
-      this.menuCoin1 = this.add.image(100, 180, 'coin').setScale(4).setAlpha(0.8);
-      this.menuCoin2 = this.add.image(540, 180, 'coin').setScale(4).setAlpha(0.8);
+      this.menuCoin1 = this.add.image(120, 180, 'coin').setScale(3).setAlpha(0.6);
+      this.menuCoin2 = this.add.image(520, 180, 'coin').setScale(3).setAlpha(0.6);
 
       this.tweens.add({
         targets: [this.menuCoin1, this.menuCoin2],
         scaleX: 0,
-        duration: 1000,
+        duration: 1500,
         yoyo: true,
         repeat: -1,
         ease: 'Sine.easeInOut'
@@ -66,42 +55,33 @@ export class MainMenu extends Scene {
 
     // Sottotitolo
     const subtitle = this.add.text(320, 120, 'Survival Arena', {
-      fontFamily: 'Arial',
+      fontFamily: 'Verdana',
       fontSize: '16px',
-      color: '#cccccc'
+      color: '#aaaaaa'
     });
     subtitle.setOrigin(0.5);
 
-    // Bottone PLAY
-    const playButton = this.add.rectangle(320, 200, 180, 50, 0x4a4a8a);
+    // PLAY BUTTON (Minimalist)
+    const playButton = this.add.rectangle(320, 200, 200, 50, 0xffffff); // White btn
+    playButton.setStrokeStyle(2, 0x000000);
     playButton.setInteractive({ useHandCursor: true });
 
-    const playText = this.add.text(320, 200, 'GIOCA', {
-      fontFamily: 'Arial Black',
-      fontSize: '28px',
-      color: '#ffffff',
-      fontStyle: 'bold',
-      stroke: '#000000',
-      strokeThickness: 4
+    const playText = this.add.text(320, 200, 'START GAME', {
+      fontFamily: 'Verdana',
+      fontSize: '20px',
+      color: '#000000', // Black text on white
+      fontStyle: 'bold'
     });
     playText.setOrigin(0.5);
 
-    // Play Icon
-    const playIcon = this.add.text(260, 200, '▶', {
-      fontSize: '24px',
-      color: '#ffd700'
-    }).setOrigin(0.5);
-
     // Hover effect per PLAY
     playButton.on('pointerover', () => {
-      playButton.setFillStyle(0x6a6aaa);
-      playText.setScale(1.1);
-      playIcon.x = 255; // Nudge icon
+      playButton.setFillStyle(0xeeeeee);
+      playText.setScale(1.05);
     });
     playButton.on('pointerout', () => {
-      playButton.setFillStyle(0x4a4a8a);
+      playButton.setFillStyle(0xffffff);
       playText.setScale(1);
-      playIcon.x = 260; // Reset icon
     });
     playButton.on('pointerdown', () => {
       // Avvia audio al primo click (per policy browser)
