@@ -33,21 +33,20 @@ Un gioco survival shooter 2D dove controlli un cavaliere che deve sopravvivere a
 - ✅ **Console.log Cleanup**: Rimossi log di debug rimanenti
 - ✅ **UI/UX Improvements**: Bottone menu posizionato strategicamente in alto a sinistra
 
-### Nuovi File
-- `src/Settings.js` - Schermata impostazioni con UI migliorata
-- `src/MobileControls.js` - Controlli touch per mobile
+### 🔧 Code Quality
+- ✅ **Settings Persistence**: Impostazioni salvate in localStorage
+- ✅ **AudioManager Settings**: Musica rispetta impostazioni utente
+- ✅ **VisualEffects Settings**: Particelle rispettano impostazioni utente
+- ✅ **Console.log Cleanup**: Rimossi log di debug rimanenti
+- ✅ **UI/UX Improvements**: Bottone menu posizionato strategicamente in alto a sinistra
 
----
-
-## 📋 CHANGELOG v1.6.0
-
-### Code Cleanup & Optimization
-- ✅ **UI Layout Fix**: Risolte sovrapposizioni testo (Trophy y:30, Difficulty y:50, Combo y:62)
-- ✅ **Trofei Persistenti**: I trofei ora si salvano in localStorage permanentemente
-- ✅ **Import Cleanup**: Rimossi import inutilizzati (Slime, Shotgun da Level.js)
-- ✅ **Console.log Cleanup**: Rimossi tutti i log di debug
-- ✅ **Package.json**: Aggiornato con nome, versione, descrizione, keywords
-- ✅ **Hitbox Slime Fix**: Tutti gli slime hanno hitbox 20x16 centrata sullo sprite
+### 💎 v1.8.0 - Economy & Save Update
+- ✅ **Shop System**: Nuovo shop tra le wave per potenziare il personaggio!
+- ✅ **Currency**: I nemici droppano monete d'oro per acquistare upgrade.
+- ✅ **Save System**: Le statistiche e le monete vengono salvate automaticamente.
+- ✅ **New Assets**: Nuovi sprite per Monete, Pozione Frenzy (Bianca) e Pozione Magnet (Rosa).
+- ✅ **HUD Upgrade**: Aggiunto contatore monete nell'interfaccia.
+- ✅ **Optimization**: Migliore gestione della pausa e degli input.
 
 ### Layout UI Gameplay (sinistra, dall'alto)
 ```

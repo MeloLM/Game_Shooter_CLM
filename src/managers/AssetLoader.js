@@ -123,6 +123,11 @@ export class AssetLoader {
     this.scene.load.spritesheet("blue_potion", "assets/potions/azure_potion.png", {frameWidth: 16, frameHeight: 16});
     this.scene.load.spritesheet("green_potion", "assets/potions/green_potion.png", {frameWidth: 16, frameHeight: 16});
     this.scene.load.spritesheet("purple_potion", "assets/potions/purple_potion.png", {frameWidth: 16, frameHeight: 16});
+    
+    // New Items
+    this.scene.load.image("coin", "assets/items/coin.png");
+    this.scene.load.spritesheet("white_potion", "assets/potions/white_potion.png", {frameWidth: 16, frameHeight: 16});
+    this.scene.load.spritesheet("pink_potion", "assets/potions/pink_potion.png", {frameWidth: 16, frameHeight: 16});
   }
 
   /**

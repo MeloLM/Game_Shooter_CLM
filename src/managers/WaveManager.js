@@ -22,11 +22,11 @@ export class WaveManager {
   spawnDelay = 1500;
   waveText;
   waveAnnouncement;
-  
+
   // Boss tracking
   bossActive = false;
   currentBoss = null;
-  
+
   // Configurazione nemici per wave
   enemyConfigs = {
     slimeGreen: { minWave: 1, weight: 30 },
@@ -40,12 +40,12 @@ export class WaveManager {
     assassin: { minWave: 12, weight: 8 }  // Nemico stealth
     // skeleton: { minWave: 15, weight: 8 } // ARCHIVED: Sprites not ready
   };
-  
+
   constructor(scene) {
     this.scene = scene;
     this.createWaveUI();
   }
-  
+
   /**
    * Crea l'UI per mostrare la wave corrente
    */
@@ -60,7 +60,7 @@ export class WaveManager {
     this.waveText.setOrigin(0.5, 0);
     this.waveText.setScrollFactor(0);
     this.waveText.setDepth(50);
-    
+
     // Testo annuncio wave (centro schermo)
     this.waveAnnouncement = this.scene.add.text(320, 180, '', {
       fontFamily: 'Arial',
@@ -75,14 +75,14 @@ export class WaveManager {
     this.waveAnnouncement.setDepth(100);
     this.waveAnnouncement.setAlpha(0);
   }
-  
+
   /**
    * Avvia il sistema di wave
    */
   start() {
     this.startNextWave();
   }
-  
+
   /**
    * Inizia la prossima wave
    */
@@ -90,48 +90,48 @@ export class WaveManager {
     this.currentWave++;
     this.enemiesKilledInWave = 0;
     this.waveActive = true;
-    
+
     // Boss wave ogni 10
     if (this.currentWave % 10 === 0) {
       this.startBossWave();
       return;
     }
-    
+
     // Calcola numero nemici (aumenta con le wave)
     this.enemiesInWave = this.baseEnemiesPerWave + Math.floor(this.currentWave * 1.5);
-    
+
     // Mostra annuncio wave
     this.showWaveAnnouncement();
-    
+
     // Aggiorna UI
     this.updateWaveUI();
-    
+
     // Inizia spawn nemici
     this.startSpawning();
   }
-  
+
   /**
    * Inizia una wave con boss
    */
   startBossWave() {
     this.bossActive = true;
     this.enemiesInWave = 1; // Solo il boss
-    
+
     // Cambia musica a boss theme
     if (this.scene.audioManager) {
       this.scene.audioManager.playBossBGM();
     }
-    
+
     // Mostra annuncio boss
     this.showWaveAnnouncement();
     this.updateWaveUI();
-    
+
     // Spawn boss dopo breve delay
     this.scene.time.delayedCall(2000, () => {
       this.spawnBoss();
     });
   }
-  
+
   /**
    * Spawna il boss appropriato per la wave
    */
@@ -139,9 +139,9 @@ export class WaveManager {
     // Posizione centro-alto della mappa
     const x = 320;
     const y = 50;
-    
+
     let boss;
-    
+
     // Wave 10, 30, 50... = Giant Goblin
     // Wave 20, 40, 60... = Orc Boss
     if ((this.currentWave / 10) % 2 === 0) {
@@ -151,37 +151,37 @@ export class WaveManager {
       // Giant Goblin
       boss = this.scene.createBoss('goblin', x, y);
     }
-    
+
     if (boss) {
       this.currentBoss = boss;
       this.scene.enemies.push(boss);
     }
   }
-  
+
   /**
    * Chiamato quando il boss viene sconfitto
    */
   bossDefeated() {
     this.bossActive = false;
     this.currentBoss = null;
-    
+
     // Torna alla musica normale
     if (this.scene.audioManager) {
       this.scene.audioManager.playBGM();
     }
-    
+
     // Completa la wave
     this.enemiesKilledInWave = this.enemiesInWave;
     this.waveComplete();
   }
-  
+
   /**
    * Mostra l'annuncio della nuova wave
    */
   showWaveAnnouncement() {
     let text = `WAVE ${this.currentWave}`;
     let color = '#ffffff';
-    
+
     // Wave speciali
     if (this.currentWave % 10 === 0) {
       const bossName = (this.currentWave / 10) % 2 === 0 ? 'ORC WARLORD' : 'GIANT GOBLIN';
@@ -200,10 +200,10 @@ export class WaveManager {
       text = `WAVE ${this.currentWave}\n🛡️ New: Tank Enemy!`;
       color = '#8B4513';
     }
-    
+
     this.waveAnnouncement.setText(text);
     this.waveAnnouncement.setColor(color);
-    
+
     // Animazione fade in/out
     this.scene.tweens.add({
       targets: this.waveAnnouncement,
@@ -214,7 +214,7 @@ export class WaveManager {
       ease: 'Power2'
     });
   }
-  
+
   /**
    * Aggiorna l'UI della wave
    */
@@ -224,16 +224,16 @@ export class WaveManager {
       this.waveText.setText(`🌊 Wave ${this.currentWave} (${remaining})`);
     }
   }
-  
+
   /**
    * Inizia lo spawn dei nemici per la wave corrente
    */
   startSpawning() {
     let spawned = 0;
-    
+
     // Calcola delay spawn (diminuisce con le wave, minimo 500ms)
     const currentSpawnDelay = Math.max(500, this.spawnDelay - (this.currentWave * 50));
-    
+
     const spawnEvent = this.scene.time.addEvent({
       delay: currentSpawnDelay,
       repeat: this.enemiesInWave - 1,
@@ -242,25 +242,25 @@ export class WaveManager {
           spawnEvent.remove();
           return;
         }
-        
+
         this.spawnEnemy();
         spawned++;
       }
     });
   }
-  
+
   /**
    * Spawna un singolo nemico basato sulla wave corrente
    */
   spawnEnemy() {
     if (!this.scene || !this.scene.enemies) return;
-    
+
     // Trova posizione spawn ai bordi MA dentro la mappa (evita nemici fuori bounds)
     let x, y;
     const side = Phaser.Math.Between(0, 3);
     const margin = 20; // Margine dal bordo
-    
-    switch(side) {
+
+    switch (side) {
       case 0: // Top
         x = Phaser.Math.Between(margin, 640 - margin);
         y = margin;
@@ -278,30 +278,30 @@ export class WaveManager {
         y = Phaser.Math.Between(margin, 360 - margin);
         break;
     }
-    
+
     // Seleziona tipo nemico
     const enemyType = this.selectEnemyType();
     const enemy = this.createEnemy(enemyType, x, y);
-    
+
     if (enemy) {
       this.scene.enemies.push(enemy);
     }
   }
-  
+
   /**
    * Seleziona il tipo di nemico da spawnare basato su peso e wave
    */
   selectEnemyType() {
     const availableEnemies = [];
     let totalWeight = 0;
-    
+
     for (const [type, config] of Object.entries(this.enemyConfigs)) {
       if (this.currentWave >= config.minWave) {
         availableEnemies.push({ type, weight: config.weight });
         totalWeight += config.weight;
       }
     }
-    
+
     // Selezione pesata
     let random = Phaser.Math.Between(1, totalWeight);
     for (const enemy of availableEnemies) {
@@ -310,17 +310,17 @@ export class WaveManager {
         return enemy.type;
       }
     }
-    
+
     return 'slime'; // Default
   }
-  
+
   /**
    * Crea un nemico del tipo specificato
    */
   createEnemy(type, x, y) {
     const enemyCreators = this.scene.enemiesList;
-    
-    switch(type) {
+
+    switch (type) {
       case 'slimeGreen':
         return enemyCreators[0] ? enemyCreators[0](x, y) : null;
       case 'slimeBlue':
@@ -343,28 +343,28 @@ export class WaveManager {
         return enemyCreators[0](x, y);
     }
   }
-  
+
   /**
    * Chiamato quando un nemico viene ucciso
    */
   onEnemyKilled() {
     if (!this.waveActive) return;
-    
+
     this.enemiesKilledInWave++;
     this.updateWaveUI();
-    
+
     // Controlla se la wave è completata
     if (this.enemiesKilledInWave >= this.enemiesInWave) {
       this.waveComplete();
     }
   }
-  
+
   /**
    * Wave completata
    */
   waveComplete() {
     this.waveActive = false;
-    
+
     // Mostra messaggio completamento
     const completeText = this.scene.add.text(320, 200, '✅ WAVE COMPLETE!', {
       fontFamily: 'Arial',
@@ -377,7 +377,7 @@ export class WaveManager {
     completeText.setOrigin(0.5);
     completeText.setScrollFactor(0);
     completeText.setDepth(100);
-    
+
     this.scene.tweens.add({
       targets: completeText,
       alpha: { from: 1, to: 0 },
@@ -385,13 +385,26 @@ export class WaveManager {
       duration: 2000,
       onComplete: () => completeText.destroy()
     });
-    
+
     // Prossima wave dopo il delay
-    this.scene.time.delayedCall(this.timeBetweenWaves, () => {
-      this.startNextWave();
+    this.scene.time.delayedCall(2000, () => {
+      // Apri lo shop se disponibile
+      if (this.scene.shopSystem) {
+        this.scene.shopSystem.open();
+
+        // Attendi chiusura shop per prossima wave
+        this.scene.events.once('shopClosed', () => {
+          this.startNextWave();
+        });
+      } else {
+        // Fallback se no shop
+        this.scene.time.delayedCall(this.timeBetweenWaves - 2000, () => {
+          this.startNextWave();
+        });
+      }
     });
   }
-  
+
   /**
    * Ottieni statistiche della wave
    */

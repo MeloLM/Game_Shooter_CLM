@@ -6,10 +6,11 @@
 export class HUDManager {
   constructor(scene) {
     this.scene = scene;
-    
+
     // Elementi HUD
     this.hudBg = null;
     this.scoreText = null;
+    this.coinText = null;
     this.timerText = null;
     this.weaponText = null;
     this.hpBarBg = null;
@@ -36,6 +37,15 @@ export class HUDManager {
     });
     this.scoreText.setScrollFactor(0);
     this.scoreText.setDepth(hudDepth + 1);
+
+    // Coins (sotto lo score)
+    this.coinText = this.scene.add.text(10, 25, '💰 0', {
+      fontFamily: 'Arial',
+      fontSize: '12px',
+      color: '#ffd700'
+    });
+    this.coinText.setScrollFactor(0);
+    this.coinText.setDepth(hudDepth + 1);
 
     // Timer (centro)
     this.timerText = this.scene.add.text(320, 5, '⏱️ 0:00', {
@@ -92,6 +102,11 @@ export class HUDManager {
     // Aggiorna score
     this.scoreText.setText('💀 ' + enemyCounter);
 
+    // Aggiorna coins
+    if (this.scene.shopSystem) {
+      this.coinText.setText('💰 ' + this.scene.shopSystem.coins);
+    }
+
     // Aggiorna timer
     const elapsed = (this.scene.time.now - startTime) / 1000;
     const minutes = Math.floor(elapsed / 60);
@@ -102,7 +117,7 @@ export class HUDManager {
     if (player) {
       let weaponName = '⚔️ Spada';
       let weaponColor = '#ffffff';
-      
+
       if (player.weaponType === 'shotgun') {
         weaponName = '🔥 Shotgun';
         weaponColor = '#ff8800';
@@ -113,7 +128,7 @@ export class HUDManager {
         weaponName = '🔫 Laser';
         weaponColor = '#ffff00';
       }
-      
+
       this.weaponText.setText(weaponName);
       this.weaponText.setColor(weaponColor);
     }
@@ -123,7 +138,7 @@ export class HUDManager {
       const hpPercent = player.currentHP / player.maxHP;
       this.hpBarFill.setScale(hpPercent, 1);
       this.hpText.setText(`${player.currentHP}/${player.maxHP}`);
-      
+
       // Cambia colore in base agli HP
       if (hpPercent > 0.6) {
         this.hpBarFill.setFillStyle(0x00ff00); // Verde
@@ -140,7 +155,7 @@ export class HUDManager {
    */
   showDamageFlash() {
     if (!this.damageFlash) return;
-    
+
     this.scene.tweens.add({
       targets: this.damageFlash,
       alpha: { from: 0.4, to: 0 },
@@ -160,7 +175,7 @@ export class HUDManager {
       const particle = this.scene.add.circle(x, y, 3, color);
       const angle = (i / 8) * Math.PI * 2;
       const distance = 20;
-      
+
       this.scene.tweens.add({
         targets: particle,
         x: x + Math.cos(angle) * distance,
@@ -193,7 +208,7 @@ export class HUDManager {
       },
       loop: true
     });
-    
+
     this.scene.time.delayedCall(1000, () => {
       powerUpText.destroy();
       textUpdate.remove(false);

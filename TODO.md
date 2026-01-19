@@ -25,10 +25,11 @@
 
 ```
 public/assets/
-├── items/           ← CREARE (per Coin, futuri collectibles)
+├── items/           ✅ CREATED
 └── potions/
-    ├── white_potion.png   ← AGGIUNGERE
-    └── pink_potion.png    ← AGGIUNGERE
+    ├── white_potion.png   ✅ ADDED
+    └── pink_potion.png    ✅ ADDED
+    └── purple_potion.png  ✅ ADDED
 ```
 
 ---
@@ -39,39 +40,39 @@ public/assets/
 
 ### Level.js - Integrazioni
 
-- [ ] **Importare e inizializzare ShopSystem**
+- [x] **Importare e inizializzare ShopSystem** ✅ DONE
   ```javascript
   import { ShopSystem } from "../managers/ShopSystem.js";
   // In create(): this.shopSystem = new ShopSystem(this);
   ```
 
-- [ ] **Importare e inizializzare SaveSystem**
+- [x] **Importare e inizializzare SaveSystem** ✅ DONE
   ```javascript
   import SaveSystem from "../managers/SaveSystem.js";
   // In create(): SaveSystem.incrementStat('gamesPlayed');
   ```
 
-- [ ] **Collegare Coin drop alla morte nemici**
+- [x] **Collegare Coin drop alla morte nemici** ✅ DONE
   ```javascript
   import { createCoin } from "../entities/items/Coin.js";
   // Quando nemico muore: createCoin(this, enemy.x, enemy.y, enemy.type);
   ```
 
-- [ ] **Aprire Shop tra wave**
+- [x] **Aprire Shop tra wave** ✅ DONE
   ```javascript
   // In WaveManager quando wave completa:
-  // this.scene.shopSystem.openShop();
+  // this.scene.shopSystem.open();
   ```
 
 ### AssetLoader.js - Nuovi Asset
 
-- [ ] **Aggiungere preload nuove pozioni** (quando sprite disponibili)
+- [x] **Aggiungere preload nuove pozioni** (quando sprite disponibili) ✅ DONE
   ```javascript
   this.scene.load.spritesheet("white_potion", "assets/potions/white_potion.png", {frameWidth: 16, frameHeight: 16});
   this.scene.load.spritesheet("pink_potion", "assets/potions/pink_potion.png", {frameWidth: 16, frameHeight: 16});
   ```
 
-- [ ] **Aggiungere preload coin** (quando sprite disponibili)
+- [x] **Aggiungere preload coin** (quando sprite disponibili) ✅ DONE
   ```javascript
   this.scene.load.image("coin", "assets/items/coin.png");
   ```

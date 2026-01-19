@@ -6,15 +6,12 @@ import { Bottle } from "./Bottle.js";
  */
 export class PinkBottle extends Bottle {
   constructor(scene, x, y) {
-    super(scene, x, y, "potion");
-    
-    // Tint rosa/magenta per distinguerla
-    this.setTint(0xff69b4);
-    
+    super(scene, x, y, "pink_potion");
+
     // Effetto magnetico pulsante
     this.createMagnetEffect(scene);
   }
-  
+
   /**
    * Crea effetto visivo magnetico
    */
@@ -22,11 +19,11 @@ export class PinkBottle extends Bottle {
     // Cerchi concentrici che si contraggono
     const createRing = () => {
       if (!this.active) return;
-      
+
       const ring = scene.add.circle(this.x, this.y, 20, 0xff69b4, 0);
       ring.setStrokeStyle(1, 0xff69b4, 0.5);
       ring.setDepth(4);
-      
+
       scene.tweens.add({
         targets: ring,
         scale: 0.3,
@@ -35,7 +32,7 @@ export class PinkBottle extends Bottle {
         onComplete: () => ring.destroy()
       });
     };
-    
+
     // Ripeti effetto
     scene.time.addEvent({
       delay: 500,
@@ -43,30 +40,30 @@ export class PinkBottle extends Bottle {
       callback: createRing
     });
   }
-  
+
   /**
    * Applica effetto Magnet
    */
   applyEffect(scene, player) {
     const duration = 8000; // 8 secondi
     const magnetRange = 100; // Raggio di attrazione
-    
+
     // Attiva magnet mode
     player.magnetMode = true;
     player.magnetRange = magnetRange;
-    
+
     // Visual feedback
     this.createMagnetAura(scene, player, duration);
-    
+
     // UI indicator
     this.showMagnetUI(scene, duration);
-    
+
     // Timer per disattivare
     scene.time.delayedCall(duration, () => {
       this.deactivateMagnet(player);
     });
   }
-  
+
   /**
    * Crea aura magnetica intorno al player
    */
@@ -75,7 +72,7 @@ export class PinkBottle extends Bottle {
     const aura = scene.add.circle(player.x, player.y, player.magnetRange, 0xff69b4, 0.1);
     aura.setStrokeStyle(1, 0xff69b4, 0.3);
     aura.setDepth(3);
-    
+
     // Segui il player
     const updateAura = () => {
       if (!player.magnetMode || !player.active || !aura.active) {
@@ -84,10 +81,10 @@ export class PinkBottle extends Bottle {
       }
       aura.setPosition(player.x, player.y);
     };
-    
+
     // Update ogni frame
     scene.events.on('update', updateAura);
-    
+
     // Cleanup dopo durata
     scene.time.delayedCall(duration, () => {
       scene.events.off('update', updateAura);
@@ -101,7 +98,7 @@ export class PinkBottle extends Bottle {
         });
       }
     });
-    
+
     // Pulsazione
     scene.tweens.add({
       targets: aura,
@@ -112,7 +109,7 @@ export class PinkBottle extends Bottle {
       repeat: Math.floor(duration / 1000)
     });
   }
-  
+
   /**
    * Mostra UI magnet
    */
@@ -128,12 +125,12 @@ export class PinkBottle extends Bottle {
     magnetText.setOrigin(0.5);
     magnetText.setScrollFactor(0);
     magnetText.setDepth(100);
-    
+
     // Timer bar
     const timerBar = scene.add.rectangle(320, 63, 80, 3, 0xff69b4);
     timerBar.setScrollFactor(0);
     timerBar.setDepth(100);
-    
+
     scene.tweens.add({
       targets: timerBar,
       scaleX: 0,
@@ -145,13 +142,13 @@ export class PinkBottle extends Bottle {
       }
     });
   }
-  
+
   /**
    * Disattiva magnet mode
    */
   deactivateMagnet(player) {
     if (!player.active) return;
-    
+
     player.magnetMode = false;
     player.magnetRange = 0;
   }

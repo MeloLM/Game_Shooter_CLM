@@ -18,6 +18,8 @@ import { AudioManager } from "../managers/AudioManager.js";
 import { AssetLoader } from "../managers/AssetLoader.js";
 import { PauseManager } from "../managers/PauseManager.js";
 import { CollisionManager } from "../managers/CollisionManager.js";
+import { ShopSystem } from "../managers/ShopSystem.js";
+import SaveSystem from "../managers/SaveSystem.js";
 
 // UI
 import { Minimap } from "../ui/Minimap.js";
@@ -64,8 +66,10 @@ export class Level extends Scene {
   pauseManager = null;
   collisionManager = null;
   assetLoader = null;
+  assetLoader = null;
   hudManager = null;
-  
+  shopSystem = null;
+
   // === UI ===
   minimap = null;
   visualEffects = null;
@@ -92,11 +96,11 @@ export class Level extends Scene {
     this.potionsCollected = 0;
     this.slimeKills = 0;
     this.lastAchievementCheck = 0;
-    
+
     // Init factories
     this.enemiesList = createEnemyFactories(this);
     this.bottleWeights = createBottleFactories(this);
-    
+
     // Reset managers
     this.waveManager = null;
     this.comboSystem = null;
@@ -107,7 +111,9 @@ export class Level extends Scene {
     this.mobileControls = null;
     this.pauseManager = null;
     this.collisionManager = null;
+    this.collisionManager = null;
     this.hudManager = null;
+    this.shopSystem = null;
   }
 
   /**
@@ -116,7 +122,7 @@ export class Level extends Scene {
   preload() {
     this.assetLoader = new AssetLoader(this);
     this.assetLoader.loadAll();
-    
+
     // Audio preload separato (ha logica specifica)
     this.audioManager = new AudioManager(this);
     this.audioManager.preloadSounds();
@@ -127,26 +133,30 @@ export class Level extends Scene {
    */
   create() {
     this.startTime = this.time.now;
-    
+
+    // Stats tracking
+    SaveSystem.updateStatistics({ gamesPlayed: 1 });
+    this.slimeKills = 0;
+
     // === MAP ===
     this.setupMap();
-    
+
     // === AUDIO ===
     this.audioManager.initSounds();
     this.audioManager.playBGM();
 
     // === MANAGERS ===
     this.initManagers();
-    
+
     // === ENTITIES ===
     this.createEntities();
-    
+
     // === SPAWNERS ===
     this.setupSpawners();
-    
+
     // === PHYSICS ===
     this.setupPhysics();
-    
+
     // === CAMERA ===
     this.cameras.main.startFollow(this.player).setZoom(1).setBounds(10, 5, 620, 344);
   }
@@ -168,32 +178,36 @@ export class Level extends Scene {
    */
   initManagers() {
     const hudDepth = this.wallLayer.depth + 10;
-    
+
     // HUD Manager
     this.hudManager = new HUDManager(this);
     this.hudManager.create(hudDepth);
-    
+
     // Pause Manager
     this.pauseManager = new PauseManager(this);
     this.pauseManager.create();
-    
+
     // Collision Manager
     this.collisionManager = new CollisionManager(this);
-    
+
     // Combo System
     this.comboSystem = new ComboSystem(this);
-    
+
     // Minimap
     this.minimap = new Minimap(this, 640, 360);
-    
+
     // Visual Effects
     this.visualEffects = new VisualEffects(this);
-    
+
     // Achievement System
     this.achievementSystem = new AchievementSystem(this);
-    
+
+    // Difficulty Manager
     // Difficulty Manager
     this.difficultyManager = new DifficultyManager(this);
+
+    // Shop System
+    this.shopSystem = new ShopSystem(this);
   }
 
   /**
@@ -204,13 +218,13 @@ export class Level extends Scene {
     this.player = new Player(this, 320, 0, "player_idle");
     this.player.setOrigin(0.5, 0.5);
     this.player.setBodySize(8, 10);
-    
+
     // Mobile Controls
     this.mobileControls = new MobileControls(this, this.player);
-    
+
     // Door
     this.door = new Door(this, 320, 16, "door");
-    
+
     // Shield
     this.shield = new Shield(this, this.player.x, this.player.y, "shield1");
     this.updateShieldVisibility();
@@ -244,7 +258,7 @@ export class Level extends Scene {
     const totalWeight = this.bottleWeights.reduce((sum, b) => sum + b.weight, 0);
     let random = Phaser.Math.Between(1, totalWeight);
     let selectedBottle = null;
-    
+
     for (const bottleConfig of this.bottleWeights) {
       random -= bottleConfig.weight;
       if (random <= 0) {
@@ -364,11 +378,11 @@ export class Level extends Scene {
       } else {
         this.physics.moveToObject(enemy, this.player, enemy.moveSpeed || 40);
       }
-      
+
       // Bounds check
       enemy.x = Phaser.Math.Clamp(enemy.x, 10, 630);
       enemy.y = Phaser.Math.Clamp(enemy.y, 10, 350);
-      
+
       // Flip based on player position
       enemy.setFlipX(enemy.x > this.player.x);
     });
@@ -389,24 +403,24 @@ export class Level extends Scene {
   updateSystems() {
     this.updateShieldVisibility();
     this.player.updateHPBar();
-    
+
     // Enemy HP bars
     this.enemies.forEach((enemy) => {
       if (enemy.updateHPBar) enemy.updateHPBar();
     });
-    
+
     // Boomerangs
     this.boomerangs.forEach((b) => {
       if (b && b.active && b.update) b.update();
     });
     this.boomerangs = this.boomerangs.filter(b => b && b.active);
-    
+
     // Minimap
     if (this.minimap) this.minimap.update();
-    
+
     // Visual Effects
     if (this.visualEffects) this.visualEffects.update();
-    
+
     // Achievements (ogni secondo)
     if (this.achievementSystem && Math.floor(this.time.now / 1000) !== this.lastAchievementCheck) {
       this.lastAchievementCheck = Math.floor(this.time.now / 1000);
@@ -414,13 +428,13 @@ export class Level extends Scene {
       this.achievementSystem.checkAchievements(stats);
       this.achievementSystem.updateTrophyUI();
     }
-    
+
     // Difficulty
     if (this.difficultyManager) {
       const elapsed = (this.time.now - this.startTime) / 1000;
       this.difficultyManager.update(elapsed, this.enemyCounter);
     }
-    
+
     // HUD
     if (this.hudManager) {
       this.hudManager.update({
@@ -453,7 +467,7 @@ export class Level extends Scene {
 
   // === RETROCOMPATIBILITÀ ===
   // Metodi mantenuti per compatibilità con altri sistemi
-  
+
   get isPaused() {
     return this.pauseManager ? this.pauseManager.getIsPaused() : false;
   }

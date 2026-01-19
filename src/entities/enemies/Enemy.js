@@ -1,4 +1,5 @@
 import { Physics } from "phaser";
+import { createCoin } from "../items/Coin.js";
 
 /**
  * Classe base per tutti i nemici del gioco.
@@ -13,29 +14,29 @@ export class Enemy extends Physics.Arcade.Sprite {
   xpReward = 10;
   hpBar;
   animationKey;
-  
+
   constructor(scene, x, y, texture, config = {}) {
     super(scene, x, y, texture);
-    
+
     // Applica configurazione custom
     this.maxHP = config.maxHP || this.maxHP;
     this.currentHP = config.currentHP || this.maxHP;
     this.enemyDmg = config.enemyDmg || this.enemyDmg;
     this.moveSpeed = config.moveSpeed || this.moveSpeed;
     this.xpReward = config.xpReward || this.xpReward;
-    
+
     scene.add.existing(this);
     scene.physics.add.existing(this);
-    
+
     // Hitbox standard come gli slime (piccola e centrata)
     this.body.setSize(12, 12);
     this.body.setOffset(10, 10);
-    
+
     // Barra HP del nemico
     this.hpBar = scene.add.graphics();
     this.updateHPBar();
   }
-  
+
   /**
    * Crea l'animazione per il nemico (da chiamare nel costruttore delle sottoclassi)
    */
@@ -54,31 +55,31 @@ export class Enemy extends Physics.Arcade.Sprite {
     }
     this.play(key);
   }
-  
+
   /**
    * Aggiorna la barra HP sopra il nemico
    */
   updateHPBar() {
     if (!this.hpBar || !this.active) return;
     this.hpBar.clear();
-    
+
     // Sfondo grigio
     this.hpBar.fillStyle(0x808080, 1);
     const barWidth = 12;
     const barHeight = 2;
     this.hpBar.fillRect(this.x - barWidth / 2, this.y - 10, barWidth, barHeight);
-    
+
     // Barra HP (colore in base alla percentuale)
     const hpPercent = this.currentHP / this.maxHP;
     let color = 0x00ff00; // Verde
     if (hpPercent < 0.3) color = 0xff0000; // Rosso
     else if (hpPercent < 0.6) color = 0xffff00; // Giallo
-    
+
     this.hpBar.fillStyle(color, 1);
     const hpWidth = barWidth * hpPercent;
     this.hpBar.fillRect(this.x - barWidth / 2, this.y - 10, hpWidth, barHeight);
   }
-  
+
   /**
    * Infliggi danno al nemico
    * @returns {boolean} true se il nemico è morto
@@ -86,19 +87,19 @@ export class Enemy extends Physics.Arcade.Sprite {
   takeDamage(dmg) {
     this.currentHP -= dmg;
     this.updateHPBar();
-    
+
     // Flash bianco quando colpito
     this.setTint(0xffffff);
     this.scene.time.delayedCall(100, () => {
       if (this.active) this.clearTint();
     });
-    
+
     if (this.currentHP <= 0) {
       return true; // Nemico morto
     }
     return false;
   }
-  
+
   /**
    * Logica di morte del nemico
    * NOTA: XP viene già data in Level.js, non duplicare qui
@@ -107,27 +108,30 @@ export class Enemy extends Physics.Arcade.Sprite {
     if (this.hpBar) {
       this.hpBar.destroy();
     }
-    
+
     // Rimuovi dall'array enemies
     const index = this.scene.enemies.indexOf(this);
     if (index > -1) {
       this.scene.enemies.splice(index, 1);
     }
-    
+
     // XP già gestita in Level.js (player.addXP chiamato là)
     // Non chiamare qui per evitare XP doppia
-    
+
+    // Drop monete
+    createCoin(this.scene, this.x, this.y, this.texture.key); // Usa texture key per determinare il tipo in createCoin
+
     this.destroy();
   }
-  
+
   /**
    * Movimento verso il player (comportamento base)
    */
   moveTowardsPlayer() {
     if (!this.scene || !this.scene.player) return;
-    
+
     this.scene.physics.moveToObject(this, this.scene.player, this.moveSpeed);
-    
+
     // Flip sprite in base alla direzione
     if (this.x > this.scene.player.x) {
       this.setFlipX(true);
@@ -135,7 +139,7 @@ export class Enemy extends Physics.Arcade.Sprite {
       this.setFlipX(false);
     }
   }
-  
+
   /**
    * Update chiamato ogni frame (da sovrascrivere per comportamenti custom)
    */

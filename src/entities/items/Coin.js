@@ -7,21 +7,21 @@ import { Physics } from "phaser";
 export class Coin extends Physics.Arcade.Sprite {
   value = 1;
   magnetRange = 0;  // Distanza a cui viene attratto (0 = no magnet)
-  
+
   constructor(scene, x, y, value = 1) {
     super(scene, x, y, 'coin');
-    
+
     this.value = value;
-    
+
     scene.add.existing(this);
     scene.physics.add.existing(this);
-    
+
     // Setup sprite (usa un cerchio giallo come placeholder)
     this.createCoinGraphic(scene);
-    
+
     // Bounce animation
     this.spawnAnimation(scene);
-    
+
     // Auto-despawn dopo 15 secondi
     scene.time.delayedCall(15000, () => {
       if (this.active) {
@@ -29,26 +29,18 @@ export class Coin extends Physics.Arcade.Sprite {
       }
     });
   }
-  
+
   /**
    * Crea grafica della moneta
    */
+  /**
+   * Imposta sprite moneta
+   */
   createCoinGraphic(scene) {
-    // Se texture non esiste, crea un cerchio dorato
-    if (!scene.textures.exists('coin')) {
-      const graphics = scene.make.graphics({ x: 0, y: 0, add: false });
-      graphics.fillStyle(0xffd700);
-      graphics.fillCircle(4, 4, 4);
-      graphics.lineStyle(1, 0xaa8800);
-      graphics.strokeCircle(4, 4, 4);
-      graphics.generateTexture('coin', 8, 8);
-      graphics.destroy();
-    }
-    
     this.setTexture('coin');
     this.setDepth(5);
   }
-  
+
   /**
    * Animazione di spawn (bounce)
    */
@@ -58,7 +50,7 @@ export class Coin extends Physics.Arcade.Sprite {
     const distance = 10 + Math.random() * 15;
     const targetX = this.x + Math.cos(angle) * distance;
     const targetY = this.y + Math.sin(angle) * distance;
-    
+
     scene.tweens.add({
       targets: this,
       x: targetX,
@@ -72,7 +64,7 @@ export class Coin extends Physics.Arcade.Sprite {
       }
     });
   }
-  
+
   /**
    * Effetto luccichio
    */
@@ -86,7 +78,7 @@ export class Coin extends Physics.Arcade.Sprite {
       repeat: -1
     });
   }
-  
+
   /**
    * Fade out prima di scomparire
    */
@@ -99,23 +91,23 @@ export class Coin extends Physics.Arcade.Sprite {
       onComplete: () => this.destroy()
     });
   }
-  
+
   /**
    * Update - gestisce effetto magnete
    */
   update(player, magnetActive = false, magnetRange = 50) {
     if (!this.active || !player) return;
-    
+
     if (magnetActive) {
       const distance = Phaser.Math.Distance.Between(this.x, this.y, player.x, player.y);
-      
+
       if (distance < magnetRange) {
         // Attira verso il player
         this.scene.physics.moveToObject(this, player, 150);
       }
     }
   }
-  
+
   /**
    * Chiamato quando viene raccolta
    */
@@ -131,7 +123,7 @@ export class Coin extends Physics.Arcade.Sprite {
           0xffd700
         );
         particle.setDepth(15);
-        
+
         this.scene.tweens.add({
           targets: particle,
           y: particle.y - 15,
@@ -141,7 +133,7 @@ export class Coin extends Physics.Arcade.Sprite {
         });
       }
     }
-    
+
     this.destroy();
     return this.value;
   }
@@ -162,16 +154,16 @@ export function createCoin(scene, x, y, enemyType = 'default') {
     boss: 50,
     default: 1
   };
-  
+
   const value = coinValues[enemyType] || coinValues.default;
-  
+
   // Chance di droppare monete extra
   const coinCount = Math.random() < 0.1 ? 2 : 1; // 10% chance per doppia moneta
-  
+
   const coins = [];
   for (let i = 0; i < coinCount; i++) {
     coins.push(new Coin(scene, x + (i * 5), y, value));
   }
-  
+
   return coins;
 }

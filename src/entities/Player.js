@@ -6,7 +6,7 @@ import { Boomerang } from "./weapons/Boomerang";
 
 
 
-export class Player extends Physics.Arcade.Sprite{
+export class Player extends Physics.Arcade.Sprite {
   speed = 100;
   baseSpeed = 100;
   maxHP = 1000; // HP massimi del giocatore
@@ -17,20 +17,20 @@ export class Player extends Physics.Arcade.Sprite{
   power = false;
   weaponType = 'normal'; // normal, shotgun, boomerang
   hasSpeedBoost = false; // Flag per evitare stack speed boost
-  
+
   // === SISTEMA XP E LEVEL ===
   level = 1;
   currentXP = 0;
   xpToNextLevel = 100;
   xpMultiplier = 1.5; // Moltiplicatore XP per ogni livello
-  
+
   // Stats bonus per level up
   bonusDamage = 0;
   bonusSpeed = 0;
   bonusMaxHP = 0;
 
 
-  constructor(scene, x, y, texture = "knight_idle"){
+  constructor(scene, x, y, texture = "knight_idle") {
     super(scene, x, y, texture);
 
     scene.add.existing(this);
@@ -39,16 +39,16 @@ export class Player extends Physics.Arcade.Sprite{
     // Aggiungi la barra degli HP sopra il giocatore
     this.hpBar = scene.add.graphics();
     this.updateHPBar();
-    
+
     // Crea UI per XP/Level
     this.createLevelUI(scene);
 
-  // ANIMAZIONI PLAYER
+    // ANIMAZIONI PLAYER
     if (!scene.anims.exists("player_idle")) {
       scene.anims.create({
         key: "player_idle",
         frameRate: 6,
-        repeat: -1 ,
+        repeat: -1,
         frames: scene.anims.generateFrameNumbers("knight_idle", {
           start: 0,
           end: 5,
@@ -60,7 +60,7 @@ export class Player extends Physics.Arcade.Sprite{
       scene.anims.create({
         key: "player_run",
         frameRate: 6,
-        repeat: -1 ,
+        repeat: -1,
         frames: scene.anims.generateFrameNumbers("knight_run", {
           start: 0,
           end: 5,
@@ -70,55 +70,59 @@ export class Player extends Physics.Arcade.Sprite{
 
     this.play("player_idle");
 
-  // Y
-    scene.input.keyboard.on('keydown-S',()=>{
+    // Y
+    scene.input.keyboard.on('keydown-S', () => {
+      if (scene.pauseManager && scene.pauseManager.getIsPaused()) return;
       this.setVelocityY(this.speed);
       this.updateAnimation();
     })
-    scene.input.keyboard.on('keyup-S',()=>{
+    scene.input.keyboard.on('keyup-S', () => {
       this.setVelocityY(0);
       this.updateAnimation();
     })
 
-    scene.input.keyboard.on('keydown-W',()=>{
+    scene.input.keyboard.on('keydown-W', () => {
+      if (scene.pauseManager && scene.pauseManager.getIsPaused()) return;
       this.setVelocityY(-this.speed);
       this.updateAnimation();
     })
-    scene.input.keyboard.on('keyup-W',()=>{
+    scene.input.keyboard.on('keyup-W', () => {
       this.setVelocityY(0);
       this.updateAnimation();
     })
 
-  // X
-    scene.input.keyboard.on('keydown-A',()=>{
+    // X
+    scene.input.keyboard.on('keydown-A', () => {
+      if (scene.pauseManager && scene.pauseManager.getIsPaused()) return;
       this.setVelocityX(-this.speed);
       this.updateAnimation();
       this.setFlipX(true);
     })
-    scene.input.keyboard.on('keyup-A',()=>{
+    scene.input.keyboard.on('keyup-A', () => {
       this.setVelocityX(0);
       this.updateAnimation();
     })
 
-    scene.input.keyboard.on('keydown-D',()=>{
+    scene.input.keyboard.on('keydown-D', () => {
+      if (scene.pauseManager && scene.pauseManager.getIsPaused()) return;
       this.setVelocityX(this.speed);
       this.updateAnimation();
       this.setFlipX(false)
     })
-    scene.input.keyboard.on('keyup-D',()=>{
+    scene.input.keyboard.on('keyup-D', () => {
       this.setVelocityX(0);
       this.updateAnimation();
     })
 
     // ATTACK
-    scene.input.on('pointerdown', (pointer)=>{
+    scene.input.on('pointerdown', (pointer) => {
       // Blocca attacchi durante la pausa
       if (scene.pauseManager && scene.pauseManager.getIsPaused()) {
         return;
       }
-      
+
       let angle = Phaser.Math.Angle.Between(this.x, this.y, pointer.worldX, pointer.worldY);
-      
+
       // Sistema armi avanzato
       if (this.weaponType === 'shotgun') {
         // Shotgun: 3 proiettili a ventaglio
@@ -141,12 +145,12 @@ export class Player extends Physics.Arcade.Sprite{
     });
   }
 
-   // Aggiorna la barra degli HP in base agli HP attuali del giocatore
+  // Aggiorna la barra degli HP in base agli HP attuali del giocatore
   updateHPBar() {
     this.hpBar.clear();
 
     // Disegna lo sfondo grigio
-    this.hpBar.fillStyle(0x808080, 1); 
+    this.hpBar.fillStyle(0x808080, 1);
     const barWidth = 15; // Larghezza fissa della barra degli HP
     const barHeight = 2;
     this.hpBar.fillRect(this.x - barWidth / 2, this.y - 8 - barHeight, barWidth, barHeight);
@@ -156,8 +160,8 @@ export class Player extends Physics.Arcade.Sprite{
     let color = 0x00ff00; // Verde
     if (hpPercent < 0.3) color = 0xff0000; // Rosso
     else if (hpPercent < 0.6) color = 0xffff00; // Giallo
-    
-    this.hpBar.fillStyle(color, 1); 
+
+    this.hpBar.fillStyle(color, 1);
     const hpWidth = barWidth * (this.displayHP / this.maxHP); // Larghezza proporzionale
     this.hpBar.fillRect(this.x - barWidth / 2, this.y - 8 - barHeight, Math.max(0, hpWidth), barHeight);
   }
@@ -168,7 +172,7 @@ export class Player extends Physics.Arcade.Sprite{
     if (this.hpTween) {
       this.hpTween.stop();
     }
-    
+
     // Anima displayHP verso currentHP
     this.hpTween = this.scene.tweens.add({
       targets: this,
@@ -178,7 +182,7 @@ export class Player extends Physics.Arcade.Sprite{
     });
   }
 
-   // Riduci gli HP del giocatore quando subisce danni
+  // Riduci gli HP del giocatore quando subisce danni
   takeDamage(dmg) {
     this.currentHP -= dmg;
     if (this.currentHP < 0) this.currentHP = 0;
@@ -188,24 +192,24 @@ export class Player extends Physics.Arcade.Sprite{
   // Aumenta gli HP del giocatore quando viene curato
   heal(healAmount = 200) {
     if (this.currentHP < this.maxHP) {
-        this.currentHP += healAmount;
-        if (this.currentHP > this.maxHP) {
-            this.currentHP = this.maxHP;
-        }
-        this.animateHPBar(); // Smooth animation
+      this.currentHP += healAmount;
+      if (this.currentHP > this.maxHP) {
+        this.currentHP = this.maxHP;
+      }
+      this.animateHPBar(); // Smooth animation
     }
-}
-
-  updateAnimation(){
-    if (this.body.velocity.x != 0 || this.body.velocity.y != 0) {
-        this.play("player_run", true)
-      } else {
-        this.play("player_idle",true)
-      };
   }
-  
+
+  updateAnimation() {
+    if (this.body.velocity.x != 0 || this.body.velocity.y != 0) {
+      this.play("player_run", true)
+    } else {
+      this.play("player_idle", true)
+    };
+  }
+
   // === SISTEMA XP E LEVEL UP ===
-  
+
   /**
    * Crea l'UI per mostrare livello e XP
    */
@@ -219,37 +223,37 @@ export class Player extends Physics.Arcade.Sprite{
     });
     this.levelText.setScrollFactor(0);
     this.levelText.setDepth(50);
-    
+
     // Barra XP
     this.xpBarBg = scene.add.rectangle(70, 338, 80, 6, 0x333333);
     this.xpBarBg.setScrollFactor(0);
     this.xpBarBg.setDepth(50);
-    
+
     this.xpBarFill = scene.add.rectangle(31, 338, 78, 4, 0x00ccff);
     this.xpBarFill.setOrigin(0, 0.5);
     this.xpBarFill.setScrollFactor(0);
     this.xpBarFill.setDepth(51);
-    
+
     this.updateXPBar();
   }
-  
+
   /**
    * Aggiunge XP al player
    */
   addXP(amount) {
     this.currentXP += amount;
-    
+
     // Mostra +XP text
     this.showXPGain(amount);
-    
+
     // Check level up
     while (this.currentXP >= this.xpToNextLevel) {
       this.levelUp();
     }
-    
+
     this.updateXPBar();
   }
-  
+
   /**
    * Mostra il guadagno XP sopra il player
    */
@@ -262,7 +266,7 @@ export class Player extends Physics.Arcade.Sprite{
     });
     xpText.setOrigin(0.5);
     xpText.setDepth(100);
-    
+
     this.scene.tweens.add({
       targets: xpText,
       y: xpText.y - 20,
@@ -271,7 +275,7 @@ export class Player extends Physics.Arcade.Sprite{
       onComplete: () => xpText.destroy()
     });
   }
-  
+
   /**
    * Level Up!
    */
@@ -279,22 +283,22 @@ export class Player extends Physics.Arcade.Sprite{
     this.currentXP -= this.xpToNextLevel;
     this.level++;
     this.xpToNextLevel = Math.floor(this.xpToNextLevel * this.xpMultiplier);
-    
+
     // Bonus stats per level
     this.bonusDamage += 2;
     this.bonusSpeed += 3;
     this.bonusMaxHP += 50;
-    
+
     // Applica bonus
     this.baseSpeed += 3;
     this.speed = this.baseSpeed;
     this.maxHP += 50;
     this.currentHP = Math.min(this.currentHP + 50, this.maxHP); // Cura parziale
-    
+
     // Effetto Level Up
     this.showLevelUpEffect();
   }
-  
+
   /**
    * Effetto visivo del level up
    */
@@ -304,7 +308,7 @@ export class Player extends Physics.Arcade.Sprite{
     this.scene.time.delayedCall(200, () => {
       this.clearTint();
     });
-    
+
     // Testo LEVEL UP
     const levelUpText = this.scene.add.text(this.x, this.y - 40, '⬆️ LEVEL UP!', {
       fontFamily: 'Arial',
@@ -316,7 +320,7 @@ export class Player extends Physics.Arcade.Sprite{
     });
     levelUpText.setOrigin(0.5);
     levelUpText.setDepth(100);
-    
+
     this.scene.tweens.add({
       targets: levelUpText,
       y: levelUpText.y - 30,
@@ -325,12 +329,12 @@ export class Player extends Physics.Arcade.Sprite{
       duration: 1500,
       onComplete: () => levelUpText.destroy()
     });
-    
+
     // Particelle dorate
     for (let i = 0; i < 12; i++) {
       const particle = this.scene.add.circle(this.x, this.y, 4, 0xffcc00);
       const angle = (i / 12) * Math.PI * 2;
-      
+
       this.scene.tweens.add({
         targets: particle,
         x: this.x + Math.cos(angle) * 40,
@@ -341,11 +345,11 @@ export class Player extends Physics.Arcade.Sprite{
         onComplete: () => particle.destroy()
       });
     }
-    
+
     // Screen shake leggero
     this.scene.cameras.main.shake(150, 0.005);
   }
-  
+
   /**
    * Aggiorna la barra XP
    */
@@ -353,13 +357,13 @@ export class Player extends Physics.Arcade.Sprite{
     if (this.levelText) {
       this.levelText.setText(`Lv.${this.level}`);
     }
-    
+
     if (this.xpBarFill) {
       const xpPercent = this.currentXP / this.xpToNextLevel;
       this.xpBarFill.setScale(xpPercent, 1);
     }
   }
-  
+
   /**
    * Ottieni il danno totale (base + bonus)
    */
