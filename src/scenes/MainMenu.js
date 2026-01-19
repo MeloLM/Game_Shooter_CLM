@@ -9,32 +9,60 @@ export class MainMenu extends Scene {
   preload() {
     // Carica assets per il menu
     this.load.image("menu_bg", "assets/tilesheet.png");
-    
+
     // Carica audio
     this.audioManager = new AudioManager(this);
     this.audioManager.preloadSounds();
+
+    // Carica coin per decorazione
+    this.load.image("coin", "assets/items/coin.png");
   }
 
   create() {
     // Inizializza audio menu (ma non avvia ancora per policy browser)
     this.audioManager.initSounds();
-    
+
     // Flag per tracking primo click
     this.audioStarted = false;
-    
+
     // Sfondo
     this.add.rectangle(320, 180, 640, 360, 0x1a1a2e);
 
     // Titolo del gioco
+    // Titolo del gioco (con ombreggiatura più marcata)
+    const titleShadow = this.add.text(324, 84, '⚔️ KNIGHT SHOOTER ⚔️', {
+      fontFamily: 'Arial Black',
+      fontSize: '42px',
+      color: '#000000',
+      fontStyle: 'bold'
+    });
+    titleShadow.setOrigin(0.5);
+    titleShadow.setAlpha(0.5);
+
     const title = this.add.text(320, 80, '⚔️ KNIGHT SHOOTER ⚔️', {
-      fontFamily: 'Arial',
-      fontSize: '36px',
+      fontFamily: 'Arial Black',
+      fontSize: '42px',
       color: '#ffd700',
       fontStyle: 'bold',
-      stroke: '#000000',
-      strokeThickness: 4
+      stroke: '#8a6a2a',
+      strokeThickness: 6
     });
     title.setOrigin(0.5);
+
+    // Coin decorativa che ruota
+    if (this.textures.exists('coin')) {
+      this.menuCoin1 = this.add.image(100, 180, 'coin').setScale(4).setAlpha(0.8);
+      this.menuCoin2 = this.add.image(540, 180, 'coin').setScale(4).setAlpha(0.8);
+
+      this.tweens.add({
+        targets: [this.menuCoin1, this.menuCoin2],
+        scaleX: 0,
+        duration: 1000,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut'
+      });
+    }
 
     // Sottotitolo
     const subtitle = this.add.text(320, 120, 'Survival Arena', {
@@ -47,23 +75,33 @@ export class MainMenu extends Scene {
     // Bottone PLAY
     const playButton = this.add.rectangle(320, 200, 180, 50, 0x4a4a8a);
     playButton.setInteractive({ useHandCursor: true });
-    
-    const playText = this.add.text(320, 200, '▶ GIOCA', {
-      fontFamily: 'Arial',
-      fontSize: '24px',
+
+    const playText = this.add.text(320, 200, 'GIOCA', {
+      fontFamily: 'Arial Black',
+      fontSize: '28px',
       color: '#ffffff',
-      fontStyle: 'bold'
+      fontStyle: 'bold',
+      stroke: '#000000',
+      strokeThickness: 4
     });
     playText.setOrigin(0.5);
+
+    // Play Icon
+    const playIcon = this.add.text(260, 200, '▶', {
+      fontSize: '24px',
+      color: '#ffd700'
+    }).setOrigin(0.5);
 
     // Hover effect per PLAY
     playButton.on('pointerover', () => {
       playButton.setFillStyle(0x6a6aaa);
       playText.setScale(1.1);
+      playIcon.x = 255; // Nudge icon
     });
     playButton.on('pointerout', () => {
       playButton.setFillStyle(0x4a4a8a);
       playText.setScale(1);
+      playIcon.x = 260; // Reset icon
     });
     playButton.on('pointerdown', () => {
       // Avvia audio al primo click (per policy browser)
@@ -78,7 +116,7 @@ export class MainMenu extends Scene {
     // Bottone TROFEI
     const trophyButton = this.add.rectangle(320, 255, 140, 35, 0x8a6a2a);
     trophyButton.setInteractive({ useHandCursor: true });
-    
+
     const trophyText = this.add.text(320, 255, '🏆 TROFEI', {
       fontFamily: 'Arial',
       fontSize: '16px',
@@ -107,7 +145,7 @@ export class MainMenu extends Scene {
     // Bottone IMPOSTAZIONI
     const settingsButton = this.add.rectangle(320, 295, 160, 35, 0x4a6a4a);
     settingsButton.setInteractive({ useHandCursor: true });
-    
+
     const settingsText = this.add.text(320, 295, '⚙️ IMPOSTAZIONI', {
       fontFamily: 'Arial',
       fontSize: '16px',
@@ -134,7 +172,7 @@ export class MainMenu extends Scene {
     });
 
     // Istruzioni
-    const instructions = this.add.text(320, 340, 
+    const instructions = this.add.text(320, 340,
       '🎮 WASD - Movimento | CLICK - Attacca | ESC - Pausa', {
       fontFamily: 'Arial',
       fontSize: '10px',

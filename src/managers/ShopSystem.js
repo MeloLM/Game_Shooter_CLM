@@ -7,11 +7,11 @@ export class ShopSystem {
   scene;
   isOpen = false;
   coins = 0;
-  
+
   // UI Elements
   shopContainer = null;
   coinDisplay = null;
-  
+
   // Catalogo upgrade disponibili
   upgrades = [
     {
@@ -77,12 +77,12 @@ export class ShopSystem {
       }
     }
   ];
-  
+
   constructor(scene) {
     this.scene = scene;
     this.loadCoins();
   }
-  
+
   /**
    * Carica monete da localStorage
    */
@@ -94,7 +94,7 @@ export class ShopSystem {
       this.coins = 0;
     }
   }
-  
+
   /**
    * Salva monete
    */
@@ -105,7 +105,7 @@ export class ShopSystem {
       console.warn('[ShopSystem] Cannot save coins');
     }
   }
-  
+
   /**
    * Aggiungi monete
    */
@@ -114,7 +114,7 @@ export class ShopSystem {
     this.updateCoinDisplay();
     // Non salvare ogni volta per performance, salva alla fine wave
   }
-  
+
   /**
    * Rimuovi monete
    */
@@ -126,47 +126,64 @@ export class ShopSystem {
     }
     return false;
   }
-  
+
   /**
    * Crea UI dello shop
    */
   createShopUI() {
     const centerX = 320;
     const centerY = 180;
-    
+
     // Container principale
     this.shopContainer = this.scene.add.container(centerX, centerY);
     this.shopContainer.setScrollFactor(0);
-    this.shopContainer.setDepth(200);
+    this.shopContainer.setDepth(2000); // Super high depth to overlay everything
     this.shopContainer.setVisible(false);
-    
-    // Background overlay
-    const bg = this.scene.add.rectangle(0, 0, 500, 320, 0x000000, 0.85);
-    bg.setStrokeStyle(2, 0xffd700);
+
+    // Background overlay (Semi-transparent, less intrusive)
+    const bg = this.scene.add.rectangle(0, 0, 500, 340, 0x1a1a2e, 0.95);
+    bg.setStrokeStyle(3, 0xffd700);
     this.shopContainer.add(bg);
-    
+
+    // Decorative header background
+    const headerBg = this.scene.add.rectangle(0, -130, 500, 50, 0x111122, 1);
+    this.shopContainer.add(headerBg);
+
     // Titolo
-    const title = this.scene.add.text(0, -130, '🛒 SHOP', {
+    const title = this.scene.add.text(0, -130, 'MERCAZIO', {
       fontFamily: 'Arial',
-      fontSize: '24px',
+      fontSize: '28px',
       color: '#ffd700',
       fontStyle: 'bold'
     });
     title.setOrigin(0.5);
     this.shopContainer.add(title);
-    
-    // Coin display
-    this.coinDisplay = this.scene.add.text(0, -100, `💰 ${this.coins}`, {
+
+    // Icona Shop (Carrello) - Se disponibile, altrimenti testo
+    // if (this.scene.textures.exists('shop_icon')) ...
+
+    // Coin display container
+    const coinBg = this.scene.add.rectangle(0, -90, 150, 30, 0x000000, 0.5);
+    this.shopContainer.add(coinBg);
+
+    // Coin Icon
+    const coinIcon = this.scene.add.image(-40, -90, 'coin');
+    coinIcon.setDisplaySize(16, 16);
+    this.shopContainer.add(coinIcon);
+
+    // Coin Text
+    this.coinDisplay = this.scene.add.text(-10, -90, `${this.coins}`, {
       fontFamily: 'Arial',
-      fontSize: '16px',
-      color: '#ffd700'
+      fontSize: '18px',
+      color: '#ffd700',
+      fontStyle: 'bold'
     });
-    this.coinDisplay.setOrigin(0.5);
+    this.coinDisplay.setOrigin(0, 0.5);
     this.shopContainer.add(this.coinDisplay);
-    
+
     // Upgrade buttons
     this.createUpgradeButtons();
-    
+
     // Close button
     const closeBtn = this.scene.add.text(0, 130, '[Premi SPACE o clicca qui per chiudere]', {
       fontFamily: 'Arial',
@@ -177,71 +194,123 @@ export class ShopSystem {
     closeBtn.setInteractive();
     closeBtn.on('pointerdown', () => this.close());
     this.shopContainer.add(closeBtn);
-    
+
     // Keyboard listener
     this.scene.input.keyboard.on('keydown-SPACE', () => {
       if (this.isOpen) this.close();
     });
   }
-  
+
   /**
    * Crea bottoni upgrade
    */
   createUpgradeButtons() {
     const startY = -60;
     const spacing = 45;
-    
+
     this.upgrades.forEach((upgrade, index) => {
       const y = startY + (index * spacing);
-      
-      // Button background
-      const btnBg = this.scene.add.rectangle(-100, y, 380, 38, 0x1a1a2e, 0.9);
+
+      // Button background with hover effect
+      const btnBg = this.scene.add.rectangle(0, y, 460, 40, 0x2a2a4e, 1);
       btnBg.setStrokeStyle(1, 0x444488);
-      btnBg.setInteractive();
-      
+      btnBg.setInteractive({ useHandCursor: true });
+
+      // Icon selection based on ID
+      let iconKey = 'potion'; // default
+      let iconFrame = null;
+
+      if (upgrade.id === 'heal_small') { iconKey = 'potion'; }
+      else if (upgrade.id === 'heal_full') { iconKey = 'red_potion'; } // Assuming red_potion exists or use potion with tint
+      else if (upgrade.id === 'damage_up') { iconKey = 'sword'; }
+      else if (upgrade.id === 'speed_up') { iconKey = 'blue_potion'; } // Placeholder for speed
+      else if (upgrade.id === 'max_hp_up') { iconKey = 'green_potion'; }
+      else if (upgrade.id === 'shield_time') { iconKey = 'shield1'; }
+
+      // Icon
+      try {
+        const icon = this.scene.add.image(-200, y, iconKey, iconFrame);
+        icon.setDisplaySize(24, 24);
+        this.shopContainer.add(icon);
+      } catch (e) {
+        // Fallback text if image fails
+        const iconText = this.scene.add.text(-200, y, '⚡', { fontSize: '20px' });
+        iconText.setOrigin(0.5);
+        this.shopContainer.add(iconText);
+      }
+
       // Hover effects
       btnBg.on('pointerover', () => {
-        btnBg.setFillStyle(0x2a2a4e);
+        btnBg.setFillStyle(0x3a3a6e);
+        this.scene.tweens.add({
+          targets: [nameText, costText],
+          scale: 1.1,
+          duration: 100
+        });
       });
       btnBg.on('pointerout', () => {
-        btnBg.setFillStyle(0x1a1a2e);
+        btnBg.setFillStyle(0x2a2a4e);
+        this.scene.tweens.add({
+          targets: [nameText, costText],
+          scale: 1,
+          duration: 100
+        });
       });
-      
+
       // Click handler
       btnBg.on('pointerdown', () => {
         this.purchaseUpgrade(upgrade);
+        // Little bounce
+        this.scene.tweens.add({
+          targets: btnBg,
+          scaleX: 0.98,
+          scaleY: 0.98,
+          duration: 50,
+          yoyo: true
+        });
       });
-      
+
       this.shopContainer.add(btnBg);
-      
+      // Bring other text in front if needed, but container order matters.
+      // Since we add bg last in loop, need to be careful.
+      // Re-ordering logic: Add BG first, then text/icons on top.
+      this.shopContainer.sendToBack(btnBg); // Ensure text is on top if added after? No, added sequentially.
+
+      // We added BG first in this block, so text needs to be added AFTER bg.
+
       // Upgrade name
-      const nameText = this.scene.add.text(-270, y - 8, upgrade.name, {
+      const nameText = this.scene.add.text(-180, y - 8, upgrade.name.replace(/^[^\w\s]+/, ''), { // Strip emoji prefix if we use icons
         fontFamily: 'Arial',
-        fontSize: '12px',
+        fontSize: '16px',
         color: '#ffffff',
         fontStyle: 'bold'
       });
       this.shopContainer.add(nameText);
-      
+
       // Description
-      const descText = this.scene.add.text(-270, y + 6, upgrade.description, {
+      const descText = this.scene.add.text(-180, y + 10, upgrade.description, {
         fontFamily: 'Arial',
-        fontSize: '10px',
+        fontSize: '12px',
         color: '#aaaaaa'
       });
       this.shopContainer.add(descText);
-      
-      // Cost
-      const costText = this.scene.add.text(60, y, `💰 ${upgrade.cost}`, {
+
+      // Cost Icon & Text
+      const costIcon = this.scene.add.image(140, y, 'coin');
+      costIcon.setDisplaySize(14, 14);
+      this.shopContainer.add(costIcon);
+
+      const costText = this.scene.add.text(160, y, `${upgrade.cost}`, {
         fontFamily: 'Arial',
-        fontSize: '12px',
-        color: '#ffd700'
+        fontSize: '16px',
+        color: '#ffd700',
+        fontStyle: 'bold'
       });
-      costText.setOrigin(0.5);
+      costText.setOrigin(0, 0.5);
       this.shopContainer.add(costText);
     });
   }
-  
+
   /**
    * Acquista upgrade
    */
@@ -249,10 +318,10 @@ export class ShopSystem {
     if (this.coins >= upgrade.cost) {
       this.spendCoins(upgrade.cost);
       upgrade.effect(this.scene);
-      
+
       // Feedback visivo
       this.showPurchaseFeedback(upgrade.name);
-      
+
       // Suono (se disponibile)
       if (this.scene.audioManager) {
         this.scene.audioManager.playSFX('item_pickup');
@@ -262,7 +331,7 @@ export class ShopSystem {
       this.showNotEnoughCoins();
     }
   }
-  
+
   /**
    * Feedback acquisto
    */
@@ -276,7 +345,7 @@ export class ShopSystem {
     text.setOrigin(0.5);
     text.setScrollFactor(0);
     text.setDepth(250);
-    
+
     this.scene.tweens.add({
       targets: text,
       y: text.y - 30,
@@ -285,7 +354,7 @@ export class ShopSystem {
       onComplete: () => text.destroy()
     });
   }
-  
+
   /**
    * Feedback monete insufficienti
    */
@@ -299,7 +368,7 @@ export class ShopSystem {
     text.setOrigin(0.5);
     text.setScrollFactor(0);
     text.setDepth(250);
-    
+
     this.scene.tweens.add({
       targets: text,
       alpha: 0,
@@ -307,7 +376,7 @@ export class ShopSystem {
       onComplete: () => text.destroy()
     });
   }
-  
+
   /**
    * Apri shop
    */
@@ -315,15 +384,15 @@ export class ShopSystem {
     if (!this.shopContainer) {
       this.createShopUI();
     }
-    
+
     this.isOpen = true;
     this.shopContainer.setVisible(true);
     this.updateCoinDisplay();
-    
+
     // Pausa il gioco
     this.scene.physics.pause();
   }
-  
+
   /**
    * Chiudi shop
    */
@@ -332,26 +401,26 @@ export class ShopSystem {
     if (this.shopContainer) {
       this.shopContainer.setVisible(false);
     }
-    
+
     // Salva monete
     this.saveCoins();
-    
+
     // Riprendi gioco
     this.scene.physics.resume();
-    
+
     // Notifica wave manager
     this.scene.events.emit('shopClosed');
   }
-  
+
   /**
    * Aggiorna display monete
    */
   updateCoinDisplay() {
     if (this.coinDisplay) {
-      this.coinDisplay.setText(`💰 ${this.coins}`);
+      this.coinDisplay.setText(`${this.coins}`);
     }
   }
-  
+
   /**
    * Reset per nuova partita
    */

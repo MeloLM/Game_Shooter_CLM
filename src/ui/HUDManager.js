@@ -24,72 +24,84 @@ export class HUDManager {
    * @param {number} hudDepth - profondità z per l'HUD
    */
   create(hudDepth) {
-    // Sfondo HUD in alto
-    this.hudBg = this.scene.add.rectangle(320, 12, 640, 24, 0x000000, 0.5);
+    // --- TOP BAR BACKGROUND ---
+    this.hudBg = this.scene.add.rectangle(320, 15, 640, 30, 0x000000, 0.8);
     this.hudBg.setScrollFactor(0);
     this.hudBg.setDepth(hudDepth);
 
-    // Score (sinistra)
-    this.scoreText = this.scene.add.text(10, 5, '💀 0', {
+    // --- LEFT SECTION (HEALTH) ---
+    // Heart Icon (Emoji placeholder or sprite if available)
+    this.hpIcon = this.scene.add.text(20, 15, '❤', { fontSize: '16px', color: '#ff0000' }).setOrigin(0.5);
+    this.hpIcon.setScrollFactor(0).setDepth(hudDepth + 1);
+
+    this.hpText = this.scene.add.text(40, 15, '1000/1000', {
       fontFamily: 'Arial',
       fontSize: '14px',
-      color: '#ffffff'
-    });
-    this.scoreText.setScrollFactor(0);
-    this.scoreText.setDepth(hudDepth + 1);
+      color: '#ffffff',
+      fontStyle: 'bold'
+    }).setOrigin(0, 0.5);
+    this.hpText.setScrollFactor(0).setDepth(hudDepth + 1);
 
-    // Coins (sotto lo score)
-    this.coinText = this.scene.add.text(10, 25, '💰 0', {
-      fontFamily: 'Arial',
-      fontSize: '12px',
-      color: '#ffd700'
-    });
-    this.coinText.setScrollFactor(0);
-    this.coinText.setDepth(hudDepth + 1);
-
-    // Timer (centro)
-    this.timerText = this.scene.add.text(320, 5, '⏱️ 0:00', {
+    // --- CENTER SECTION (GAME INFO) ---
+    // Wave
+    this.waveText = this.scene.add.text(240, 15, '🌊 W1', {
       fontFamily: 'Arial',
       fontSize: '14px',
-      color: '#ffffff'
-    });
-    this.timerText.setOrigin(0.5, 0);
-    this.timerText.setScrollFactor(0);
-    this.timerText.setDepth(hudDepth + 1);
+      color: '#00ffff',
+      fontStyle: 'bold'
+    }).setOrigin(0.5);
+    this.waveText.setScrollFactor(0).setDepth(hudDepth + 1);
 
-    // Arma corrente (destra)
-    this.weaponText = this.scene.add.text(630, 5, '⚔️ Spada', {
+    // Timer
+    this.timerText = this.scene.add.text(320, 15, '0:00', {
+      fontFamily: 'Arial',
+      fontSize: '16px',
+      color: '#ffffff',
+      fontStyle: 'bold'
+    }).setOrigin(0.5);
+    this.timerText.setScrollFactor(0).setDepth(hudDepth + 1);
+
+    // Score/Kills
+    this.scoreText = this.scene.add.text(400, 15, '💀 0', {
       fontFamily: 'Arial',
       fontSize: '14px',
-      color: '#ffffff'
-    });
-    this.weaponText.setOrigin(1, 0);
-    this.weaponText.setScrollFactor(0);
-    this.weaponText.setDepth(hudDepth + 1);
+      color: '#aaaaaa'
+    }).setOrigin(0.5);
+    this.scoreText.setScrollFactor(0).setDepth(hudDepth + 1);
 
-    // HP Bar grande in basso
-    this.hpBarBg = this.scene.add.rectangle(320, 350, 200, 8, 0x333333);
-    this.hpBarBg.setScrollFactor(0);
-    this.hpBarBg.setDepth(hudDepth);
+    // --- RIGHT SECTION (ECONOMY & WEAPON) ---
+    // Coin
+    this.coinIcon = this.scene.add.text(500, 15, '💰', { fontSize: '14px' }).setOrigin(0.5);
+    this.coinIcon.setScrollFactor(0).setDepth(hudDepth + 1);
 
-    this.hpBarFill = this.scene.add.rectangle(221, 350, 198, 6, 0xff0000);
-    this.hpBarFill.setOrigin(0, 0.5);
-    this.hpBarFill.setScrollFactor(0);
-    this.hpBarFill.setDepth(hudDepth + 1);
-
-    this.hpText = this.scene.add.text(320, 340, '1000/1000', {
+    this.coinText = this.scene.add.text(520, 15, '0', {
       fontFamily: 'Arial',
-      fontSize: '10px',
+      fontSize: '14px',
+      color: '#ffd700',
+      fontStyle: 'bold'
+    }).setOrigin(0, 0.5);
+    this.coinText.setScrollFactor(0).setDepth(hudDepth + 1);
+
+    // Weapon
+    this.weaponText = this.scene.add.text(620, 15, '⚔️', {
+      fontFamily: 'Arial',
+      fontSize: '18px',
       color: '#ffffff'
-    });
-    this.hpText.setOrigin(0.5);
-    this.hpText.setScrollFactor(0);
-    this.hpText.setDepth(hudDepth + 2);
+    }).setOrigin(1, 0.5);
+    this.weaponText.setScrollFactor(0).setDepth(hudDepth + 1);
+
+    // --- HP BAR (BOTTOM COMPACT) ---
+    this.hpBarBg = this.scene.add.rectangle(320, 355, 640, 6, 0x111111, 0.8);
+    this.hpBarBg.setScrollFactor(0).setDepth(hudDepth);
+
+    this.hpBarFill = this.scene.add.rectangle(0, 355, 640, 6, 0xff0000);
+    this.hpBarFill.setOrigin(0, 0.5); // Start directly from left
+    this.hpBarFill.setScrollFactor(0).setDepth(hudDepth + 1);
 
     // Damage flash overlay
     this.damageFlash = this.scene.add.rectangle(320, 180, 640, 360, 0xff0000, 0);
     this.damageFlash.setScrollFactor(0);
-    this.damageFlash.setDepth(99);
+    this.damageFlash.setDepth(hudDepth + 5);
   }
 
   /**
@@ -104,40 +116,45 @@ export class HUDManager {
 
     // Aggiorna coins
     if (this.scene.shopSystem) {
-      this.coinText.setText('💰 ' + this.scene.shopSystem.coins);
+      this.coinText.setText(`${this.scene.shopSystem.coins}`);
     }
 
     // Aggiorna timer
     const elapsed = (this.scene.time.now - startTime) / 1000;
     const minutes = Math.floor(elapsed / 60);
     const seconds = Math.floor(elapsed % 60);
-    this.timerText.setText(`⏱️ ${minutes}:${seconds.toString().padStart(2, '0')}`);
+    this.timerText.setText(`${minutes}:${seconds.toString().padStart(2, '0')}`);
+
+    // Aggiorna wave (se disponibile)
+    if (this.scene.waveManager) {
+      this.waveText.setText(`🌊 W${this.scene.waveManager.currentWave}`);
+    }
 
     // Aggiorna arma
     if (player) {
-      let weaponName = '⚔️ Spada';
+      let weaponIcon = '⚔️';
       let weaponColor = '#ffffff';
 
       if (player.weaponType === 'shotgun') {
-        weaponName = '🔥 Shotgun';
+        weaponIcon = '🔥';
         weaponColor = '#ff8800';
       } else if (player.weaponType === 'boomerang') {
-        weaponName = '🪃 Boomerang';
+        weaponIcon = '🪃';
         weaponColor = '#00ffff';
       } else if (player.power) {
-        weaponName = '🔫 Laser';
+        weaponIcon = '🔫';
         weaponColor = '#ffff00';
       }
 
-      this.weaponText.setText(weaponName);
+      this.weaponText.setText(weaponIcon);
       this.weaponText.setColor(weaponColor);
     }
 
-    // Aggiorna HP bar
+    // Aggiorna HP bar (full width bottom)
     if (player) {
       const hpPercent = player.currentHP / player.maxHP;
       this.hpBarFill.setScale(hpPercent, 1);
-      this.hpText.setText(`${player.currentHP}/${player.maxHP}`);
+      this.hpText.setText(`${Math.floor(player.currentHP)}/${player.maxHP}`);
 
       // Cambia colore in base agli HP
       if (hpPercent > 0.6) {
