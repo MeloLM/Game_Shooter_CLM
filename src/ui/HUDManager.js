@@ -25,67 +25,66 @@ export class HUDManager {
    */
   create(hudDepth) {
     // --- TOP BAR BACKGROUND ---
-    this.hudBg = this.scene.add.rectangle(320, 15, 640, 30, 0x000000, 0.8);
+    this.hudBg = this.scene.add.rectangle(320, 20, 640, 40, 0x000000, 0.4); // More transparent (0.4) and slightly taller for breathing room
     this.hudBg.setScrollFactor(0);
     this.hudBg.setDepth(hudDepth);
 
     // --- LEFT SECTION (HEALTH) ---
-    // Heart Icon (Emoji placeholder or sprite if available)
-    this.hpIcon = this.scene.add.text(20, 15, '❤', { fontSize: '16px', color: '#ff0000' }).setOrigin(0.5);
+    this.hpIcon = this.scene.add.text(20, 20, '❤️', { fontSize: '18px' }).setOrigin(0.5);
     this.hpIcon.setScrollFactor(0).setDepth(hudDepth + 1);
 
-    this.hpText = this.scene.add.text(40, 15, '1000/1000', {
-      fontFamily: 'Arial',
+    this.hpText = this.scene.add.text(50, 20, '1000/1000', {
+      fontFamily: 'Verdana, sans-serif',
       fontSize: '14px',
       color: '#ffffff',
       fontStyle: 'bold'
     }).setOrigin(0, 0.5);
     this.hpText.setScrollFactor(0).setDepth(hudDepth + 1);
 
-    // --- CENTER SECTION (GAME INFO) ---
+    // --- CENTER SECTION (WAVE & TIMER) ---
     // Wave
-    this.waveText = this.scene.add.text(240, 15, '🌊 W1', {
-      fontFamily: 'Arial',
-      fontSize: '14px',
-      color: '#00ffff',
+    this.waveText = this.scene.add.text(250, 20, 'W1', {
+      fontFamily: 'Verdana',
+      fontSize: '16px', // Slightly larger
+      color: '#00cccc',
       fontStyle: 'bold'
     }).setOrigin(0.5);
     this.waveText.setScrollFactor(0).setDepth(hudDepth + 1);
 
     // Timer
-    this.timerText = this.scene.add.text(320, 15, '0:00', {
-      fontFamily: 'Arial',
-      fontSize: '16px',
+    this.timerText = this.scene.add.text(320, 20, '0:00', {
+      fontFamily: 'Verdana',
+      fontSize: '18px', // Slightly larger
       color: '#ffffff',
       fontStyle: 'bold'
     }).setOrigin(0.5);
     this.timerText.setScrollFactor(0).setDepth(hudDepth + 1);
 
-    // Score/Kills
-    this.scoreText = this.scene.add.text(400, 15, '💀 0', {
-      fontFamily: 'Arial',
-      fontSize: '14px',
-      color: '#aaaaaa'
-    }).setOrigin(0.5);
-    this.scoreText.setScrollFactor(0).setDepth(hudDepth + 1);
-
-    // --- RIGHT SECTION (ECONOMY & WEAPON) ---
-    // Coin
-    this.coinIcon = this.scene.add.text(500, 15, '💰', { fontSize: '14px' }).setOrigin(0.5);
+    // --- RIGHT SECTION (ECONOMY, KILLs, WEAPON) ---
+    // Coins - Moved slightly left to separate from Kills
+    this.coinIcon = this.scene.add.text(450, 20, '💰', { fontSize: '16px' }).setOrigin(0.5);
     this.coinIcon.setScrollFactor(0).setDepth(hudDepth + 1);
 
-    this.coinText = this.scene.add.text(520, 15, '0', {
-      fontFamily: 'Arial',
+    this.coinText = this.scene.add.text(470, 20, '0', {
+      fontFamily: 'Verdana',
       fontSize: '14px',
       color: '#ffd700',
       fontStyle: 'bold'
     }).setOrigin(0, 0.5);
     this.coinText.setScrollFactor(0).setDepth(hudDepth + 1);
 
+    // Score (Kills) - Moved slightly right
+    this.scoreText = this.scene.add.text(540, 20, '💀 0', {
+      fontFamily: 'Verdana',
+      fontSize: '12px',
+      color: '#aaaaaa' // Softened color
+    }).setOrigin(0, 0.5);
+    this.scoreText.setScrollFactor(0).setDepth(hudDepth + 1);
+
     // Weapon
-    this.weaponText = this.scene.add.text(620, 15, '⚔️', {
-      fontFamily: 'Arial',
-      fontSize: '18px',
+    this.weaponText = this.scene.add.text(620, 20, '⚔️', {
+      fontFamily: 'Verdana',
+      fontSize: '20px',
       color: '#ffffff'
     }).setOrigin(1, 0.5);
     this.weaponText.setScrollFactor(0).setDepth(hudDepth + 1);
@@ -94,8 +93,8 @@ export class HUDManager {
     this.hpBarBg = this.scene.add.rectangle(320, 355, 640, 6, 0x111111, 0.8);
     this.hpBarBg.setScrollFactor(0).setDepth(hudDepth);
 
-    this.hpBarFill = this.scene.add.rectangle(0, 355, 640, 6, 0xff0000);
-    this.hpBarFill.setOrigin(0, 0.5); // Start directly from left
+    this.hpBarFill = this.scene.add.rectangle(0, 355, 640, 6, 0x00ff00);
+    this.hpBarFill.setOrigin(0, 0.5);
     this.hpBarFill.setScrollFactor(0).setDepth(hudDepth + 1);
 
     // Damage flash overlay
@@ -127,7 +126,7 @@ export class HUDManager {
 
     // Aggiorna wave (se disponibile)
     if (this.scene.waveManager) {
-      this.waveText.setText(`🌊 W${this.scene.waveManager.currentWave}`);
+      this.waveText.setText(`W${this.scene.waveManager.currentWave}`);
     }
 
     // Aggiorna arma

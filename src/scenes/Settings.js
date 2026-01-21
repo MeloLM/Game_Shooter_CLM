@@ -16,104 +16,88 @@ export class Settings extends Scene {
     // Sfondo
     this.add.rectangle(320, 180, 640, 360, 0x1a1a2e);
 
-    // Bottone INDIETRO in alto a sinistra
-    const backButton = this.add.rectangle(80, 25, 130, 35, 0x8B4513);
-    backButton.setStrokeStyle(2, 0xffd700);
+    // Bottone INDIETRO in alto a sinistra (Minimalista)
+    const backButton = this.add.rectangle(70, 25, 100, 30, 0xffffff);
+    backButton.setStrokeStyle(2, 0x333333);
     backButton.setInteractive({ useHandCursor: true });
-    
-    const backText = this.add.text(80, 25, '← MENU', {
-      fontFamily: 'Arial',
+
+    const backText = this.add.text(70, 25, 'BACK', {
+      fontFamily: 'Verdana',
       fontSize: '14px',
-      color: '#ffffff',
+      color: '#111111',
       fontStyle: 'bold'
     });
     backText.setOrigin(0.5);
 
     backButton.on('pointerover', () => {
-      backButton.setFillStyle(0xA0522D);
-      backButton.setStrokeStyle(2, 0xffee00);
-      backText.setScale(1.1);
+      backButton.setFillStyle(0xdddddd);
     });
     backButton.on('pointerout', () => {
-      backButton.setFillStyle(0x8B4513);
-      backButton.setStrokeStyle(2, 0xffd700);
-      backText.setScale(1);
+      backButton.setFillStyle(0xffffff);
     });
     backButton.on('pointerdown', () => {
       this.scene.start(this.fromScene);
     });
 
     // Titolo
-    const title = this.add.text(320, 40, '⚙️ IMPOSTAZIONI', {
-      fontFamily: 'Arial',
+    const title = this.add.text(320, 40, 'SETTINGS', {
+      fontFamily: 'Verdana, sans-serif',
       fontSize: '28px',
-      color: '#ffd700',
-      fontStyle: 'bold',
-      stroke: '#000000',
-      strokeThickness: 3
+      color: '#ffffff',
+      fontStyle: 'bold'
     });
     title.setOrigin(0.5);
 
     // === SEZIONE CONTROLLI MOBILE ===
-    const mobileTitle = this.add.text(320, 95, '📱 Controlli Mobile', {
-      fontFamily: 'Arial',
-      fontSize: '18px',
-      color: '#ffffff',
+    const mobileTitle = this.add.text(320, 95, 'Mobile Controls', {
+      fontFamily: 'Verdana',
+      fontSize: '16px',
+      color: '#cccccc',
       fontStyle: 'bold'
     });
     mobileTitle.setOrigin(0.5);
 
     // Toggle controlli mobile
-    this.mobileToggle = this.createToggle(320, 135, 'Frecce direzionali', this.settings.mobileControls, (value) => {
+    this.mobileToggle = this.createToggle(320, 130, 'Directional Arrows', this.settings.mobileControls, (value) => {
       this.settings.mobileControls = value;
       this.saveSettings();
     });
 
     // === SEZIONE AUDIO ===
-    const audioTitle = this.add.text(320, 185, '🔊 Audio', {
-      fontFamily: 'Arial',
-      fontSize: '18px',
-      color: '#ffffff',
+    const audioTitle = this.add.text(320, 175, 'Audio', {
+      fontFamily: 'Verdana',
+      fontSize: '16px',
+      color: '#cccccc',
       fontStyle: 'bold'
     });
     audioTitle.setOrigin(0.5);
 
     // Toggle musica
-    this.musicToggle = this.createToggle(320, 220, 'Musica di sottofondo', this.settings.music, (value) => {
+    this.musicToggle = this.createToggle(320, 210, 'Background Music', this.settings.music, (value) => {
       this.settings.music = value;
       this.saveSettings();
     });
 
     // Toggle effetti sonori
-    this.sfxToggle = this.createToggle(320, 260, 'Effetti sonori', this.settings.sfx, (value) => {
+    this.sfxToggle = this.createToggle(320, 250, 'Sound Effects', this.settings.sfx, (value) => {
       this.settings.sfx = value;
       this.saveSettings();
     });
 
     // === SEZIONE GRAFICA ===
-    const graphicsTitle = this.add.text(320, 275, '🎨 Grafica', {
-      fontFamily: 'Arial',
-      fontSize: '18px',
-      color: '#ffffff',
+    const graphicsTitle = this.add.text(320, 295, 'Graphics', {
+      fontFamily: 'Verdana',
+      fontSize: '16px',
+      color: '#cccccc',
       fontStyle: 'bold'
     });
     graphicsTitle.setOrigin(0.5);
 
     // Toggle particelle
-    this.particlesToggle = this.createToggle(320, 315, 'Effetti particelle', this.settings.particles, (value) => {
+    this.particlesToggle = this.createToggle(320, 330, 'Particle Effects', this.settings.particles, (value) => {
       this.settings.particles = value;
       this.saveSettings();
     });
-
-    // Info mobile
-    const infoText = this.add.text(320, 345, 
-      'Le frecce direzionali appariranno sullo schermo\nper facilitare il gioco su dispositivi touch', {
-      fontFamily: 'Arial',
-      fontSize: '10px',
-      color: '#666666',
-      align: 'center'
-    });
-    infoText.setOrigin(0.5);
   }
 
   /**
@@ -124,14 +108,14 @@ export class Settings extends Scene {
 
     // Label
     const labelText = this.add.text(-120, 0, label, {
-      fontFamily: 'Arial',
+      fontFamily: 'Verdana',
       fontSize: '14px',
-      color: '#cccccc'
+      color: '#aaaaaa'
     });
     labelText.setOrigin(0, 0.5);
 
     // Toggle background
-    const toggleBg = this.add.rectangle(120, 0, 60, 28, initialValue ? 0x4CAF50 : 0x666666, 1);
+    const toggleBg = this.add.rectangle(120, 0, 60, 28, initialValue ? 0x4CAF50 : 0x555555, 1);
     toggleBg.setStrokeStyle(2, 0x333333);
     toggleBg.setInteractive({ useHandCursor: true });
 
@@ -140,7 +124,7 @@ export class Settings extends Scene {
 
     // Status text
     const statusText = this.add.text(120, 0, initialValue ? 'ON' : 'OFF', {
-      fontFamily: 'Arial',
+      fontFamily: 'Verdana',
       fontSize: '10px',
       color: '#ffffff',
       fontStyle: 'bold'
@@ -154,7 +138,7 @@ export class Settings extends Scene {
 
     toggleBg.on('pointerdown', () => {
       isOn = !isOn;
-      
+
       // Animazione toggle
       this.tweens.add({
         targets: knob,
@@ -164,7 +148,7 @@ export class Settings extends Scene {
       });
 
       // Aggiorna colore e testo
-      toggleBg.setFillStyle(isOn ? 0x4CAF50 : 0x666666);
+      toggleBg.setFillStyle(isOn ? 0x4CAF50 : 0x555555);
       statusText.setText(isOn ? 'ON' : 'OFF');
 
       // Callback

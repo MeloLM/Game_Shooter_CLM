@@ -14,33 +14,33 @@ export class DifficultyManager {
   baseDifficulty = 1;
   currentDifficulty = 1;
   maxDifficulty = 5;
-  
+
   // Fattori che influenzano la difficoltà
   timeFactor = 0;       // Aumenta col tempo
   killFactor = 0;       // Aumenta con le uccisioni
   deathFactor = 0;      // Diminuisce quando il player muore (nelle partite successive)
-  
+
   // Moltiplicatori per parametri nemici
   enemySpeedMultiplier = 1;
   enemyHPMultiplier = 1;
   enemyDamageMultiplier = 1;
   spawnRateMultiplier = 1;
   potionRateMultiplier = 1;
-  
+
   // Timer per aggiornamento
   updateInterval = 10000; // Aggiorna ogni 10 secondi
   lastUpdateTime = 0;
-  
+
   // UI
   difficultyText;
-  
+
   constructor(scene) {
     this.scene = scene;
     this.loadPlayerHistory();
     this.createUI();
     this.calculateInitialDifficulty();
   }
-  
+
   /**
    * Carica lo storico del giocatore per calibrare la difficoltà
    */
@@ -55,22 +55,22 @@ export class DifficultyManager {
       if (data.highScore > 100) this.baseDifficulty += 0.3;
     }
   }
-  
+
   /**
    * Salva lo storico del giocatore
    */
   savePlayerHistory(kills) {
     const history = localStorage.getItem('player_history');
     let data = history ? JSON.parse(history) : { gamesPlayed: 0, highScore: 0 };
-    
+
     data.gamesPlayed++;
     if (kills > data.highScore) {
       data.highScore = kills;
     }
-    
+
     localStorage.setItem('player_history', JSON.stringify(data));
   }
-  
+
   /**
    * Calcola la difficoltà iniziale
    */
@@ -78,12 +78,12 @@ export class DifficultyManager {
     this.currentDifficulty = this.baseDifficulty;
     this.updateMultipliers();
   }
-  
+
   /**
    * Crea l'indicatore di difficoltà nell'UI
    */
   createUI() {
-    this.difficultyText = this.scene.add.text(10, 50, '', {
+    this.difficultyText = this.scene.add.text(10, 88, '', {
       fontFamily: 'Arial',
       fontSize: '9px',
       color: '#ff6600'
@@ -92,7 +92,7 @@ export class DifficultyManager {
     this.difficultyText.setDepth(50);
     this.updateUI();
   }
-  
+
   /**
    * Aggiorna l'UI della difficoltà
    */
@@ -100,7 +100,7 @@ export class DifficultyManager {
     const diffName = this.getDifficultyName();
     this.difficultyText.setText(`⚔️ ${diffName}`);
   }
-  
+
   /**
    * Ottieni il nome della difficoltà
    */
@@ -111,29 +111,29 @@ export class DifficultyManager {
     if (this.currentDifficulty < 4.0) return 'Molto Difficile';
     return 'Incubo';
   }
-  
+
   /**
    * Aggiorna i moltiplicatori in base alla difficoltà corrente
    */
   updateMultipliers() {
     const d = this.currentDifficulty;
-    
+
     // Velocità nemici: +10% per ogni livello di difficoltà
     this.enemySpeedMultiplier = 1 + (d - 1) * 0.1;
-    
+
     // HP nemici: +15% per ogni livello
     this.enemyHPMultiplier = 1 + (d - 1) * 0.15;
-    
+
     // Danno nemici: +10% per ogni livello
     this.enemyDamageMultiplier = 1 + (d - 1) * 0.1;
-    
+
     // Spawn rate: diminuisce il delay (più nemici)
     this.spawnRateMultiplier = Math.max(0.5, 1 - (d - 1) * 0.08);
-    
+
     // Pozioni: leggermente meno frequenti a difficoltà alta
     this.potionRateMultiplier = 1 + (d - 1) * 0.1;
   }
-  
+
   /**
    * Aggiorna la difficoltà (chiamare periodicamente)
    * @param {number} elapsedTime - Tempo trascorso in secondi
@@ -141,35 +141,35 @@ export class DifficultyManager {
    */
   update(elapsedTime, kills) {
     const now = this.scene.time.now;
-    
+
     // Aggiorna solo ogni intervallo
     if (now - this.lastUpdateTime < this.updateInterval) return;
     this.lastUpdateTime = now;
-    
+
     // Calcola fattori
     this.timeFactor = Math.min(elapsedTime / 180, 1); // Max dopo 3 minuti
     this.killFactor = Math.min(kills / 100, 1); // Max dopo 100 kill
-    
+
     // Calcola nuova difficoltà
-    const newDifficulty = this.baseDifficulty + 
-      (this.timeFactor * 1.5) + 
+    const newDifficulty = this.baseDifficulty +
+      (this.timeFactor * 1.5) +
       (this.killFactor * 1.5);
-    
+
     // Aumenta gradualmente
     this.currentDifficulty = Math.min(
       this.currentDifficulty + (newDifficulty - this.currentDifficulty) * 0.3,
       this.maxDifficulty
     );
-    
+
     this.updateMultipliers();
     this.updateUI();
-    
+
     // Notifica cambio difficoltà significativo
     if (Math.floor(this.currentDifficulty) > Math.floor(this.currentDifficulty - 0.3)) {
       this.showDifficultyIncrease();
     }
   }
-  
+
   /**
    * Mostra notifica aumento difficoltà
    */
@@ -183,7 +183,7 @@ export class DifficultyManager {
     text.setOrigin(0.5);
     text.setScrollFactor(0);
     text.setDepth(100);
-    
+
     this.scene.tweens.add({
       targets: text,
       alpha: 0,
@@ -192,13 +192,13 @@ export class DifficultyManager {
       onComplete: () => text.destroy()
     });
   }
-  
+
   /**
    * Applica modificatori a un nuovo nemico
    */
   applyToEnemy(enemy) {
     if (!enemy) return;
-    
+
     // Modifica stats in base alla difficoltà
     if (enemy.moveSpeed !== undefined) {
       enemy.moveSpeed *= this.enemySpeedMultiplier;
@@ -211,21 +211,21 @@ export class DifficultyManager {
       enemy.enemyDmg = Math.floor(enemy.enemyDmg * this.enemyDamageMultiplier);
     }
   }
-  
+
   /**
    * Ottieni il delay di spawn modificato
    */
   getModifiedSpawnDelay(baseDelay) {
     return Math.floor(baseDelay * this.spawnRateMultiplier);
   }
-  
+
   /**
    * Ottieni il delay pozioni modificato
    */
   getModifiedPotionDelay(baseDelay) {
     return Math.floor(baseDelay * this.potionRateMultiplier);
   }
-  
+
   /**
    * Ottieni statistiche
    */

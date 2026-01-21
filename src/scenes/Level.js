@@ -42,6 +42,7 @@ export class Level extends Scene {
   player = null;
   enemies = [];
   bottles = [];
+  coins = []; // Add coins array
   attacks = [];
   boomerangs = [];
   immunity = false;
@@ -88,6 +89,7 @@ export class Level extends Scene {
     this.enemies = [];
     this.attacks = [];
     this.bottles = [];
+    this.coins = [];
     this.boomerangs = [];
     this.survivalTime = 0;
     this.startTime = 0;

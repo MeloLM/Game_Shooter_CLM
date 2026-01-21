@@ -42,40 +42,21 @@ export class Coin extends Physics.Arcade.Sprite {
   }
 
   /**
-   * Animazione di spawn (bounce)
+   * Animazione di spawn semplice (senza shimmer)
    */
   spawnAnimation(scene) {
-    // Movimento random iniziale
+    // Piccolo movimento random iniziale
     const angle = Math.random() * Math.PI * 2;
-    const distance = 10 + Math.random() * 15;
+    const distance = 8 + Math.random() * 10;
     const targetX = this.x + Math.cos(angle) * distance;
     const targetY = this.y + Math.sin(angle) * distance;
 
     scene.tweens.add({
       targets: this,
       x: targetX,
-      y: targetY - 10,
-      duration: 200,
-      ease: 'Power2',
-      yoyo: true,
-      onComplete: () => {
-        // Effetto shimmer
-        this.startShimmer(scene);
-      }
-    });
-  }
-
-  /**
-   * Effetto luccichio
-   */
-  startShimmer(scene) {
-    scene.tweens.add({
-      targets: this,
-      alpha: { from: 1, to: 0.7 },
-      scale: { from: 1, to: 1.2 },
-      duration: 500,
-      yoyo: true,
-      repeat: -1
+      y: targetY - 5,
+      duration: 150,
+      ease: 'Power1'
     });
   }
 

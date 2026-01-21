@@ -10,7 +10,7 @@ export class AchievementSystem {
   achievementQueue = []; // Coda per mostrare achievement
   isShowingAchievement = false;
   trophyText = null; // UI trofei durante il gioco
-  
+
   constructor(scene) {
     this.scene = scene;
     // Carica trofei salvati da localStorage
@@ -18,16 +18,16 @@ export class AchievementSystem {
     this.initAchievements();
     this.createTrophyUI();
   }
-  
+
   /**
    * Crea l'UI dei trofei visibile durante il gameplay
    */
   createTrophyUI() {
     // Container per trofei con progressi
-    this.trophyContainer = this.scene.add.container(10, 30);
+    this.trophyContainer = this.scene.add.container(10, 60);
     this.trophyContainer.setScrollFactor(0);
     this.trophyContainer.setDepth(50);
-    
+
     // Testo principale trofei
     this.trophyText = this.scene.add.text(0, 0, '🏆 0/16', {
       fontFamily: 'Arial',
@@ -35,16 +35,16 @@ export class AchievementSystem {
       color: '#ffd700'
     });
     this.trophyContainer.add(this.trophyText);
-    
+
     // Prossimo trofeo (progress)
-    this.nextTrophyText = this.scene.add.text(0, 10, '', {
+    this.nextTrophyText = this.scene.add.text(0, 14, '', {
       fontFamily: 'Arial',
       fontSize: '7px',
       color: '#aaaaaa'
     });
     this.trophyContainer.add(this.nextTrophyText);
   }
-  
+
   /**
    * Aggiorna l'UI dei trofei con progressi
    */
@@ -54,7 +54,7 @@ export class AchievementSystem {
       const total = this.getTotalCount();
       this.trophyText.setText(`🏆 ${unlocked}/${total}`);
     }
-    
+
     // Mostra progresso verso prossimo trofeo
     if (this.nextTrophyText) {
       const nextAch = this.getNextAchievementProgress();
@@ -65,18 +65,18 @@ export class AchievementSystem {
       }
     }
   }
-  
+
   /**
    * Ottieni progresso verso il prossimo achievement non sbloccato
    */
   getNextAchievementProgress() {
     const stats = AchievementSystem.getStatsFromScene(this.scene);
-    
+
     // Cerca primo achievement non sbloccato e mostra progresso
     for (const ach of this.achievements) {
       if (!this.isUnlocked(ach.id)) {
         let progress = '';
-        
+
         if (ach.id.startsWith('kill_') && !ach.id.includes('slime')) {
           const target = parseInt(ach.id.split('_')[1]);
           progress = `${stats.totalKills}/${target}`;
@@ -98,13 +98,13 @@ export class AchievementSystem {
           const target = parseInt(ach.id.split('_')[1]);
           progress = `Lv ${stats.playerLevel}/${target}`;
         }
-        
+
         return { icon: ach.icon, name: ach.name, progress };
       }
     }
     return null;
   }
-  
+
   /**
    * Inizializza tutti gli achievement disponibili
    */
@@ -143,7 +143,7 @@ export class AchievementSystem {
         condition: (stats) => stats.slimeKills >= 25,
         reward: { xp: 75 }
       },
-      
+
       // Survival achievements
       {
         id: 'survive_60',
@@ -169,7 +169,7 @@ export class AchievementSystem {
         condition: (stats) => stats.survivalTime >= 300,
         reward: { xp: 300 }
       },
-      
+
       // Wave achievements
       {
         id: 'wave_5',
@@ -187,7 +187,7 @@ export class AchievementSystem {
         condition: (stats) => stats.waveReached >= 10,
         reward: { xp: 250 }
       },
-      
+
       // Combo achievements
       {
         id: 'combo_5',
@@ -213,7 +213,7 @@ export class AchievementSystem {
         condition: (stats) => stats.maxCombo >= 25,
         reward: { xp: 200 }
       },
-      
+
       // Potion achievements
       {
         id: 'potions_10',
@@ -231,7 +231,7 @@ export class AchievementSystem {
         condition: (stats) => stats.potionsCollected >= 50,
         reward: { xp: 150 }
       },
-      
+
       // Level achievements
       {
         id: 'level_5',
@@ -251,7 +251,7 @@ export class AchievementSystem {
       },
     ];
   }
-  
+
   /**
    * Carica achievement sbloccati da localStorage
    */
@@ -261,21 +261,21 @@ export class AchievementSystem {
       this.unlockedAchievements = JSON.parse(saved);
     }
   }
-  
+
   /**
    * Salva achievement sbloccati in localStorage
    */
   saveUnlocked() {
     localStorage.setItem('achievements_unlocked', JSON.stringify(this.unlockedAchievements));
   }
-  
+
   /**
    * Controlla se un achievement è già sbloccato
    */
   isUnlocked(achievementId) {
     return this.unlockedAchievements.includes(achievementId);
   }
-  
+
   /**
    * Controlla tutti gli achievement con le stats correnti
    * @param {object} stats - Statistiche di gioco
@@ -287,39 +287,39 @@ export class AchievementSystem {
       }
     }
   }
-  
+
   /**
    * Sblocca un achievement
    */
   unlockAchievement(achievement) {
     if (this.isUnlocked(achievement.id)) return;
-    
+
     this.unlockedAchievements.push(achievement.id);
-    
+
     // Aggiorna UI trofei (propria)
     this.updateTrophyUI();
-    
+
     // Aggiungi alla coda di visualizzazione
     this.achievementQueue.push(achievement);
     this.processQueue();
-    
+
     // Dai reward
     if (achievement.reward && achievement.reward.xp && this.scene.player) {
       this.scene.player.addXP(achievement.reward.xp);
     }
   }
-  
+
   /**
    * Processa la coda di achievement da mostrare
    */
   processQueue() {
     if (this.isShowingAchievement || this.achievementQueue.length === 0) return;
-    
+
     this.isShowingAchievement = true;
     const achievement = this.achievementQueue.shift();
     this.showAchievementPopup(achievement);
   }
-  
+
   /**
    * Mostra popup achievement - versione discreta in basso a destra
    */
@@ -327,14 +327,14 @@ export class AchievementSystem {
     // Posizione: angolo in basso a destra, più discreto
     const x = 560;
     const y = 310;
-    
+
     // Container sfondo più piccolo con trasparenza aumentata
     const bg = this.scene.add.rectangle(x, y, 150, 35, 0x000000, 0.5);
     bg.setStrokeStyle(1, 0xffd700, 0.7);
     bg.setScrollFactor(0);
     bg.setDepth(200);
     bg.setAlpha(0);
-    
+
     // Testo combinato icona + nome (più compatto)
     const title = this.scene.add.text(x, y - 5, `${achievement.icon} ${achievement.name}`, {
       fontFamily: 'Arial',
@@ -346,7 +346,7 @@ export class AchievementSystem {
     title.setScrollFactor(0);
     title.setDepth(201);
     title.setAlpha(0);
-    
+
     // Descrizione più piccola
     const desc = this.scene.add.text(x, y + 8, achievement.description, {
       fontFamily: 'Arial',
@@ -357,12 +357,12 @@ export class AchievementSystem {
     desc.setScrollFactor(0);
     desc.setDepth(201);
     desc.setAlpha(0);
-    
+
     // Animazione entrata più veloce da destra
     bg.x = x + 50;
     title.x = x + 50;
     desc.x = x + 50;
-    
+
     this.scene.tweens.add({
       targets: [bg, title, desc],
       alpha: { value: 0.85, duration: 300 }, // Fade in con trasparenza finale
@@ -370,7 +370,7 @@ export class AchievementSystem {
       duration: 300,
       ease: 'Power2'
     });
-    
+
     // Animazione uscita dopo 2 secondi (più veloce)
     this.scene.time.delayedCall(2000, () => {
       this.scene.tweens.add({
@@ -382,14 +382,14 @@ export class AchievementSystem {
           bg.destroy();
           title.destroy();
           desc.destroy();
-          
+
           this.isShowingAchievement = false;
           this.processQueue();
         }
       });
     });
   }
-  
+
   /**
    * Ottieni statistiche per il check achievement
    */
@@ -404,7 +404,7 @@ export class AchievementSystem {
       playerLevel: scene.player ? scene.player.level : 1
     };
   }
-  
+
   /**
    * Ottieni lista achievement con stato
    */
@@ -414,14 +414,14 @@ export class AchievementSystem {
       unlocked: this.isUnlocked(a.id)
     }));
   }
-  
+
   /**
    * Conta achievement sbloccati
    */
   getUnlockedCount() {
     return this.unlockedAchievements.length;
   }
-  
+
   /**
    * Conta totale achievement
    */

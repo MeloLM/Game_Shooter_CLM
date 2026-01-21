@@ -158,7 +158,7 @@ export class ShopSystem {
 
     // Titolo
     const title = this.scene.add.text(0, -130, 'MERCAZIO', {
-      fontFamily: 'Arial',
+      fontFamily: 'Verdana',
       fontSize: '28px',
       color: '#ffd700',
       fontStyle: 'bold'
@@ -177,7 +177,7 @@ export class ShopSystem {
 
     // Coin Text
     this.coinDisplay = this.scene.add.text(-10, -90, `${this.coins}`, {
-      fontFamily: 'Arial',
+      fontFamily: 'Verdana',
       fontSize: '18px',
       color: '#ffd700',
       fontStyle: 'bold'
@@ -203,18 +203,49 @@ export class ShopSystem {
     this.scrollContainer.setMask(mask);
 
     // Input area for scrolling (invisible rect over the list)
-    const hitArea = this.scene.add.rectangle(0, 30, maskW, maskH, 0x000000, 0); // Relative to center
+    // FIX: This rect was likely blocking button clicks if depth was wrong or it consumed inputs.
+    // Instead of a blocking rect, we use a Zone that provides scroll but lets clicks through if not dragging.
+    const hitArea = this.scene.add.zone(0, 30, maskW, maskH);
     hitArea.setInteractive();
+    // Move hitArea to the back of the container so buttons (added later) are on top? 
+    // Actually, buttons are in `scrollContainer`. `hitArea` is in `shopContainer`.
+    // If `hitArea` is in front of `scrollContainer`, it blocks.
+    // If `hitArea` is behind, `scrollContainer` buttons take precedence.
     this.shopContainer.add(hitArea);
+    this.shopContainer.sendToBack(hitArea); // Ensure it's behind content?
+    // Wait, if it's behind, then clicking empty space scrolls, but clicking button clicks button.
+    // But we want to be able to drag *starting* from a button too.
 
-    // Scroll Logic
+    // Better Logic: Detect drag vs click globally or on specific elements.
+
+    // For now, let's make the hitArea transparent to clicks but used for drag reference? 
+    // No, Phaser input is hierarchical. 
+
+    // Let's REMOVE the blocking hitArea and just use the background or a general input handler that doesn't stop propagation.
+    // Or simpler: Make the buttons themselves draggable? No.
+
+    // Solution: Add the scroll listener to the container/background, but ensure buttons don't stop propagation?
+    // Or, remove the explicit `pointers` blockage.
+
+    // Let's try: `hitArea` should NOT be interactive in a blocking way.
+    // Actually, simpler fix: The user said "link is only in the row of the first object".
+    // This implies the *mask* limits the interactive area of the *children*, or the hitArea size was tiny (default 0x0 without setSize).
+    // In the previous code: `this.scene.add.rectangle(0, 30, maskW, maskH, ...)` has default origin 0.5.
+    // It covered the center.
+
+    // Let's use the SCENE input for scrolling logic to avoid blocking buttons.
+    // And rely on the wheel for main PC scrolling.
+
+    // Scroll Logic (Global)
     this.scene.input.on('wheel', (pointer, gameObjects, deltaX, deltaY, deltaZ) => {
       if (this.isOpen) this.scroll(deltaY * 0.5);
     });
 
-    // Drag Logic
+    // Drag Logic (Global but checked against bounds)
     this.scene.input.on('pointerdown', (pointer) => {
-      if (this.isOpen && hitArea.getBounds().contains(pointer.x, pointer.y)) {
+      if (this.isOpen &&
+        pointer.x > maskX && pointer.x < maskX + maskW &&
+        pointer.y > maskY && pointer.y < maskY + maskH) {
         this.isDragging = true;
         this.lastY = pointer.y;
       }
@@ -235,7 +266,7 @@ export class ShopSystem {
 
     // Close button
     const closeBtn = this.scene.add.text(0, 130, '[Premi SPACE o clicca qui per chiudere]', {
-      fontFamily: 'Arial',
+      fontFamily: 'Verdana',
       fontSize: '12px',
       color: '#aaaaaa'
     });
@@ -288,11 +319,16 @@ export class ShopSystem {
 
       // Container per singolo item
       const itemCont = this.scene.add.container(0, y);
+      const itemWidth = 440;
+      const itemHeight = 50;
+
+      // Make the whole container interactive as a "div"
+      itemCont.setInteractive(new Phaser.Geom.Rectangle(-itemWidth / 2, -itemHeight / 2, itemWidth, itemHeight), Phaser.Geom.Rectangle.Contains);
 
       // Background Item
-      const btnBg = this.scene.add.rectangle(0, 0, 440, 50, 0x2a2a4e, 1);
+      const btnBg = this.scene.add.rectangle(0, 0, itemWidth, itemHeight, 0x2a2a4e, 1);
       btnBg.setStrokeStyle(1, 0x444488);
-      btnBg.setInteractive({ useHandCursor: true });
+      // We don't need btnBg interactive if container is, but let's keep visual feedback logic on it or container.
       itemCont.add(btnBg);
 
       // Icon
@@ -312,12 +348,12 @@ export class ShopSystem {
 
       // Texts
       const nameText = this.scene.add.text(-170, -15, upgrade.name, {
-        fontFamily: 'Arial', fontSize: '18px', color: '#ffffff', fontStyle: 'bold'
+        fontFamily: 'Verdana', fontSize: '18px', color: '#ffffff', fontStyle: 'bold'
       });
       itemCont.add(nameText);
 
       const descText = this.scene.add.text(-170, 8, upgrade.description, {
-        fontFamily: 'Arial', fontSize: '12px', color: '#aaaaaa'
+        fontFamily: 'Verdana', fontSize: '12px', color: '#aaaaaa'
       });
       itemCont.add(descText);
 
@@ -325,16 +361,16 @@ export class ShopSystem {
       const costContainer = this.scene.add.container(160, 0);
       const costIcon = this.scene.add.image(-15, 0, 'coin').setDisplaySize(16, 16);
       const costText = this.scene.add.text(5, 0, `${upgrade.cost}`, {
-        fontFamily: 'Arial', fontSize: '18px', color: '#ffd700', fontStyle: 'bold'
+        fontFamily: 'Verdana', fontSize: '18px', color: '#ffd700', fontStyle: 'bold'
       }).setOrigin(0, 0.5);
 
       costContainer.add([costIcon, costText]);
       itemCont.add(costContainer);
 
-      // Events
-      btnBg.on('pointerover', () => { btnBg.setFillStyle(0x3a3a6e); });
-      btnBg.on('pointerout', () => { btnBg.setFillStyle(0x2a2a4e); });
-      btnBg.on('pointerdown', () => {
+      // Events on the Container (The "Div")
+      itemCont.on('pointerover', () => { btnBg.setFillStyle(0x3a3a6e); });
+      itemCont.on('pointerout', () => { btnBg.setFillStyle(0x2a2a4e); });
+      itemCont.on('pointerdown', () => {
         if (!this.isDragging) this.purchaseUpgrade(upgrade);
       });
 

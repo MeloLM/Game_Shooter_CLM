@@ -7,15 +7,9 @@ export class MainMenu extends Scene {
   }
 
   preload() {
-    // Carica assets per il menu
-    this.load.image("menu_bg", "assets/tilesheet.png");
-
     // Carica audio
     this.audioManager = new AudioManager(this);
     this.audioManager.preloadSounds();
-
-    // Carica coin per decorazione
-    this.load.image("coin", "assets/items/coin.png");
   }
 
   create() {
@@ -25,161 +19,132 @@ export class MainMenu extends Scene {
     // Flag per tracking primo click
     this.audioStarted = false;
 
-    // Sfondo
-    this.add.rectangle(320, 180, 640, 360, 0x1a1a2e);
+    // Create gradient texture
+    const graphics = this.make.graphics();
+    graphics.fillGradientStyle(0x1a1a2e, 0x1a1a2e, 0x16213e, 0x16213e, 1);
+    graphics.fillRect(0, 0, 640, 360);
+    graphics.generateTexture('gradient_bg', 640, 360);
+    graphics.destroy();
 
-    // Titolo del gioco
-    // Titolo del gioco (Simple, Clean)
-    const title = this.add.text(320, 80, 'KNIGHT SHOOTER', {
+    // Add gradient background
+    this.add.image(320, 180, 'gradient_bg');
+
+    // Decorative Particles for color
+    this.createBackgroundParticles();
+
+    // Titolo del gioco (Clean & Centered)
+    const title = this.add.text(320, 100, 'KNIGHT SHOOTER', {
       fontFamily: 'Verdana, sans-serif',
-      fontSize: '32px',
+      fontSize: '36px',
       color: '#ffffff',
       fontStyle: 'bold'
-    });
-    title.setOrigin(0.5);
-
-    // Coin decorativa (keep them, they are fine)
-    if (this.textures.exists('coin')) {
-      this.menuCoin1 = this.add.image(120, 180, 'coin').setScale(3).setAlpha(0.6);
-      this.menuCoin2 = this.add.image(520, 180, 'coin').setScale(3).setAlpha(0.6);
-
-      this.tweens.add({
-        targets: [this.menuCoin1, this.menuCoin2],
-        scaleX: 0,
-        duration: 1500,
-        yoyo: true,
-        repeat: -1,
-        ease: 'Sine.easeInOut'
-      });
-    }
+    }).setOrigin(0.5);
 
     // Sottotitolo
-    const subtitle = this.add.text(320, 120, 'Survival Arena', {
-      fontFamily: 'Verdana',
+    const subtitle = this.add.text(320, 140, 'Survival Arena', {
+      fontFamily: 'Verdana, sans-serif',
       fontSize: '16px',
-      color: '#aaaaaa'
-    });
-    subtitle.setOrigin(0.5);
+      color: '#888888',
+      letterSpacing: 2
+    }).setOrigin(0.5);
 
-    // PLAY BUTTON (Minimalist)
-    const playButton = this.add.rectangle(320, 200, 200, 50, 0xffffff); // White btn
-    playButton.setStrokeStyle(2, 0x000000);
-    playButton.setInteractive({ useHandCursor: true });
+    // --- BOTTONI COLORATI ---
 
-    const playText = this.add.text(320, 200, 'START GAME', {
-      fontFamily: 'Verdana',
-      fontSize: '20px',
-      color: '#000000', // Black text on white
-      fontStyle: 'bold'
-    });
-    playText.setOrigin(0.5);
-
-    // Hover effect per PLAY
-    playButton.on('pointerover', () => {
-      playButton.setFillStyle(0xeeeeee);
-      playText.setScale(1.05);
-    });
-    playButton.on('pointerout', () => {
-      playButton.setFillStyle(0xffffff);
-      playText.setScale(1);
-    });
-    playButton.on('pointerdown', () => {
-      // Avvia audio al primo click (per policy browser)
+    // PLAY BUTTON (Green Accent)
+    const playBtn = this.createButton(320, 200, 'START GAME', () => {
       if (!this.audioStarted) {
         this.audioManager.playMenuBGM();
         this.audioStarted = true;
       }
       this.audioManager.stopBGM();
       this.scene.start('Level');
-    });
+    }, 0x00ff88);
 
-    // Bottone TROFEI
-    const trophyButton = this.add.rectangle(320, 255, 140, 35, 0x8a6a2a);
-    trophyButton.setInteractive({ useHandCursor: true });
-
-    const trophyText = this.add.text(320, 255, '🏆 TROFEI', {
-      fontFamily: 'Arial',
-      fontSize: '16px',
-      color: '#ffffff',
-      fontStyle: 'bold'
-    });
-    trophyText.setOrigin(0.5);
-
-    trophyButton.on('pointerover', () => {
-      trophyButton.setFillStyle(0xaa8a4a);
-      trophyText.setScale(1.1);
-    });
-    trophyButton.on('pointerout', () => {
-      trophyButton.setFillStyle(0x8a6a2a);
-      trophyText.setScale(1);
-    });
-    trophyButton.on('pointerdown', () => {
-      // Avvia audio al primo click (per policy browser)
+    // TROFEI BUTTON (Gold Accent)
+    const trophyBtn = this.createButton(320, 255, 'TROPHIES', () => {
       if (!this.audioStarted) {
         this.audioManager.playMenuBGM();
         this.audioStarted = true;
       }
       this.scene.start('TrophyScreen', { from: 'MainMenu' });
-    });
+    }, 0xffd700);
 
-    // Bottone IMPOSTAZIONI
-    const settingsButton = this.add.rectangle(320, 295, 160, 35, 0x4a6a4a);
-    settingsButton.setInteractive({ useHandCursor: true });
-
-    const settingsText = this.add.text(320, 295, '⚙️ IMPOSTAZIONI', {
-      fontFamily: 'Arial',
-      fontSize: '16px',
-      color: '#ffffff',
-      fontStyle: 'bold'
-    });
-    settingsText.setOrigin(0.5);
-
-    settingsButton.on('pointerover', () => {
-      settingsButton.setFillStyle(0x6a8a6a);
-      settingsText.setScale(1.1);
-    });
-    settingsButton.on('pointerout', () => {
-      settingsButton.setFillStyle(0x4a6a4a);
-      settingsText.setScale(1);
-    });
-    settingsButton.on('pointerdown', () => {
-      // Avvia audio al primo click (per policy browser)
+    // SETTINGS BUTTON (Blue Accent)
+    const settingsBtn = this.createButton(320, 310, 'SETTINGS', () => {
       if (!this.audioStarted) {
         this.audioManager.playMenuBGM();
         this.audioStarted = true;
       }
       this.scene.start('Settings', { from: 'MainMenu' });
-    });
+    }, 0x00ccff);
 
-    // Istruzioni
-    const instructions = this.add.text(320, 340,
-      '🎮 WASD - Movimento | CLICK - Attacca | ESC - Pausa', {
-      fontFamily: 'Arial',
-      fontSize: '10px',
-      color: '#888888',
-      align: 'center'
-    });
-    instructions.setOrigin(0.5);
-
-    // High Score (se disponibile)
+    // High Score (Bottom)
     const highScore = localStorage.getItem('knightShooter_highScore') || 0;
-    const highScoreText = this.add.text(320, 360, `🏆 High Score: ${highScore}`, {
-      fontFamily: 'Arial',
-      fontSize: '14px',
-      color: '#ffd700'
-    });
-    highScoreText.setOrigin(0.5);
-
-    // Animazione titolo
-    this.tweens.add({
-      targets: title,
-      y: 85,
-      duration: 1500,
-      yoyo: true,
-      repeat: -1,
-      ease: 'Sine.easeInOut'
-    });
+    this.add.text(320, 340, `High Score: ${highScore}`, {
+      fontFamily: 'Verdana',
+      fontSize: '12px',
+      color: '#444444'
+    }).setOrigin(0.5);
   }
 
+  createButton(x, y, text, callback, color = 0xffffff) {
+    const button = this.add.container(x, y);
 
+    // Background trasparente per hit area ma con bordo colorato
+    const bg = this.add.rectangle(0, 0, 200, 45, 0x000000, 0.3);
+    bg.setStrokeStyle(2, color);
+    bg.setInteractive({ useHandCursor: true });
+
+    const label = this.add.text(0, 0, text, {
+      fontFamily: 'Verdana',
+      fontSize: '16px',
+      color: '#ffffff',
+      fontStyle: 'bold'
+    }).setOrigin(0.5);
+
+    button.add([bg, label]);
+
+    bg.on('pointerover', () => {
+      bg.setFillStyle(color, 0.2); // Glow effect
+      label.setScale(1.05);
+    });
+
+    bg.on('pointerout', () => {
+      bg.setFillStyle(0x000000, 0.3);
+      label.setScale(1);
+    });
+
+    bg.on('pointerdown', callback);
+
+    return button;
+  }
+
+  createBackgroundParticles() {
+    const particles = this.add.particles(320, 180, 'coin', {
+      speed: { min: 20, max: 60 },
+      angle: { min: 0, max: 360 },
+      scale: { start: 0.2, end: 0 },
+      alpha: { start: 0.3, end: 0 },
+      lifespan: 3000,
+      frequency: 500,
+      blendMode: 'ADD'
+    });
+
+    // Colored floating orbs
+    for (let i = 0; i < 10; i++) {
+      const x = Phaser.Math.Between(0, 640);
+      const y = Phaser.Math.Between(0, 360);
+      const color = Phaser.Utils.Array.GetRandom([0xff0000, 0x00ff00, 0x0000ff, 0xffff00]);
+      const circle = this.add.circle(x, y, Phaser.Math.Between(2, 5), color, 0.3);
+
+      this.tweens.add({
+        targets: circle,
+        y: y - 50,
+        alpha: 0,
+        duration: Phaser.Math.Between(2000, 5000),
+        repeat: -1,
+        yoyo: true
+      });
+    }
+  }
 }
